@@ -16,6 +16,8 @@ export default class WorldScene extends Phaser.Scene {
   private posTick = 0;
   private progressText = new Map<string, Phaser.GameObjects.Text>();
   private rings = new Map<string, Phaser.GameObjects.Arc>();
+  private pins = new Map<string, Phaser.GameObjects.Container>();
+  private halos = new Map<string, Phaser.GameObjects.Arc>();
 
   constructor() {
     super('World');
@@ -84,6 +86,8 @@ export default class WorldScene extends Phaser.Scene {
     const icon = this.add.text(0, 0, st.glyph, { fontSize: '24px' }).setOrigin(0.5);
     pin.add([plate, icon]);
     this.tweens.add({ targets: pin, y: st.signY - 8, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+    this.pins.set(st.id, pin);
+    this.halos.set(st.id, halo);
 
     // progress badge under the pin
     const badge = this.add.text(st.x, st.signY + 30, '…', {
@@ -141,10 +145,35 @@ export default class WorldScene extends Phaser.Scene {
   private onMobileMove = (v: { dx: number; dy: number }) => this.mobileVec.set(v.dx, v.dy);
   private onMobileRelease = () => this.mobileVec.set(0, 0);
 
+  private highlightNear(nearId: string | null) {
+    this.pins.forEach((pin, id) => {
+      this.tweens.add({ targets: pin, scale: id === nearId ? 1.35 : 1, duration: 220, ease: 'Back.out' });
+    });
+    this.halos.forEach((h, id) => h.setFillStyle(h.fillColor, id === nearId ? 0.42 : 0.16));
+  }
+
+  private burstAt(st: StationDef) {
+    const color = Phaser.Display.Color.HexStringToColor(st.color).color;
+    const ripple = this.add.circle(st.x, st.signY, 18, color, 0.5).setDepth(26);
+    this.tweens.add({
+      targets: ripple,
+      scale: 4,
+      alpha: 0,
+      duration: 420,
+      ease: 'Cubic.out',
+      onComplete: () => ripple.destroy(),
+    });
+    const pin = this.pins.get(st.id);
+    if (pin) this.tweens.add({ targets: pin, scale: 1.7, duration: 130, yoyo: true, ease: 'Quad.out' });
+    this.cameras.main.flash(220, 255, 255, 255);
+  }
+
   private tryInteract = () => {
     if (this.paused) return;
-    if (this.nearStation) EventBus.emit('station:enter', { stationId: this.nearStation.id });
-    else this.interactBuffered = true;
+    if (this.nearStation) {
+      this.burstAt(this.nearStation);
+      EventBus.emit('station:enter', { stationId: this.nearStation.id });
+    } else this.interactBuffered = true;
   };
 
   update() {
@@ -186,10 +215,12 @@ export default class WorldScene extends Phaser.Scene {
     }
     if (near?.id !== this.nearStation?.id) {
       this.nearStation = near;
+      this.highlightNear(near?.id ?? null);
       EventBus.emit('station:near', { stationId: near?.id ?? null });
     }
     if (this.interactBuffered && this.nearStation) {
       this.interactBuffered = false;
+      this.burstAt(this.nearStation);
       EventBus.emit('station:enter', { stationId: this.nearStation.id });
     }
   }

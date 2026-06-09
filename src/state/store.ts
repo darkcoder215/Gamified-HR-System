@@ -37,6 +37,8 @@ interface GameState extends PersistedState {
   // transient UI state (not persisted)
   activeStation: StationId | null;
   characterOpen: boolean;
+  guideOpen: boolean;
+  analyticsOpen: boolean;
 
   // actions
   startGame: (name: string) => void;
@@ -45,6 +47,10 @@ interface GameState extends PersistedState {
   setCharacterTint: (hex: string | null) => void;
   openCharacter: () => void;
   closeCharacter: () => void;
+  openGuide: () => void;
+  closeGuide: () => void;
+  openAnalytics: () => void;
+  closeAnalytics: () => void;
   addXp: (amount: number) => void;
   loseEnergy: (amount: number) => void;
   regenEnergy: () => void;
@@ -155,12 +161,18 @@ export const useGameStore = create<GameState>()(
         ...initialPersisted,
         activeStation: null,
         characterOpen: false,
+        guideOpen: false,
+        analyticsOpen: false,
 
         setAvatarImage: (dataUrl) =>
           set({ player: { ...get().player, avatarImage: dataUrl } }),
         setCharacterTint: (hex) => set({ player: { ...get().player, characterTint: hex } }),
         openCharacter: () => set({ characterOpen: true }),
         closeCharacter: () => set({ characterOpen: false }),
+        openGuide: () => set({ guideOpen: true }),
+        closeGuide: () => set({ guideOpen: false }),
+        openAnalytics: () => set({ analyticsOpen: true }),
+        closeAnalytics: () => set({ analyticsOpen: false }),
 
         startGame: (name) =>
           commit({ started: true, player: { ...get().player, nameAr: name.trim() || 'لاعب جديد' } }),
@@ -260,7 +272,7 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false });
         },
       };
     },

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Zap, Sparkles, RotateCcw, Palette } from 'lucide-react';
+import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3 } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { levelProgress } from '@/state/gamification';
 import { stations } from '@/game/stations/stationZones';
@@ -16,6 +16,8 @@ export default function Hud() {
   const activeStation = useGameStore((s) => s.activeStation);
   const resetSave = useGameStore((s) => s.resetSave);
   const openCharacter = useGameStore((s) => s.openCharacter);
+  const openGuide = useGameStore((s) => s.openGuide);
+  const openAnalytics = useGameStore((s) => s.openAnalytics);
 
   const prog = levelProgress(player.xp);
   const energyColor =
@@ -120,8 +122,24 @@ export default function Hud() {
         </motion.div>
       </div>
 
-      {/* Control buttons */}
-      <div className="pointer-events-none fixed top-4 left-1/2 flex -translate-x-1/2 items-center gap-2">
+      {/* Control toolbar */}
+      <div className="pointer-events-none fixed top-4 left-1/2 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2">
+        <button
+          onClick={openGuide}
+          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
+          style={{ color: 'var(--color-blue)' }}
+          title="الدليل"
+        >
+          <BookOpen size={14} /> الدليل
+        </button>
+        <button
+          onClick={openAnalytics}
+          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
+          style={{ color: 'var(--color-green)' }}
+          title="تحليلاتي"
+        >
+          <BarChart3 size={14} /> تحليلاتي
+        </button>
         <button
           onClick={openCharacter}
           className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"

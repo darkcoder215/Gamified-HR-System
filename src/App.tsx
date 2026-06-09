@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Palette } from 'lucide-react';
+import { Palette, BookOpen, BarChart3 } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { EventBus } from '@/game/EventBus';
 import StartScreen from './StartScreen';
@@ -12,6 +12,8 @@ import Celebrations from './animation/Celebrations';
 import MobileControls from './game/input/MobileControls';
 import Modal from './ui/Modal';
 import CharacterStudio from './modules/character/CharacterStudio';
+import GuideModal from './modules/guide/GuideModal';
+import AnalyticsDashboard from './modules/analytics/AnalyticsDashboard';
 
 // Phaser lives in its own chunk so the shell paints first.
 const PhaserGame = lazy(() => import('./game/PhaserGame'));
@@ -22,6 +24,10 @@ export default function App() {
   const activeStation = useGameStore((s) => s.activeStation);
   const characterOpen = useGameStore((s) => s.characterOpen);
   const closeCharacter = useGameStore((s) => s.closeCharacter);
+  const guideOpen = useGameStore((s) => s.guideOpen);
+  const closeGuide = useGameStore((s) => s.closeGuide);
+  const analyticsOpen = useGameStore((s) => s.analyticsOpen);
+  const closeAnalytics = useGameStore((s) => s.closeAnalytics);
 
   // Passive energy regeneration while playing.
   useEffect(() => {
@@ -30,9 +36,10 @@ export default function App() {
   }, [regenEnergy]);
 
   // Freeze the world whenever any dashboard/modal is open.
+  const anyModal = !!activeStation || characterOpen || guideOpen || analyticsOpen;
   useEffect(() => {
-    EventBus.emit(activeStation || characterOpen ? 'game:pause' : 'game:resume');
-  }, [activeStation, characterOpen]);
+    EventBus.emit(anyModal ? 'game:pause' : 'game:resume');
+  }, [anyModal]);
 
   if (!started) return <StartScreen />;
 
@@ -80,6 +87,28 @@ export default function App() {
         maxWidth="640px"
       >
         <CharacterStudio />
+      </Modal>
+      <Modal
+        open={guideOpen}
+        onClose={closeGuide}
+        title="الدليل"
+        subtitle="ما الذي يقدّمه كل مبنى وكيف تستفيد"
+        icon={<BookOpen size={24} />}
+        accent="var(--color-blue)"
+        maxWidth="640px"
+      >
+        <GuideModal />
+      </Modal>
+      <Modal
+        open={analyticsOpen}
+        onClose={closeAnalytics}
+        title="تحليلاتي"
+        subtitle="أين تقف الآن وكيف تتقدّم"
+        icon={<BarChart3 size={24} />}
+        accent="var(--color-green)"
+        maxWidth="760px"
+      >
+        <AnalyticsDashboard />
       </Modal>
       <Celebrations />
     </div>
