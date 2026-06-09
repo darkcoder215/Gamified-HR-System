@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Palette, BookOpen, BarChart3, ShoppingBag } from 'lucide-react';
+import { Palette, BookOpen, BarChart3, ShoppingBag, Flame } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { EventBus } from '@/game/EventBus';
 import StartScreen from './StartScreen';
@@ -15,6 +15,7 @@ import CharacterStudio from './modules/character/CharacterStudio';
 import GuideModal from './modules/guide/GuideModal';
 import AnalyticsDashboard from './modules/analytics/AnalyticsDashboard';
 import Shop from './modules/shop/Shop';
+import DailyChallenges from './modules/daily/DailyChallenges';
 import Intro from './intro/Intro';
 import DialogueBox from './modules/dialogue/DialogueBox';
 import { initAudio, setMuted } from './audio/sound';
@@ -34,6 +35,8 @@ export default function App() {
   const closeAnalytics = useGameStore((s) => s.closeAnalytics);
   const shopOpen = useGameStore((s) => s.shopOpen);
   const closeShop = useGameStore((s) => s.closeShop);
+  const dailyOpen = useGameStore((s) => s.dailyOpen);
+  const closeDaily = useGameStore((s) => s.closeDaily);
   const introReplay = useGameStore((s) => s.introReplay);
   const introSeen = useGameStore((s) => s.onboarding.introSeen);
   const showIntro = introReplay || !introSeen;
@@ -55,7 +58,8 @@ export default function App() {
   }, [regenEnergy]);
 
   // Freeze the world whenever any dashboard/modal is open.
-  const anyModal = !!activeStation || characterOpen || guideOpen || analyticsOpen || shopOpen || showIntro || !!activeNpc;
+  const anyModal =
+    !!activeStation || characterOpen || guideOpen || analyticsOpen || shopOpen || dailyOpen || showIntro || !!activeNpc;
   useEffect(() => {
     EventBus.emit(anyModal ? 'game:pause' : 'game:resume');
   }, [anyModal]);
@@ -139,6 +143,17 @@ export default function App() {
         maxWidth="640px"
       >
         <Shop />
+      </Modal>
+      <Modal
+        open={dailyOpen}
+        onClose={closeDaily}
+        title="التحديات اليومية"
+        subtitle="أنجز تحديات اليوم وحافظ على سلسلتك"
+        icon={<Flame size={24} />}
+        accent="var(--color-red)"
+        maxWidth="560px"
+      >
+        <DailyChallenges />
       </Modal>
       <DialogueBox />
       <Celebrations />

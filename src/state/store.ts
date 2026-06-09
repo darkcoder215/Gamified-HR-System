@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { AssessmentResult, Badge, StationId } from '@/types';
 import { badges as allBadges } from '@/data/badges';
 import { careerLadder } from '@/data/careerLadder';
+import { type DailyState, freshDaily, allDailiesDone, DAILY_REWARD } from '@/data/dailies';
 import {
   MAX_ENERGY,
   levelForXp,
@@ -34,6 +35,9 @@ interface PersistedState {
   coins: number;
   ownedFrames: Record<string, true>;
   colleagueAvatars: Record<string, string>; // npc/person id → AI avatar data URL
+  daily: DailyState;
+  streak: number;
+  lastActiveDay: string | null;
   onboarding: {
     moved: boolean;
     visited: Partial<Record<StationId, boolean>>;
@@ -52,6 +56,7 @@ interface GameState extends PersistedState {
   activeNpc: string | null;
   muted: boolean;
   shopOpen: boolean;
+  dailyOpen: boolean;
 
   // actions
   startGame: (name: string) => void;
@@ -87,7 +92,21 @@ interface GameState extends PersistedState {
   equipFrame: (id: string | null) => void;
   buyEnergyRefill: (price: number) => void;
   setColleagueAvatar: (id: string, dataUrl: string) => void;
+  openDaily: () => void;
+  closeDaily: () => void;
+  claimDaily: () => void;
   resetSave: () => void;
+}
+
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
+// Roll the daily counters to today and advance the login streak on a new day.
+function rollDaily(s: { daily: DailyState; streak: number; lastActiveDay: string | null }) {
+  const t = todayStr();
+  if (s.daily.date === t) return { daily: s.daily, streak: s.streak, lastActiveDay: t };
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const streak = s.lastActiveDay === yesterday ? s.streak + 1 : 1;
+  return { daily: freshDaily(t), streak, lastActiveDay: t };
 }
 
 const initialPlayer: PlayerState = {
@@ -114,6 +133,9 @@ const initialPersisted: PersistedState = {
   coins: 0,
   ownedFrames: {},
   colleagueAvatars: {},
+  daily: freshDaily(''), // empty date → first activity rolls to today and starts the streak
+  streak: 0,
+  lastActiveDay: null,
   onboarding: { moved: false, visited: {}, checklistDismissed: false, introSeen: false },
 };
 
@@ -161,6 +183,9 @@ export const useGameStore = create<GameState>()(
           coins: partial.coins ?? prev.coins,
           ownedFrames: partial.ownedFrames ?? prev.ownedFrames,
           colleagueAvatars: partial.colleagueAvatars ?? prev.colleagueAvatars,
+          daily: partial.daily ?? prev.daily,
+          streak: partial.streak ?? prev.streak,
+          lastActiveDay: partial.lastActiveDay ?? prev.lastActiveDay,
           onboarding: partial.onboarding ?? prev.onboarding,
         };
 
@@ -198,9 +223,25 @@ export const useGameStore = create<GameState>()(
         activeNpc: null,
         muted: false,
         shopOpen: false,
+        dailyOpen: false,
 
         openShop: () => set({ shopOpen: true }),
         closeShop: () => set({ shopOpen: false }),
+        openDaily: () => {
+          const r = rollDaily(get());
+          commit({ daily: r.daily, streak: r.streak, lastActiveDay: r.lastActiveDay });
+          set({ dailyOpen: true });
+        },
+        closeDaily: () => set({ dailyOpen: false }),
+        claimDaily: () => {
+          const s = get();
+          if (s.daily.claimed || !allDailiesDone(s.daily)) return;
+          commit({
+            daily: { ...s.daily, claimed: true },
+            coins: s.coins + DAILY_REWARD.coins,
+            player: { ...s.player, xp: s.player.xp + DAILY_REWARD.xp },
+          });
+        },
         buyFrame: (id, price) => {
           const s = get();
           if (s.ownedFrames[id] || s.coins < price) return;
@@ -225,7 +266,11 @@ export const useGameStore = create<GameState>()(
         finishIntro: () =>
           set({ introReplay: false, onboarding: { ...get().onboarding, introSeen: true } }),
         replayIntro: () => set({ introReplay: true }),
-        talkNpc: (id) => set({ activeNpc: id }),
+        talkNpc: (id) => {
+          const r = rollDaily(get());
+          commit({ daily: { ...r.daily, talk: true }, streak: r.streak, lastActiveDay: r.lastActiveDay });
+          set({ activeNpc: id });
+        },
         endDialogue: () => set({ activeNpc: null }),
         toggleMuted: () => set({ muted: !get().muted }),
 
@@ -269,11 +314,15 @@ export const useGameStore = create<GameState>()(
         recordAssessment: (result) => {
           const prev = get();
           const best = Math.max(prev.competencyScores[result.competencyId] ?? 0, result.scorePct);
+          const r = rollDaily(prev);
           commit({
             assessmentHistory: [result, ...prev.assessmentHistory].slice(0, 50),
             competencyScores: { ...prev.competencyScores, [result.competencyId]: best },
             coins: prev.coins + result.correct * 5,
             player: { ...prev.player, xp: prev.player.xp + result.xpEarned },
+            daily: { ...r.daily, assess: r.daily.assess + 1, xp: r.daily.xp + result.xpEarned },
+            streak: r.streak,
+            lastActiveDay: r.lastActiveDay,
           });
         },
 
@@ -299,6 +348,7 @@ export const useGameStore = create<GameState>()(
           if (!entry || !entry.done) return;
           // award XP only once
           if (entry.completedSteps.includes('__rewarded__')) return;
+          const r = rollDaily(prev);
           commit({
             questProgress: {
               ...prev.questProgress,
@@ -306,6 +356,9 @@ export const useGameStore = create<GameState>()(
             },
             coins: prev.coins + Math.round(xpReward / 4),
             player: { ...prev.player, xp: prev.player.xp + xpReward },
+            daily: { ...r.daily, quests: r.daily.quests + 1, xp: r.daily.xp + xpReward },
+            streak: r.streak,
+            lastActiveDay: r.lastActiveDay,
           });
         },
 
@@ -340,7 +393,7 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false, dailyOpen: false });
         },
       };
     },
@@ -359,6 +412,9 @@ export const useGameStore = create<GameState>()(
         coins: state.coins,
         ownedFrames: state.ownedFrames,
         colleagueAvatars: state.colleagueAvatars,
+        daily: state.daily,
+        streak: state.streak,
+        lastActiveDay: state.lastActiveDay,
         onboarding: state.onboarding,
         muted: state.muted,
       }),

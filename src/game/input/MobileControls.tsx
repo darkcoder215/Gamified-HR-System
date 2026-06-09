@@ -100,9 +100,9 @@ export default function MobileControls() {
         </div>
       )}
 
-      {/* Interact button */}
+      {/* Interact button (physical right corner) */}
       <button
-        className="pointer-events-auto fixed bottom-10 end-6 z-30 flex h-20 w-20 flex-col items-center justify-center gap-0.5 rounded-full text-white shadow-float active:scale-95"
+        className="pointer-events-auto fixed bottom-10 right-6 z-30 flex h-20 w-20 flex-col items-center justify-center gap-0.5 rounded-full text-white shadow-float active:scale-95"
         style={{ background: 'var(--color-green)' }}
         onPointerDown={(e) => {
           e.preventDefault();

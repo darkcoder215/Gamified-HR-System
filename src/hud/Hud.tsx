@@ -1,5 +1,6 @@
+import { useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3, Volume2, VolumeX, MessageSquare, ShoppingBag, Coins } from 'lucide-react';
+import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3, Volume2, VolumeX, MessageSquare, ShoppingBag, Coins, Flame, Menu, X } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { levelProgress } from '@/state/gamification';
 import { stations } from '@/game/stations/stationZones';
@@ -26,7 +27,9 @@ export default function Hud() {
   const muted = useGameStore((s) => s.muted);
   const toggleMuted = useGameStore((s) => s.toggleMuted);
   const openShop = useGameStore((s) => s.openShop);
+  const openDaily = useGameStore((s) => s.openDaily);
   const coins = useGameStore((s) => s.coins);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const prog = levelProgress(player.xp);
   const energyColor =
@@ -36,6 +39,25 @@ export default function Hud() {
   const stationFocus = focus?.kind === 'station' ? stations.find((s) => s.id === focus.id) : undefined;
   const npcFocus = focus?.kind === 'npc' ? npcs.find((n) => n.id === focus.id) : undefined;
   const showPrompt = !activeStation && !activeNpc && (stationFocus || npcFocus);
+
+  const confirmReset = () => {
+    if (window.confirm('هل تريد إعادة ضبط كل تقدّمك والبدء من جديد؟')) resetSave();
+  };
+  const controls: { id: string; icon: ReactNode; label: string; color: string; onClick: () => void }[] = [
+    { id: 'guide', icon: <BookOpen size={15} />, label: 'الدليل', color: 'var(--color-blue)', onClick: openGuide },
+    { id: 'daily', icon: <Flame size={15} />, label: 'التحديات', color: 'var(--color-red)', onClick: openDaily },
+    { id: 'analytics', icon: <BarChart3 size={15} />, label: 'تحليلاتي', color: 'var(--color-green)', onClick: openAnalytics },
+    { id: 'shop', icon: <ShoppingBag size={15} />, label: 'المتجر', color: 'var(--color-amber)', onClick: openShop },
+    { id: 'character', icon: <Palette size={15} />, label: 'الشخصية', color: 'var(--color-charcoal)', onClick: openCharacter },
+    {
+      id: 'mute',
+      icon: muted ? <VolumeX size={15} /> : <Volume2 size={15} />,
+      label: muted ? 'تشغيل الصوت' : 'كتم الصوت',
+      color: 'var(--color-muted)',
+      onClick: toggleMuted,
+    },
+    { id: 'reset', icon: <RotateCcw size={14} />, label: 'إعادة ضبط', color: 'var(--color-muted)', onClick: confirmReset },
+  ];
 
   return (
     <div className="pointer-events-none fixed inset-0 z-20">
@@ -136,56 +158,54 @@ export default function Hud() {
         </motion.div>
       </div>
 
-      {/* Control toolbar */}
-      <div className="pointer-events-none fixed top-3 left-1/2 z-30 flex -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 rounded-pill bg-white/70 p-1 backdrop-blur-sm">
+      {/* Control toolbar — inline on desktop */}
+      <div className="pointer-events-none fixed top-3 left-1/2 z-30 hidden -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 rounded-pill bg-white/70 p-1 backdrop-blur-sm sm:flex">
+        {controls.map((c) => (
+          <button
+            key={c.id}
+            onClick={c.onClick}
+            title={c.label}
+            className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
+            style={{ color: c.color }}
+          >
+            {c.icon} <span className="hidden md:inline">{c.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Control menu — collapsible on mobile */}
+      <div className="pointer-events-none fixed top-3 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-2 sm:hidden">
         <button
-          onClick={openGuide}
-          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
-          style={{ color: 'var(--color-blue)' }}
-          title="الدليل"
+          onClick={() => setMenuOpen((o) => !o)}
+          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-card"
+          aria-label="القائمة"
         >
-          <BookOpen size={14} /> <span className="hidden sm:inline">الدليل</span>
+          {menuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
-        <button
-          onClick={openAnalytics}
-          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
-          style={{ color: 'var(--color-green)' }}
-          title="تحليلاتي"
-        >
-          <BarChart3 size={14} /> <span className="hidden sm:inline">تحليلاتي</span>
-        </button>
-        <button
-          onClick={openShop}
-          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
-          style={{ color: 'var(--color-amber)' }}
-          title="المتجر"
-        >
-          <ShoppingBag size={14} /> <span className="hidden sm:inline">المتجر</span>
-        </button>
-        <button
-          onClick={openCharacter}
-          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
-          style={{ color: 'var(--color-charcoal)' }}
-          title="تخصيص الشخصية"
-        >
-          <Palette size={14} /> <span className="hidden sm:inline">الشخصية</span>
-        </button>
-        <button
-          onClick={toggleMuted}
-          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-muted shadow-soft transition hover:opacity-80"
-          title={muted ? 'تشغيل الصوت' : 'كتم الصوت'}
-        >
-          {muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
-        </button>
-        <button
-          onClick={() => {
-            if (window.confirm('هل تريد إعادة ضبط كل تقدّمك والبدء من جديد؟')) resetSave();
-          }}
-          className="pointer-events-auto hidden items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-medium text-muted shadow-soft transition hover:text-red sm:flex"
-          title="إعادة ضبط التقدّم"
-        >
-          <RotateCcw size={13} /> <span className="hidden sm:inline">إعادة ضبط</span>
-        </button>
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.96 }}
+              className="pointer-events-auto grid grid-cols-2 gap-1.5 rounded-xl bg-white p-2 shadow-float"
+            >
+              {controls.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    c.onClick();
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-1.5 rounded-pill bg-off-white px-3 py-2 font-ui text-xs font-bold"
+                  style={{ color: c.color }}
+                >
+                  {c.icon} {c.label}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Bottom interaction prompt (station or NPC) */}
@@ -197,7 +217,7 @@ export default function Hud() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             onClick={() => EventBus.emit('station:enter', { stationId: stationFocus.id })}
-            className="pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float"
+            className="pointer-events-auto fixed bottom-32 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float sm:bottom-6"
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">{stationFocus.glyph}</span>
@@ -218,7 +238,7 @@ export default function Hud() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             onClick={() => EventBus.emit('npc:talk', { npcId: npcFocus.id })}
-            className="pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float"
+            className="pointer-events-auto fixed bottom-32 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float sm:bottom-6"
           >
             <div className="flex items-center gap-3">
               <span
