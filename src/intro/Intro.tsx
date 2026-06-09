@@ -25,6 +25,41 @@ const item = {
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 180, damping: 18 } },
 };
 
+// A pixel building presented as a slowly-rotating pseudo-3D object on a pedestal.
+function Building3D({ src, color, delay = 0 }: { src: string; color: string; delay?: number }) {
+  return (
+    <div style={{ perspective: 700 }} className="flex flex-col items-center">
+      <motion.div
+        initial={{ opacity: 0, y: 24, rotateX: 25 }}
+        animate={{ opacity: 1, y: [0, -8, 0], rotateY: [-12, 12, -12], rotateX: 12 }}
+        transition={{
+          opacity: { delay, duration: 0.5 },
+          y: { delay, duration: 4.5, repeat: Infinity, ease: 'easeInOut' },
+          rotateY: { delay, duration: 6, repeat: Infinity, ease: 'easeInOut' },
+          rotateX: { delay, duration: 0.6 },
+        }}
+        style={{ transformStyle: 'preserve-3d' }}
+        className="relative"
+      >
+        <img
+          src={src}
+          alt=""
+          className="h-24 w-auto rounded-md object-contain sm:h-28"
+          style={{ imageRendering: 'pixelated', filter: 'drop-shadow(0 14px 12px rgba(17,20,33,0.35))' }}
+          draggable={false}
+        />
+        {/* shine sweep */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-md">
+          <div className="absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 animate-shine bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+        </div>
+      </motion.div>
+      {/* ground shadow + pedestal */}
+      <div className="mt-1 h-2 w-20 rounded-[100%] bg-black/20 blur-[2px]" />
+      <div className="-mt-1 h-1.5 w-16 rounded-pill" style={{ background: color, opacity: 0.5 }} />
+    </div>
+  );
+}
+
 function Slide({ children }: { children: ReactNode }) {
   return (
     <motion.div
@@ -99,18 +134,18 @@ export default function Intro() {
       <motion.p variants={item} className="mt-3 font-ui text-xs text-muted">📱 على الجوال: استخدم عصا التحكّم وزر التفاعل.</motion.p>
     </Slide>,
 
-    // 2 — Buildings
+    // 2 — Buildings (pseudo-3D showcase of the real buildings)
     <Slide key="buildings">
       <motion.h2 variants={item} className="font-display text-4xl font-black text-black">المباني الخمسة</motion.h2>
-      <motion.p variants={item} className="mt-1 mb-5 font-body text-base text-charcoal">لكل مبنى دور يدفعك نحو الترقية.</motion.p>
-      <div className="grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2">
-        {buildingGuides.map((b) => (
-          <motion.div key={b.id} variants={item} className="flex items-center gap-3 rounded-lg bg-white p-3 text-start shadow-soft">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-xl text-white" style={{ background: b.color }}>{b.glyph}</span>
-            <div>
-              <p className="font-ui text-sm font-bold text-black">{b.nameAr}</p>
-              <p className="font-ui text-[11px] leading-tight text-muted">{b.benefitAr}</p>
-            </div>
+      <motion.p variants={item} className="mt-1 mb-6 font-body text-base text-charcoal">لكل مبنى دور يدفعك نحو الترقية.</motion.p>
+      <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
+        {buildingGuides.map((b, k) => (
+          <motion.div key={b.id} variants={item} className="flex flex-col items-center text-center">
+            <Building3D src={`/game/buildings/${b.id}.png`} color={b.color} delay={k * 0.12} />
+            <p className="mt-2 font-ui text-sm font-bold text-black">
+              <span style={{ borderBottom: `3px solid ${b.color}` }}>{b.nameAr}</span>
+            </p>
+            <p className="mt-1 font-ui text-[11px] leading-tight text-muted">{b.benefitAr}</p>
           </motion.div>
         ))}
       </div>
@@ -210,6 +245,22 @@ export default function Intro() {
       className="fixed inset-0 z-[70] flex flex-col overflow-hidden"
       style={{ background: 'radial-gradient(120% 120% at 50% 0%, #ffffff, #f7f4ee 45%, #eef3ef 100%)' }}
     >
+      {/* drifting brand-color blobs */}
+      {[
+        { c: '#00c17a', s: 320, x: '-8%', y: '-10%' },
+        { c: '#0072f9', s: 260, x: '70%', y: '8%' },
+        { c: '#ffbc0a', s: 240, x: '78%', y: '64%' },
+        { c: '#82003a', s: 280, x: '-6%', y: '62%' },
+      ].map((b, k) => (
+        <motion.div
+          key={`blob-${k}`}
+          className="pointer-events-none absolute rounded-full"
+          style={{ width: b.s, height: b.s, left: b.x, top: b.y, background: b.c, filter: 'blur(70px)', opacity: 0.16 }}
+          animate={{ x: [0, 30, -20, 0], y: [0, -25, 15, 0], scale: [1, 1.1, 0.95, 1] }}
+          transition={{ duration: 14 + k * 3, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      ))}
+
       {/* floating brand decorations */}
       {['⚔️', '📋', '🏆', '🏢', '⭐', '💎', '🚀'].map((g, k) => (
         <motion.span

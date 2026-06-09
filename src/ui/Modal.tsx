@@ -28,9 +28,10 @@ export default function Modal({
       {open && (
         <motion.div
           className="fixed inset-0 z-40 flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, pointerEvents: 'none' }}
+          animate={{ opacity: 1, pointerEvents: 'auto' }}
+          exit={{ opacity: 0, pointerEvents: 'none' }}
+          transition={{ duration: 0.2 }}
         >
           <motion.div
             className="absolute inset-0"

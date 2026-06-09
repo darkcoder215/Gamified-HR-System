@@ -129,7 +129,7 @@ export default function Hud() {
       </div>
 
       {/* Control toolbar */}
-      <div className="pointer-events-none fixed top-4 left-1/2 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2">
+      <div className="pointer-events-none fixed top-3 left-1/2 z-30 flex -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 rounded-pill bg-white/70 p-1 backdrop-blur-sm">
         <button
           onClick={openGuide}
           className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
