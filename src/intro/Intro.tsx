@@ -15,6 +15,7 @@ import {
 import { useGameStore } from '@/state/store';
 import { buildingGuides } from '@/data/guide';
 import { celebrate } from '@/animation/confetti';
+import { useIsTouch } from '@/hooks/useIsTouch';
 
 const stagger = {
   hidden: {},
@@ -87,6 +88,7 @@ function Kbd({ children }: { children: ReactNode }) {
 export default function Intro() {
   const finishIntro = useGameStore((s) => s.finishIntro);
   const playerName = useGameStore((s) => s.player.nameAr);
+  const isTouch = useIsTouch();
   const [i, setI] = useState(0);
 
   const slides: ReactNode[] = [
@@ -118,20 +120,45 @@ export default function Intro() {
       />
     </Slide>,
 
-    // 1 — Controls
+    // 1 — Controls (adapts to touch vs keyboard)
     <Slide key="controls">
-      <motion.span variants={item} className="mb-2 text-5xl">🕹️</motion.span>
+      <motion.span variants={item} className="mb-2 text-5xl">{isTouch ? '👆' : '🕹️'}</motion.span>
       <motion.h2 variants={item} className="font-display text-4xl font-black text-black">تنقّل في العالم</motion.h2>
-      <motion.p variants={item} className="mt-2 font-body text-base text-charcoal">حرّك شخصيتك بين المباني واكتشف ما تقدّمه.</motion.p>
-      <motion.div variants={item} className="mt-6 flex items-center justify-center gap-2">
-        <Kbd>W</Kbd><Kbd>A</Kbd><Kbd>S</Kbd><Kbd>D</Kbd>
-        <span className="mx-2 font-ui text-sm text-muted">أو</span>
-        <Kbd>↑</Kbd><Kbd>↓</Kbd><Kbd>←</Kbd><Kbd>→</Kbd>
-      </motion.div>
-      <motion.div variants={item} className="mt-4 flex items-center gap-2 rounded-pill bg-green-light px-4 py-2 font-ui text-sm font-bold text-black">
-        اقترب من أي مبنى واضغط <Kbd>E</Kbd> للدخول
-      </motion.div>
-      <motion.p variants={item} className="mt-3 font-ui text-xs text-muted">📱 على الجوال: استخدم عصا التحكّم وزر التفاعل.</motion.p>
+      {isTouch ? (
+        <>
+          <motion.p variants={item} className="mt-2 font-body text-base text-charcoal">
+            المس أي مكان في الشاشة <b>واسحب</b> لتحريك شخصيتك — تظهر عصا التحكّم تحت إصبعك.
+          </motion.p>
+          <motion.div variants={item} className="mt-6 flex flex-col items-center gap-2">
+            <motion.div
+              className="relative flex h-28 w-28 items-center justify-center rounded-full border-2 border-dashed"
+              style={{ borderColor: 'var(--color-green)', background: 'rgba(0,193,122,0.08)' }}
+            >
+              <motion.div
+                className="h-12 w-12 rounded-full bg-green shadow-card"
+                animate={{ x: [0, 22, -18, 0], y: [0, -16, 14, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            </motion.div>
+            <span className="font-ui text-xs text-muted">اسحب للتحرّك في كل الاتجاهات</span>
+          </motion.div>
+          <motion.div variants={item} className="mt-4 flex items-center gap-2 rounded-pill bg-green-light px-4 py-2 text-center font-ui text-sm font-bold text-black">
+            للدخول إلى مبنى أو التحدّث: اقترب ثم اضغط زر <span className="rounded-full bg-green px-2 py-0.5 text-white">تفاعل</span> الأخضر
+          </motion.div>
+        </>
+      ) : (
+        <>
+          <motion.p variants={item} className="mt-2 font-body text-base text-charcoal">حرّك شخصيتك بين المباني واكتشف ما تقدّمه.</motion.p>
+          <motion.div variants={item} className="mt-6 flex items-center justify-center gap-2">
+            <Kbd>W</Kbd><Kbd>A</Kbd><Kbd>S</Kbd><Kbd>D</Kbd>
+            <span className="mx-2 font-ui text-sm text-muted">أو</span>
+            <Kbd>↑</Kbd><Kbd>↓</Kbd><Kbd>←</Kbd><Kbd>→</Kbd>
+          </motion.div>
+          <motion.div variants={item} className="mt-4 flex items-center gap-2 rounded-pill bg-green-light px-4 py-2 font-ui text-sm font-bold text-black">
+            اقترب من أي مبنى واضغط <Kbd>E</Kbd> للدخول
+          </motion.div>
+        </>
+      )}
     </Slide>,
 
     // 2 — Buildings (pseudo-3D showcase of the real buildings)
@@ -286,7 +313,7 @@ export default function Intro() {
       </div>
 
       {/* slide area */}
-      <div className="relative flex flex-1 items-center justify-center px-6">
+      <div className="relative flex flex-1 items-center justify-center overflow-y-auto px-5 py-2">
         <AnimatePresence mode="wait">
           <motion.div
             key={i}

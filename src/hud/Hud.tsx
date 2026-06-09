@@ -6,6 +6,7 @@ import { stations } from '@/game/stations/stationZones';
 import { npcs } from '@/data/npcs';
 import { badges as allBadges } from '@/data/badges';
 import { useFocus } from '@/hooks/useFocus';
+import { useIsTouch } from '@/hooks/useIsTouch';
 import { EventBus } from '@/game/EventBus';
 import NumberText from '@/ui/NumberText';
 import ProgressBar from '@/ui/ProgressBar';
@@ -14,6 +15,7 @@ export default function Hud() {
   const player = useGameStore((s) => s.player);
   const badgeMap = useGameStore((s) => s.badges);
   const focus = useFocus();
+  const isTouch = useIsTouch();
   const activeStation = useGameStore((s) => s.activeStation);
   const activeNpc = useGameStore((s) => s.activeNpc);
   const resetSave = useGameStore((s) => s.resetSave);
@@ -40,11 +42,10 @@ export default function Hud() {
         <motion.div
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="pointer-events-auto flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-card"
-          style={{ minWidth: 280 }}
+          className="pointer-events-auto flex max-w-[56vw] items-center gap-2 rounded-xl bg-white px-2.5 py-2 shadow-card sm:max-w-none sm:min-w-[280px] sm:gap-3 sm:px-4 sm:py-3"
         >
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full font-display text-xl font-black text-white"
+            className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full font-display text-base font-black text-white sm:h-12 sm:w-12 sm:text-xl"
             style={{ background: player.avatar }}
           >
             {player.avatarImage ? (
@@ -63,10 +64,10 @@ export default function Hud() {
                 المستوى <NumberText value={prog.level} />
               </span>
             </div>
-            <p className="font-ui text-xs text-muted">{player.titleAr}</p>
+            <p className="hidden font-ui text-xs text-muted sm:block">{player.titleAr}</p>
             <div className="mt-1.5">
               <ProgressBar pct={prog.pct} glow height={7} />
-              <div className="mt-0.5 flex justify-between font-ui text-[10px] text-muted">
+              <div className="mt-0.5 hidden justify-between font-ui text-[10px] text-muted sm:flex">
                 <span>
                   <NumberText value={prog.currentLevelXp} /> / <NumberText value={prog.neededForNext} /> خبرة
                 </span>
@@ -83,26 +84,26 @@ export default function Hud() {
           className="pointer-events-auto flex flex-col items-end gap-2"
         >
           {/* Brand lockup — icon kept in its own safe-space square */}
-          <div className="flex items-center gap-3 rounded-xl bg-black py-2 pe-4 ps-2 shadow-card">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-black">
+          <div className="flex items-center gap-3 rounded-xl bg-black p-2 shadow-card sm:py-2 sm:pe-4 sm:ps-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black sm:h-10 sm:w-10">
               <img
                 src="/logo/thamanyah.png"
                 alt="ثمانية"
-                className="h-8 w-8 select-none"
+                className="h-7 w-7 select-none sm:h-8 sm:w-8"
                 draggable={false}
                 style={{ imageRendering: 'auto' }}
               />
             </span>
-            <span className="h-8 w-px bg-white/15" />
-            <div className="text-end leading-none">
+            <span className="hidden h-8 w-px bg-white/15 sm:block" />
+            <div className="hidden text-end leading-none sm:block">
               <p className="font-display text-base font-bold text-white">ثمانية</p>
               <p className="mt-0.5 font-ui text-[10px] text-white/55">تطوير الموظفين</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 shadow-card">
+          <div className="flex items-center gap-2 rounded-xl bg-white px-2.5 py-1.5 shadow-card sm:px-3 sm:py-2">
             <Zap size={16} style={{ color: energyColor }} />
-            <div className="w-28">
+            <div className="w-16 sm:w-28">
               <ProgressBar pct={player.energy} color={energyColor} height={7} />
             </div>
             <span className="num font-ui text-xs font-bold" style={{ color: energyColor }}>
@@ -111,7 +112,7 @@ export default function Hud() {
           </div>
 
           {unlocked.length > 0 && (
-            <div className="flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 shadow-card">
+            <div className="hidden items-center gap-1.5 rounded-xl bg-white px-3 py-2 shadow-card sm:flex">
               <Sparkles size={14} className="text-muted" />
               {unlocked.map((b) => (
                 <div
@@ -136,7 +137,7 @@ export default function Hud() {
           style={{ color: 'var(--color-blue)' }}
           title="الدليل"
         >
-          <BookOpen size={14} /> الدليل
+          <BookOpen size={14} /> <span className="hidden sm:inline">الدليل</span>
         </button>
         <button
           onClick={openAnalytics}
@@ -144,7 +145,7 @@ export default function Hud() {
           style={{ color: 'var(--color-green)' }}
           title="تحليلاتي"
         >
-          <BarChart3 size={14} /> تحليلاتي
+          <BarChart3 size={14} /> <span className="hidden sm:inline">تحليلاتي</span>
         </button>
         <button
           onClick={openCharacter}
@@ -152,7 +153,7 @@ export default function Hud() {
           style={{ color: 'var(--color-charcoal)' }}
           title="تخصيص الشخصية"
         >
-          <Palette size={14} /> الشخصية
+          <Palette size={14} /> <span className="hidden sm:inline">الشخصية</span>
         </button>
         <button
           onClick={toggleMuted}
@@ -168,7 +169,7 @@ export default function Hud() {
           className="pointer-events-auto hidden items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-medium text-muted shadow-soft transition hover:text-red sm:flex"
           title="إعادة ضبط التقدّم"
         >
-          <RotateCcw size={13} /> إعادة ضبط
+          <RotateCcw size={13} /> <span className="hidden sm:inline">إعادة ضبط</span>
         </button>
       </div>
 
@@ -190,7 +191,7 @@ export default function Hud() {
                 <p className="font-ui text-xs text-muted">{stationFocus.hintAr}</p>
               </div>
               <span className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-green)' }}>
-                اضغط <span className="num">E</span> للدخول
+                {isTouch ? 'زر التفاعل ←' : <>اضغط <span className="num">E</span> للدخول</>}
               </span>
             </div>
           </motion.button>
@@ -216,7 +217,7 @@ export default function Hud() {
                 <p className="font-ui text-xs text-muted">{npcFocus.titleAr}</p>
               </div>
               <span className="ms-2 flex items-center gap-1 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: npcFocus.tint }}>
-                <MessageSquare size={12} /> تحدّث · <span className="num">E</span>
+                <MessageSquare size={12} /> {isTouch ? 'تحدّث' : <>تحدّث · <span className="num">E</span></>}
               </span>
             </div>
           </motion.button>

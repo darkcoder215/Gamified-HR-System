@@ -1,82 +1,118 @@
 import { useEffect, useRef, useState } from 'react';
 import { Hand } from 'lucide-react';
 import { EventBus } from '../EventBus';
+import { useIsTouch } from '@/hooks/useIsTouch';
 
-// On-screen joystick + interact button for touch devices. Rendered in React so
-// it can be styled per brand; it emits movement through the EventBus.
+// Floating joystick: touch anywhere in the play area and drag to move — the
+// stick spawns where your thumb lands, which is far easier on a phone than a
+// fixed pad. The top HUD bar and the interact button sit above this layer.
+const RADIUS = 60;
+const DEAD = 0.16;
+
 export default function MobileControls() {
-  const [isTouch, setIsTouch] = useState(false);
-  const baseRef = useRef<HTMLDivElement>(null);
+  const isTouch = useIsTouch();
+  const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
-  const activeId = useRef<number | null>(null);
+  const [showHint, setShowHint] = useState(true);
+  const [disabled, setDisabled] = useState(false);
+  const pointerId = useRef<number | null>(null);
 
   useEffect(() => {
-    const mq = window.matchMedia('(pointer: coarse)');
-    const update = () => setIsTouch(mq.matches || 'ontouchstart' in window);
-    update();
-    mq.addEventListener?.('change', update);
-    return () => mq.removeEventListener?.('change', update);
+    if (!isTouch) return;
+    const t = window.setTimeout(() => setShowHint(false), 6000);
+    return () => window.clearTimeout(t);
+  }, [isTouch]);
+
+  // Hide the controls while any panel/modal is open (world paused).
+  useEffect(() => {
+    const pause = () => setDisabled(true);
+    const resume = () => setDisabled(false);
+    EventBus.on('game:pause', pause);
+    EventBus.on('game:resume', resume);
+    return () => {
+      EventBus.off('game:pause', pause);
+      EventBus.off('game:resume', resume);
+    };
   }, []);
 
-  if (!isTouch) return null;
+  if (!isTouch || disabled) return null;
 
-  const RADIUS = 52;
-
-  const handleMove = (clientX: number, clientY: number) => {
-    const base = baseRef.current;
-    if (!base) return;
-    const rect = base.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    let dx = clientX - cx;
-    let dy = clientY - cy;
+  const emit = (ox: number, oy: number, cx: number, cy: number) => {
+    let dx = cx - ox;
+    let dy = cy - oy;
     const dist = Math.hypot(dx, dy) || 1;
     const clamped = Math.min(dist, RADIUS);
     const nx = (dx / dist) * clamped;
     const ny = (dy / dist) * clamped;
     setKnob({ x: nx, y: ny });
-    EventBus.emit('input:move', { dx: nx / RADIUS, dy: ny / RADIUS });
+    const mx = nx / RADIUS;
+    const my = ny / RADIUS;
+    EventBus.emit('input:move', {
+      dx: Math.abs(mx) < DEAD ? 0 : mx,
+      dy: Math.abs(my) < DEAD ? 0 : my,
+    });
   };
 
   const reset = () => {
-    activeId.current = null;
+    pointerId.current = null;
+    setOrigin(null);
     setKnob({ x: 0, y: 0 });
     EventBus.emit('input:release');
   };
 
   return (
     <>
+      {/* Movement zone — covers the play area (below the top HUD bar). */}
       <div
-        ref={baseRef}
-        className="pointer-events-auto fixed bottom-8 start-6 z-30 h-32 w-32 touch-none rounded-full"
-        style={{ background: 'rgba(43,45,63,0.35)', backdropFilter: 'blur(4px)' }}
+        className="pointer-events-auto fixed inset-x-0 bottom-0 top-24 z-[15] touch-none"
         onPointerDown={(e) => {
-          activeId.current = e.pointerId;
+          pointerId.current = e.pointerId;
           (e.target as HTMLElement).setPointerCapture(e.pointerId);
-          handleMove(e.clientX, e.clientY);
+          setOrigin({ x: e.clientX, y: e.clientY });
+          setKnob({ x: 0, y: 0 });
+          setShowHint(false);
         }}
         onPointerMove={(e) => {
-          if (activeId.current === e.pointerId) handleMove(e.clientX, e.clientY);
+          if (pointerId.current === e.pointerId && origin) emit(origin.x, origin.y, e.clientX, e.clientY);
         }}
         onPointerUp={reset}
         onPointerCancel={reset}
-      >
-        <div
-          className="absolute left-1/2 top-1/2 h-14 w-14 rounded-full bg-white/90 shadow-card"
-          style={{ transform: `translate(-50%, -50%) translate(${knob.x}px, ${knob.y}px)` }}
-        />
-      </div>
+      />
 
+      {/* Joystick visual at the touch origin */}
+      {origin && (
+        <div className="pointer-events-none fixed z-20" style={{ left: origin.x, top: origin.y }}>
+          <div
+            className="absolute rounded-full border-2 border-white/70"
+            style={{ width: RADIUS * 2, height: RADIUS * 2, transform: 'translate(-50%, -50%)', background: 'rgba(43,45,63,0.35)', backdropFilter: 'blur(3px)' }}
+          />
+          <div
+            className="absolute h-14 w-14 rounded-full bg-white/90 shadow-card"
+            style={{ transform: `translate(-50%, -50%) translate(${knob.x}px, ${knob.y}px)` }}
+          />
+        </div>
+      )}
+
+      {/* First-time movement hint */}
+      {showHint && !origin && (
+        <div className="pointer-events-none fixed bottom-28 left-1/2 z-20 -translate-x-1/2 animate-pulse rounded-pill bg-black/80 px-4 py-2 font-ui text-xs font-bold text-white">
+          اسحب في أي مكان للتحرّك 👆
+        </div>
+      )}
+
+      {/* Interact button */}
       <button
-        className="pointer-events-auto fixed bottom-12 end-8 z-30 flex h-20 w-20 items-center justify-center rounded-full text-white shadow-float active:scale-95"
+        className="pointer-events-auto fixed bottom-10 end-6 z-30 flex h-20 w-20 flex-col items-center justify-center gap-0.5 rounded-full text-white shadow-float active:scale-95"
         style={{ background: 'var(--color-green)' }}
         onPointerDown={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           EventBus.emit('input:interact');
         }}
         aria-label="تفاعل"
       >
-        <Hand size={30} />
+        <Hand size={26} />
+        <span className="font-ui text-[10px] font-bold">تفاعل</span>
       </button>
     </>
   );
