@@ -9,6 +9,7 @@ import { usePromotionEligibility } from '@/state/selectors';
 import { levelProgress } from '@/state/gamification';
 import NumberText from '@/ui/NumberText';
 import { celebrate } from '@/animation/confetti';
+import { sfx } from '@/audio/sound';
 
 type Phase = 'idle' | 'requesting' | 'approved';
 
@@ -49,6 +50,7 @@ export default function CareerLadder() {
     window.setTimeout(() => {
       approvePromotion();
       celebrate();
+      sfx('promote');
       setPhase('approved');
       window.setTimeout(() => setPhase('idle'), 2600);
     }, 1900);

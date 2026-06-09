@@ -13,6 +13,7 @@ export default function ProgressBridge() {
   const currentRung = useGameStore((s) => s.promotionStatus.currentRung);
   const characterTint = useGameStore((s) => s.player.characterTint);
   const markMoved = useGameStore((s) => s.markMoved);
+  const talkNpc = useGameStore((s) => s.talkNpc);
   const ranked = useLeaderboard();
 
   const assessed = Object.keys(competencyScores).length;
@@ -22,8 +23,13 @@ export default function ProgressBridge() {
 
   useEffect(() => {
     EventBus.on('player:moved', markMoved);
-    return () => EventBus.off('player:moved', markMoved);
-  }, [markMoved]);
+    const onTalk = (p: { npcId: string }) => talkNpc(p.npcId);
+    EventBus.on('npc:talk', onTalk);
+    return () => {
+      EventBus.off('player:moved', markMoved);
+      EventBus.off('npc:talk', onTalk);
+    };
+  }, [markMoved, talkNpc]);
 
   useEffect(() => {
     const payload: Record<string, string> = {

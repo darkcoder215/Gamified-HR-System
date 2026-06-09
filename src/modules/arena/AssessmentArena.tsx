@@ -26,6 +26,7 @@ import Card from '@/ui/Card';
 import ScoreBadge from '@/ui/ScoreBadge';
 import NumberText from '@/ui/NumberText';
 import { smallBurst } from '@/animation/confetti';
+import { sfx } from '@/audio/sound';
 
 type Phase = 'select' | 'battle' | 'result';
 
@@ -83,10 +84,12 @@ export default function AssessmentArena() {
       setXpEarned((x) => x + q.xp);
       setGainFx(q.xp);
       smallBurst();
+      sfx('correct');
       window.setTimeout(() => setGainFx(null), 900);
     } else {
       loseEnergy(energyCostForWrong(q.difficulty));
       setWrongFx(true);
+      sfx('wrong');
       window.setTimeout(() => setWrongFx(false), 450);
     }
   };

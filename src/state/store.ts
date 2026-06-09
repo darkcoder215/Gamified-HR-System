@@ -45,6 +45,8 @@ interface GameState extends PersistedState {
   guideOpen: boolean;
   analyticsOpen: boolean;
   introReplay: boolean;
+  activeNpc: string | null;
+  muted: boolean;
 
   // actions
   startGame: (name: string) => void;
@@ -71,6 +73,9 @@ interface GameState extends PersistedState {
   dismissChecklist: () => void;
   finishIntro: () => void;
   replayIntro: () => void;
+  talkNpc: (id: string) => void;
+  endDialogue: () => void;
+  toggleMuted: () => void;
   resetSave: () => void;
 }
 
@@ -172,10 +177,15 @@ export const useGameStore = create<GameState>()(
         guideOpen: false,
         analyticsOpen: false,
         introReplay: false,
+        activeNpc: null,
+        muted: false,
 
         finishIntro: () =>
           set({ introReplay: false, onboarding: { ...get().onboarding, introSeen: true } }),
         replayIntro: () => set({ introReplay: true }),
+        talkNpc: (id) => set({ activeNpc: id }),
+        endDialogue: () => set({ activeNpc: null }),
+        toggleMuted: () => set({ muted: !get().muted }),
 
         setAvatarImage: (dataUrl) =>
           set({ player: { ...get().player, avatarImage: dataUrl } }),
@@ -285,7 +295,7 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null });
         },
       };
     },
@@ -302,6 +312,7 @@ export const useGameStore = create<GameState>()(
         badges: state.badges,
         promotionStatus: state.promotionStatus,
         onboarding: state.onboarding,
+        muted: state.muted,
       }),
       onRehydrateStorage: () => (state) => {
         // regenerate energy based on elapsed offline time

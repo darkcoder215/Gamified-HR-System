@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3 } from 'lucide-react';
+import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3, Volume2, VolumeX, MessageSquare } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { levelProgress } from '@/state/gamification';
 import { stations } from '@/game/stations/stationZones';
+import { npcs } from '@/data/npcs';
 import { badges as allBadges } from '@/data/badges';
-import { useNearStation } from '@/hooks/useNearStation';
+import { useFocus } from '@/hooks/useFocus';
 import { EventBus } from '@/game/EventBus';
 import NumberText from '@/ui/NumberText';
 import ProgressBar from '@/ui/ProgressBar';
@@ -12,19 +13,24 @@ import ProgressBar from '@/ui/ProgressBar';
 export default function Hud() {
   const player = useGameStore((s) => s.player);
   const badgeMap = useGameStore((s) => s.badges);
-  const near = useNearStation();
+  const focus = useFocus();
   const activeStation = useGameStore((s) => s.activeStation);
+  const activeNpc = useGameStore((s) => s.activeNpc);
   const resetSave = useGameStore((s) => s.resetSave);
   const openCharacter = useGameStore((s) => s.openCharacter);
   const openGuide = useGameStore((s) => s.openGuide);
   const openAnalytics = useGameStore((s) => s.openAnalytics);
+  const muted = useGameStore((s) => s.muted);
+  const toggleMuted = useGameStore((s) => s.toggleMuted);
 
   const prog = levelProgress(player.xp);
   const energyColor =
     player.energy > 50 ? 'var(--color-green)' : player.energy > 25 ? 'var(--color-amber)' : 'var(--color-red)';
 
   const unlocked = allBadges.filter((b) => badgeMap[b.id]).slice(-4);
-  const nearDef = stations.find((s) => s.id === near);
+  const stationFocus = focus?.kind === 'station' ? stations.find((s) => s.id === focus.id) : undefined;
+  const npcFocus = focus?.kind === 'npc' ? npcs.find((n) => n.id === focus.id) : undefined;
+  const showPrompt = !activeStation && !activeNpc && (stationFocus || npcFocus);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-20">
@@ -149,6 +155,13 @@ export default function Hud() {
           <Palette size={14} /> الشخصية
         </button>
         <button
+          onClick={toggleMuted}
+          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-muted shadow-soft transition hover:opacity-80"
+          title={muted ? 'تشغيل الصوت' : 'كتم الصوت'}
+        >
+          {muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+        </button>
+        <button
           onClick={() => {
             if (window.confirm('هل تريد إعادة ضبط كل تقدّمك والبدء من جديد؟')) resetSave();
           }}
@@ -159,28 +172,51 @@ export default function Hud() {
         </button>
       </div>
 
-      {/* Bottom interaction prompt */}
+      {/* Bottom interaction prompt (station or NPC) */}
       <AnimatePresence>
-        {nearDef && !activeStation && (
+        {showPrompt && stationFocus && (
           <motion.button
-            key={nearDef.id}
+            key={`st-${stationFocus.id}`}
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
-            onClick={() => EventBus.emit('station:enter', { stationId: nearDef.id })}
+            onClick={() => EventBus.emit('station:enter', { stationId: stationFocus.id })}
             className="pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{nearDef.glyph}</span>
+              <span className="text-2xl">{stationFocus.glyph}</span>
               <div className="text-start">
-                <p className="font-display text-lg font-black text-black">{nearDef.nameAr}</p>
-                <p className="font-ui text-xs text-muted">{nearDef.hintAr}</p>
+                <p className="font-display text-lg font-black text-black">{stationFocus.nameAr}</p>
+                <p className="font-ui text-xs text-muted">{stationFocus.hintAr}</p>
               </div>
-              <span
-                className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white"
-                style={{ background: 'var(--color-green)' }}
-              >
+              <span className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-green)' }}>
                 اضغط <span className="num">E</span> للدخول
+              </span>
+            </div>
+          </motion.button>
+        )}
+        {showPrompt && npcFocus && (
+          <motion.button
+            key={`npc-${npcFocus.id}`}
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 40, opacity: 0 }}
+            onClick={() => EventBus.emit('npc:talk', { npcId: npcFocus.id })}
+            className="pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float"
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className="flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-black text-white"
+                style={{ background: npcFocus.tint }}
+              >
+                {npcFocus.nameAr.trim().charAt(0)}
+              </span>
+              <div className="text-start">
+                <p className="font-display text-lg font-black text-black">{npcFocus.nameAr}</p>
+                <p className="font-ui text-xs text-muted">{npcFocus.titleAr}</p>
+              </div>
+              <span className="ms-2 flex items-center gap-1 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: npcFocus.tint }}>
+                <MessageSquare size={12} /> تحدّث · <span className="num">E</span>
               </span>
             </div>
           </motion.button>

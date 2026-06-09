@@ -15,6 +15,8 @@ import CharacterStudio from './modules/character/CharacterStudio';
 import GuideModal from './modules/guide/GuideModal';
 import AnalyticsDashboard from './modules/analytics/AnalyticsDashboard';
 import Intro from './intro/Intro';
+import DialogueBox from './modules/dialogue/DialogueBox';
+import { initAudio, setMuted } from './audio/sound';
 
 // Phaser lives in its own chunk so the shell paints first.
 const PhaserGame = lazy(() => import('./game/PhaserGame'));
@@ -32,6 +34,16 @@ export default function App() {
   const introReplay = useGameStore((s) => s.introReplay);
   const introSeen = useGameStore((s) => s.onboarding.introSeen);
   const showIntro = introReplay || !introSeen;
+  const activeNpc = useGameStore((s) => s.activeNpc);
+  const muted = useGameStore((s) => s.muted);
+
+  // Audio: set up event-driven SFX + ambient (starts on first gesture).
+  useEffect(() => {
+    initAudio();
+  }, []);
+  useEffect(() => {
+    setMuted(muted);
+  }, [muted]);
 
   // Passive energy regeneration while playing.
   useEffect(() => {
@@ -40,7 +52,7 @@ export default function App() {
   }, [regenEnergy]);
 
   // Freeze the world whenever any dashboard/modal is open.
-  const anyModal = !!activeStation || characterOpen || guideOpen || analyticsOpen || showIntro;
+  const anyModal = !!activeStation || characterOpen || guideOpen || analyticsOpen || showIntro || !!activeNpc;
   useEffect(() => {
     EventBus.emit(anyModal ? 'game:pause' : 'game:resume');
   }, [anyModal]);
@@ -114,6 +126,7 @@ export default function App() {
       >
         <AnalyticsDashboard />
       </Modal>
+      <DialogueBox />
       <Celebrations />
       {showIntro && <Intro />}
     </div>
