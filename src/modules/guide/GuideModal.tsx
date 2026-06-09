@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, Gamepad2, ArrowDownLeft, Sparkles } from 'lucide-react';
+import { Building2, Gamepad2, ArrowDownLeft, Sparkles, PlayCircle } from 'lucide-react';
 import { buildingGuides } from '@/data/guide';
+import { useGameStore } from '@/state/store';
 
 type Tab = 'buildings' | 'howto';
 
 export default function GuideModal() {
   const [tab, setTab] = useState<Tab>('buildings');
+  const replayIntro = useGameStore((s) => s.replayIntro);
+  const closeGuide = useGameStore((s) => s.closeGuide);
 
   return (
     <div>
@@ -92,6 +95,15 @@ export default function GuideModal() {
               💡 تابع «دليل البداية» أسفل الشاشة لإكمال خطواتك الأولى، وافتح «تحليلاتي» لمعرفة أين تقف وما خطوتك التالية.
             </p>
           </div>
+          <button
+            onClick={() => {
+              closeGuide();
+              replayIntro();
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-pill bg-black py-3 font-ui text-sm font-bold text-white transition hover:opacity-90"
+          >
+            <PlayCircle size={16} /> شاهد المقدّمة من جديد
+          </button>
         </div>
       )}
     </div>

@@ -30,7 +30,12 @@ interface PersistedState {
   questProgress: Record<string, { completedSteps: string[]; done: boolean }>;
   badges: Record<string, { unlockedAt: string }>;
   promotionStatus: { currentRung: number; pendingRequest: boolean };
-  onboarding: { moved: boolean; visited: Partial<Record<StationId, boolean>>; checklistDismissed: boolean };
+  onboarding: {
+    moved: boolean;
+    visited: Partial<Record<StationId, boolean>>;
+    checklistDismissed: boolean;
+    introSeen: boolean;
+  };
 }
 
 interface GameState extends PersistedState {
@@ -39,6 +44,7 @@ interface GameState extends PersistedState {
   characterOpen: boolean;
   guideOpen: boolean;
   analyticsOpen: boolean;
+  introReplay: boolean;
 
   // actions
   startGame: (name: string) => void;
@@ -63,6 +69,8 @@ interface GameState extends PersistedState {
   closeStation: () => void;
   markMoved: () => void;
   dismissChecklist: () => void;
+  finishIntro: () => void;
+  replayIntro: () => void;
   resetSave: () => void;
 }
 
@@ -86,7 +94,7 @@ const initialPersisted: PersistedState = {
   questProgress: {},
   badges: {},
   promotionStatus: { currentRung: 1, pendingRequest: false },
-  onboarding: { moved: false, visited: {}, checklistDismissed: false },
+  onboarding: { moved: false, visited: {}, checklistDismissed: false, introSeen: false },
 };
 
 // Evaluate which badges should now be unlocked given a state snapshot.
@@ -163,6 +171,11 @@ export const useGameStore = create<GameState>()(
         characterOpen: false,
         guideOpen: false,
         analyticsOpen: false,
+        introReplay: false,
+
+        finishIntro: () =>
+          set({ introReplay: false, onboarding: { ...get().onboarding, introSeen: true } }),
+        replayIntro: () => set({ introReplay: true }),
 
         setAvatarImage: (dataUrl) =>
           set({ player: { ...get().player, avatarImage: dataUrl } }),
@@ -272,7 +285,7 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false });
         },
       };
     },

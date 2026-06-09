@@ -14,6 +14,7 @@ import Modal from './ui/Modal';
 import CharacterStudio from './modules/character/CharacterStudio';
 import GuideModal from './modules/guide/GuideModal';
 import AnalyticsDashboard from './modules/analytics/AnalyticsDashboard';
+import Intro from './intro/Intro';
 
 // Phaser lives in its own chunk so the shell paints first.
 const PhaserGame = lazy(() => import('./game/PhaserGame'));
@@ -28,6 +29,9 @@ export default function App() {
   const closeGuide = useGameStore((s) => s.closeGuide);
   const analyticsOpen = useGameStore((s) => s.analyticsOpen);
   const closeAnalytics = useGameStore((s) => s.closeAnalytics);
+  const introReplay = useGameStore((s) => s.introReplay);
+  const introSeen = useGameStore((s) => s.onboarding.introSeen);
+  const showIntro = introReplay || !introSeen;
 
   // Passive energy regeneration while playing.
   useEffect(() => {
@@ -36,7 +40,7 @@ export default function App() {
   }, [regenEnergy]);
 
   // Freeze the world whenever any dashboard/modal is open.
-  const anyModal = !!activeStation || characterOpen || guideOpen || analyticsOpen;
+  const anyModal = !!activeStation || characterOpen || guideOpen || analyticsOpen || showIntro;
   useEffect(() => {
     EventBus.emit(anyModal ? 'game:pause' : 'game:resume');
   }, [anyModal]);
@@ -111,6 +115,7 @@ export default function App() {
         <AnalyticsDashboard />
       </Modal>
       <Celebrations />
+      {showIntro && <Intro />}
     </div>
   );
 }
