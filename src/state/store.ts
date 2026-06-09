@@ -30,6 +30,7 @@ interface PersistedState {
   questProgress: Record<string, { completedSteps: string[]; done: boolean }>;
   badges: Record<string, { unlockedAt: string }>;
   promotionStatus: { currentRung: number; pendingRequest: boolean };
+  onboarding: { moved: boolean; visited: Partial<Record<StationId, boolean>>; checklistDismissed: boolean };
 }
 
 interface GameState extends PersistedState {
@@ -54,6 +55,8 @@ interface GameState extends PersistedState {
   approvePromotion: () => void;
   openStation: (id: StationId) => void;
   closeStation: () => void;
+  markMoved: () => void;
+  dismissChecklist: () => void;
   resetSave: () => void;
 }
 
@@ -77,6 +80,7 @@ const initialPersisted: PersistedState = {
   questProgress: {},
   badges: {},
   promotionStatus: { currentRung: 1, pendingRequest: false },
+  onboarding: { moved: false, visited: {}, checklistDismissed: false },
 };
 
 // Evaluate which badges should now be unlocked given a state snapshot.
@@ -120,6 +124,7 @@ export const useGameStore = create<GameState>()(
           questProgress: partial.questProgress ?? prev.questProgress,
           badges: { ...prev.badges, ...(partial.badges ?? {}) },
           promotionStatus: partial.promotionStatus ?? prev.promotionStatus,
+          onboarding: partial.onboarding ?? prev.onboarding,
         };
 
         // derive level from xp
@@ -239,8 +244,20 @@ export const useGameStore = create<GameState>()(
           });
         },
 
-        openStation: (id) => set({ activeStation: id }),
+        openStation: (id) => {
+          const prev = get();
+          set({
+            activeStation: id,
+            onboarding: { ...prev.onboarding, visited: { ...prev.onboarding.visited, [id]: true } },
+          });
+        },
         closeStation: () => set({ activeStation: null }),
+        markMoved: () => {
+          if (get().onboarding.moved) return;
+          set({ onboarding: { ...get().onboarding, moved: true } });
+        },
+        dismissChecklist: () =>
+          set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
           set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false });
@@ -259,6 +276,7 @@ export const useGameStore = create<GameState>()(
         questProgress: state.questProgress,
         badges: state.badges,
         promotionStatus: state.promotionStatus,
+        onboarding: state.onboarding,
       }),
       onRehydrateStorage: () => (state) => {
         // regenerate energy based on elapsed offline time

@@ -1,4 +1,4 @@
-export type StationId = 'arena' | 'quests' | 'career' | 'leaderboard';
+export type StationId = 'arena' | 'quests' | 'career' | 'leaderboard' | 'org';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 

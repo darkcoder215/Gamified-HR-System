@@ -5,6 +5,8 @@ import { EventBus } from '@/game/EventBus';
 import StartScreen from './StartScreen';
 import Hud from './hud/Hud';
 import ProgressBridge from './hud/ProgressBridge';
+import MiniMap from './hud/MiniMap';
+import OnboardingChecklist from './hud/OnboardingChecklist';
 import StationModalRouter from './modules/StationModalRouter';
 import Celebrations from './animation/Celebrations';
 import MobileControls from './game/input/MobileControls';
@@ -45,8 +47,27 @@ export default function App() {
       >
         <PhaserGame />
       </Suspense>
+
+      {/* Thmanyah color grade over the pixel world for brand cohesion */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          background:
+            'radial-gradient(120% 120% at 50% 35%, rgba(0,193,122,0.10), rgba(0,114,249,0.06) 55%, rgba(130,0,58,0.10) 100%)',
+          mixBlendMode: 'soft-light',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          background: 'radial-gradient(110% 110% at 50% 45%, transparent 60%, rgba(17,20,33,0.34) 100%)',
+        }}
+      />
+
       <Hud />
       <ProgressBridge />
+      <MiniMap />
+      <OnboardingChecklist />
       <MobileControls />
       <StationModalRouter />
       <Modal

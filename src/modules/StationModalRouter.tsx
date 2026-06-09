@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Swords, ClipboardList, TrendingUp, Trophy } from 'lucide-react';
+import { Swords, ClipboardList, TrendingUp, Trophy, Building2 } from 'lucide-react';
 import type { StationId } from '@/types';
 import { useGameStore } from '@/state/store';
 import { EventBus } from '@/game/EventBus';
@@ -8,6 +8,7 @@ import AssessmentArena from './arena/AssessmentArena';
 import QuestBoard from './quests/QuestBoard';
 import CareerLadder from './promotion/CareerLadder';
 import LeaderboardHall from './leaderboard/LeaderboardHall';
+import OrgHierarchy from './org/OrgHierarchy';
 
 interface StationMeta {
   title: string;
@@ -50,6 +51,14 @@ const META: Record<StationId, StationMeta> = {
     icon: <Trophy size={24} />,
     Component: LeaderboardHall,
     maxWidth: '680px',
+  },
+  org: {
+    title: 'الهيكل التنظيمي',
+    subtitle: 'فريق ثمانية وموقعك فيه',
+    accent: 'var(--color-charcoal)',
+    icon: <Building2 size={24} />,
+    Component: OrgHierarchy,
+    maxWidth: '720px',
   },
 };
 

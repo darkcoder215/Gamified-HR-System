@@ -54,4 +54,14 @@ export const stations: StationDef[] = [
     color: '#82003a',
     glyph: '🏆',
   },
+  {
+    id: 'org',
+    nameAr: 'المقر — الهيكل التنظيمي',
+    hintAr: 'تعرّف على فريق الشركة وموقعك فيه',
+    x: 230,
+    y: 300,
+    signY: 150,
+    color: '#2b2d3f',
+    glyph: '🏢',
+  },
 ];

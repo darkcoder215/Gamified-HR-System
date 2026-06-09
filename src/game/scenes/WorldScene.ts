@@ -12,6 +12,8 @@ export default class WorldScene extends Phaser.Scene {
   private mobileVec = new Phaser.Math.Vector2(0, 0);
   private nearStation: StationDef | null = null;
   private interactBuffered = false;
+  private movedEmitted = false;
+  private posTick = 0;
   private progressText = new Map<string, Phaser.GameObjects.Text>();
   private rings = new Map<string, Phaser.GameObjects.Arc>();
 
@@ -56,8 +58,9 @@ export default class WorldScene extends Phaser.Scene {
 
     this.bindEvents();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.unbindEvents());
-    // request initial progress values from React
+    // request initial progress values from React + seed minimap position
     EventBus.emit('progress:request');
+    EventBus.emit('player:pos', { x: SPAWN.x, y: SPAWN.y });
   }
 
   private createMarker(st: StationDef) {
@@ -162,6 +165,16 @@ export default class WorldScene extends Phaser.Scene {
 
     const px = this.player.sprite.x;
     const py = this.player.sprite.y;
+
+    // onboarding: first movement
+    if (!this.movedEmitted && (dx !== 0 || dy !== 0)) {
+      this.movedEmitted = true;
+      EventBus.emit('player:moved');
+    }
+    // minimap position (throttled)
+    if (++this.posTick % 6 === 0) {
+      EventBus.emit('player:pos', { x: px, y: py });
+    }
     let near: StationDef | null = null;
     let best = 80 * 80;
     for (const st of stations) {
