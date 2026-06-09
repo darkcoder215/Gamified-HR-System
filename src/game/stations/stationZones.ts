@@ -4,47 +4,53 @@ export interface StationDef {
   id: StationId;
   nameAr: string;
   hintAr: string;
-  x: number; // world pixel center
+  x: number; // world pixel — the walkable spot in front of the building's door
   y: number;
-  color: string; // pad accent
-  glyph: string; // emoji marker drawn in canvas (icon, not Arabic text)
+  signY: number; // world pixel Y where the floating marker hovers (above the roof)
+  color: string;
+  glyph: string; // emoji marker (safe to render in the canvas)
 }
 
-// World is 1280 x 960 (40x30 tiles of 32px). Stations are spread around a campus.
+// Placed in front of four distinct, thematically-fitting buildings in the
+// Tuxemon town (verified walkable, see plan).
 export const stations: StationDef[] = [
+  {
+    id: 'career',
+    nameAr: 'برج الترقيات',
+    hintAr: 'تابع مسارك المهني واطلب الترقية',
+    x: 700,
+    y: 300,
+    signY: 40,
+    color: '#ffbc0a',
+    glyph: '🏙️',
+  },
   {
     id: 'arena',
     nameAr: 'ساحة التقييم',
     hintAr: 'اختبر مهاراتك في نزالات معرفية',
-    x: 280,
-    y: 240,
+    x: 560,
+    y: 575,
+    signY: 412,
     color: '#00c17a',
     glyph: '⚔️',
   },
   {
     id: 'quests',
-    nameAr: 'لوحة المهام',
+    nameAr: 'مركز المهام',
     hintAr: 'أكمل مهام التطوير واكسب الخبرة',
-    x: 1000,
-    y: 240,
+    x: 660,
+    y: 880,
+    signY: 700,
     color: '#0072f9',
     glyph: '📋',
-  },
-  {
-    id: 'career',
-    nameAr: 'برج الترقيات',
-    hintAr: 'تابع مسارك المهني واطلب الترقية',
-    x: 280,
-    y: 720,
-    color: '#ffbc0a',
-    glyph: '🏯',
   },
   {
     id: 'leaderboard',
     nameAr: 'قاعة الصدارة',
     hintAr: 'قارن ترتيبك واستعرض أوسمتك',
-    x: 1000,
-    y: 720,
+    x: 270,
+    y: 1165,
+    signY: 985,
     color: '#82003a',
     glyph: '🏆',
   },

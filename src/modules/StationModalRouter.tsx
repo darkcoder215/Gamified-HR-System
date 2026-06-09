@@ -67,11 +67,6 @@ export default function StationModalRouter() {
     };
   }, [openStation]);
 
-  // React → Phaser: freeze the world while a dashboard is open.
-  useEffect(() => {
-    EventBus.emit(activeStation ? 'game:pause' : 'game:resume');
-  }, [activeStation]);
-
   const meta = activeStation ? META[activeStation] : null;
 
   return (

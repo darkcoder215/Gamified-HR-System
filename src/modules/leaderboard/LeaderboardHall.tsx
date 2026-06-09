@@ -12,6 +12,7 @@ export default function LeaderboardHall() {
   const [tab, setTab] = useState<Tab>('ranking');
   const ranked = useLeaderboard();
   const unlockedMap = useGameStore((s) => s.badges);
+  const avatarImage = useGameStore((s) => s.player.avatarImage);
 
   return (
     <div>
@@ -57,10 +58,14 @@ export default function LeaderboardHall() {
                   {RankIcon ? <RankIcon size={20} style={{ color: r.rank === 1 ? '#ffbc0a' : '#494c6b' }} /> : <NumberText value={r.rank} />}
                 </div>
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full font-display text-base font-black text-white"
+                  className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full font-display text-base font-black text-white"
                   style={{ background: r.avatar }}
                 >
-                  {r.nameAr.trim().charAt(0)}
+                  {r.isPlayer && avatarImage ? (
+                    <img src={avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
+                  ) : (
+                    r.nameAr.trim().charAt(0)
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-ui text-sm font-bold text-black">

@@ -89,6 +89,34 @@ export const quests: Quest[] = [
       { id: 's4', titleAr: 'دوّن ما تعلّمته من التجربة' },
     ],
   },
+  {
+    id: 'quest-prob-1',
+    titleAr: 'مُحلّل المشكلات',
+    descAr: 'اكتسب منهجية واضحة لتفكيك المشكلات وحلّها.',
+    pathAr: 'مسار حل المشكلات',
+    competencyId: 'problem',
+    difficulty: 'medium',
+    xpReward: 140,
+    steps: [
+      { id: 's1', titleAr: 'اكتب تعريفًا دقيقًا لمشكلة تواجهك' },
+      { id: 's2', titleAr: 'طبّق أسلوب «الأسباب الخمسة»' },
+      { id: 's3', titleAr: 'قارن ثلاثة حلول واختر الأنسب' },
+    ],
+  },
+  {
+    id: 'quest-time-1',
+    titleAr: 'سيّد وقتك',
+    descAr: 'نظّم يومك وارفع تركيزك وإنتاجيتك.',
+    pathAr: 'مسار إدارة الوقت',
+    competencyId: 'time',
+    difficulty: 'easy',
+    xpReward: 100,
+    steps: [
+      { id: 's1', titleAr: 'صنّف مهامك بمصفوفة آيزنهاور' },
+      { id: 's2', titleAr: 'خصّص فترتَي تركيز عميق في يومك' },
+      { id: 's3', titleAr: 'راجع إنجازك في نهاية اليوم' },
+    ],
+  },
 ];
 
 export const getQuest = (id: string): Quest | undefined => quests.find((q) => q.id === id);

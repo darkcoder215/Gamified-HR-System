@@ -43,6 +43,20 @@ export const competencies: Competency[] = [
     icon: 'Lightbulb',
     color: '#ff00b7',
   },
+  {
+    id: 'problem',
+    nameAr: 'حل المشكلات',
+    descAr: 'تحليل المواقف المعقّدة والوصول إلى حلول عملية.',
+    icon: 'Puzzle',
+    color: '#84dbe5',
+  },
+  {
+    id: 'time',
+    nameAr: 'إدارة الوقت',
+    descAr: 'ترتيب الأولويات والتركيز وإنجاز ما يهم.',
+    icon: 'Clock',
+    color: '#d1c4e2',
+  },
 ];
 
 export const getCompetency = (id: string): Competency | undefined =>

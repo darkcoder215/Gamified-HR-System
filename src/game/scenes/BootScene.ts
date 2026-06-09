@@ -1,30 +1,30 @@
 import Phaser from 'phaser';
-import { PLAYER_SPRITE_CONFIG } from '../gameConfig';
+import { PLAYER, TILEMAP } from '../gameConfig';
 
-// Attempts to load real player art; falls back to generated sprites if absent.
 export default class BootScene extends Phaser.Scene {
-  private playerLoaded = false;
-
   constructor() {
     super('Boot');
   }
 
   preload() {
-    this.load.on('loaderror', (file: Phaser.Loader.File) => {
-      if (file.key === 'player-sheet') this.playerLoaded = false;
+    // Loading bar (brand green) over the off-white background.
+    const { width, height } = this.scale;
+    const barW = Math.min(360, width * 0.6);
+    const x = width / 2 - barW / 2;
+    const y = height / 2;
+    const box = this.add.graphics();
+    box.fillStyle(0xffffff, 1).fillRoundedRect(x - 4, y - 12, barW + 8, 24, 12);
+    const bar = this.add.graphics();
+    this.load.on('progress', (p: number) => {
+      bar.clear().fillStyle(0x00c17a, 1).fillRoundedRect(x, y - 8, barW * p, 16, 8);
     });
 
-    // Try the swappable player spritesheet. If it isn't present, we generate one.
-    this.load.spritesheet('player-sheet', PLAYER_SPRITE_CONFIG.path, {
-      frameWidth: PLAYER_SPRITE_CONFIG.frameWidth,
-      frameHeight: PLAYER_SPRITE_CONFIG.frameHeight,
-    });
-    this.load.on('filecomplete-spritesheet-player-sheet', () => {
-      this.playerLoaded = true;
-    });
+    this.load.image(TILEMAP.tilesetKey, TILEMAP.tilesetPath);
+    this.load.tilemapTiledJSON(TILEMAP.key, TILEMAP.path);
+    this.load.atlas(PLAYER.key, PLAYER.texturePath, PLAYER.atlasPath);
   }
 
   create() {
-    this.scene.start('World', { playerLoaded: this.playerLoaded });
+    this.scene.start('World');
   }
 }

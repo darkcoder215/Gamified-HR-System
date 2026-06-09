@@ -11,6 +11,8 @@ import {
   BarChart3,
   Users,
   Lightbulb,
+  Puzzle,
+  Clock,
   Circle,
   type LucideIcon as LucideIconType,
 } from 'lucide-react';
@@ -34,6 +36,8 @@ const COMP_ICONS: Record<string, LucideIconType> = {
   BarChart3,
   Users,
   Lightbulb,
+  Puzzle,
+  Clock,
 };
 
 function LucideIcon({ name, ...props }: { name: string; size?: number; color?: string }) {

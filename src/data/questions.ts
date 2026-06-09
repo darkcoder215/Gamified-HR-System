@@ -193,6 +193,70 @@ export const questions: Question[] = [
     xp: 60,
     difficulty: 'hard',
   },
+
+  // ── Problem solving ──
+  {
+    id: 'q-prob-1',
+    competencyId: 'problem',
+    promptAr: 'الخطوة الأولى في حل أي مشكلة بفعالية هي:',
+    choicesAr: ['القفز إلى أول حل يخطر ببالك', 'تعريف المشكلة بدقة وفهم جذورها', 'تجاهلها حتى تكبر', 'إلقاؤها على شخص آخر'],
+    correctIndex: 1,
+    explanationAr: 'حل المشكلات يبدأ بتعريف دقيق للمشكلة وفهم أسبابها الجذرية.',
+    xp: 30,
+    difficulty: 'easy',
+  },
+  {
+    id: 'q-prob-2',
+    competencyId: 'problem',
+    promptAr: 'أسلوب «الأسباب الخمسة» (5 Whys) يُستخدم لـ:',
+    choicesAr: ['تأجيل القرار', 'الوصول إلى السبب الجذري بالسؤال المتكرر', 'توزيع اللوم', 'كتابة التقارير'],
+    correctIndex: 1,
+    explanationAr: 'تقنية «لماذا» المتكررة تساعد على بلوغ السبب الجذري للمشكلة.',
+    xp: 45,
+    difficulty: 'medium',
+  },
+  {
+    id: 'q-prob-3',
+    competencyId: 'problem',
+    promptAr: 'أمامك عدة حلول ممكنة لمشكلة. الأنسب لاختيار الأفضل:',
+    choicesAr: ['اختيار الأسهل دائمًا', 'تقييم الحلول وفق الأثر والكلفة والمخاطر', 'اختيار الأغلى', 'ترك القرار للحظ'],
+    correctIndex: 1,
+    explanationAr: 'تُقارن الحلول عبر معايير واضحة كالأثر والكلفة والمخاطر لاختيار الأنسب.',
+    xp: 60,
+    difficulty: 'hard',
+  },
+
+  // ── Time management ──
+  {
+    id: 'q-time-1',
+    competencyId: 'time',
+    promptAr: 'مصفوفة آيزنهاور تصنّف المهام حسب:',
+    choicesAr: ['اللون والحجم', 'الأهمية والإلحاح', 'من طلبها', 'ترتيبها الأبجدي'],
+    correctIndex: 1,
+    explanationAr: 'مصفوفة آيزنهاور ترتّب المهام وفق محورَي الأهمية والإلحاح.',
+    xp: 30,
+    difficulty: 'easy',
+  },
+  {
+    id: 'q-time-2',
+    competencyId: 'time',
+    promptAr: 'لزيادة تركيزك وإنتاجيتك خلال اليوم، الأفضل:',
+    choicesAr: ['أداء عدة مهام معًا باستمرار', 'تخصيص فترات تركيز عميق دون مقاطعات', 'الرد على كل إشعار فورًا', 'تأجيل المهام الصعبة دائمًا'],
+    correctIndex: 1,
+    explanationAr: 'فترات التركيز العميق دون مقاطعات ترفع الإنتاجية مقارنة بتعدّد المهام.',
+    xp: 45,
+    difficulty: 'medium',
+  },
+  {
+    id: 'q-time-3',
+    competencyId: 'time',
+    promptAr: 'تراكمت عليك مهام أكثر من طاقتك في الوقت المتاح. الأنسب:',
+    choicesAr: ['العمل ساعات إضافية بلا حدود', 'إعادة ترتيب الأولويات والتفاوض على المواعيد', 'تنفيذ كل شيء بجودة منخفضة', 'تجاهل الأقل وضوحًا فقط'],
+    correctIndex: 1,
+    explanationAr: 'عند زيادة الحِمل، أعد ترتيب الأولويات وتفاوض على التوقعات بدل إرهاق النفس.',
+    xp: 60,
+    difficulty: 'hard',
+  },
 ];
 
 export const getQuestionsByCompetency = (competencyId: string): Question[] =>

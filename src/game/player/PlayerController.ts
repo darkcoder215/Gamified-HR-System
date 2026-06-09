@@ -1,22 +1,21 @@
 import Phaser from 'phaser';
-import { PLAYER_SPEED, PLAYER_SPRITE_CONFIG } from '../gameConfig';
+import { PLAYER_SPEED, PLAYER, PLAYER_ANIMS } from '../gameConfig';
 
 type Dir = 'down' | 'up' | 'left' | 'right';
 
 export default class PlayerController {
   sprite: Phaser.Physics.Arcade.Sprite;
   private scene: Phaser.Scene;
-  private source: 'sheet' | 'fallback';
   private facing: Dir = 'down';
   private moveVec = new Phaser.Math.Vector2(0, 0);
 
-  constructor(scene: Phaser.Scene, x: number, y: number, source: 'sheet' | 'fallback') {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
-    this.source = source;
-    const initialTexture = source === 'sheet' ? 'player-sheet' : 'pc-down-0';
-    this.sprite = scene.physics.add.sprite(x, y, initialTexture, source === 'sheet' ? 0 : undefined);
+    this.sprite = scene.physics.add.sprite(x, y, PLAYER.key, PLAYER_ANIMS.down.idle);
+    this.sprite.setScale(1.4);
     this.sprite.setCollideWorldBounds(true);
-    this.sprite.body!.setSize(18, 16).setOffset(7, 30);
+    // collide on the feet only
+    this.sprite.body!.setSize(16, 14).setOffset(7, 28);
     this.sprite.setDepth(10);
     this.createAnims();
     this.idle();
@@ -24,32 +23,21 @@ export default class PlayerController {
 
   private createAnims() {
     const a = this.scene.anims;
-    const dirs: Dir[] = PLAYER_SPRITE_CONFIG.rows as unknown as Dir[];
-    if (this.source === 'sheet') {
-      dirs.forEach((dir, row) => {
-        const start = row * PLAYER_SPRITE_CONFIG.framesPerRow;
-        if (a.exists(`walk-${dir}`)) return;
-        a.create({
-          key: `walk-${dir}`,
-          frames: a.generateFrameNumbers('player-sheet', {
-            start,
-            end: start + PLAYER_SPRITE_CONFIG.framesPerRow - 1,
-          }),
-          frameRate: 8,
-          repeat: -1,
-        });
+    (Object.keys(PLAYER_ANIMS) as Dir[]).forEach((dir) => {
+      const key = `walk-${dir}`;
+      if (a.exists(key)) return;
+      a.create({
+        key,
+        frames: a.generateFrameNames(PLAYER.key, {
+          prefix: PLAYER_ANIMS[dir].walkPrefix,
+          start: 0,
+          end: 3,
+          zeroPad: 3,
+        }),
+        frameRate: 10,
+        repeat: -1,
       });
-    } else {
-      (['down', 'up', 'left', 'right'] as Dir[]).forEach((dir) => {
-        if (a.exists(`walk-${dir}`)) return;
-        a.create({
-          key: `walk-${dir}`,
-          frames: [{ key: `pc-${dir}-0` }, { key: `pc-${dir}-1` }],
-          frameRate: 6,
-          repeat: -1,
-        });
-      });
-    }
+    });
   }
 
   setMove(dx: number, dy: number) {
@@ -57,14 +45,8 @@ export default class PlayerController {
   }
 
   private idle() {
-    if (this.source === 'sheet') {
-      const row = (PLAYER_SPRITE_CONFIG.rows as readonly string[]).indexOf(this.facing);
-      this.sprite.anims.stop();
-      this.sprite.setFrame(row * PLAYER_SPRITE_CONFIG.framesPerRow);
-    } else {
-      this.sprite.anims.stop();
-      this.sprite.setTexture(`pc-${this.facing}-0`);
-    }
+    this.sprite.anims.stop();
+    this.sprite.setTexture(PLAYER.key, PLAYER_ANIMS[this.facing].idle);
   }
 
   update() {
@@ -73,12 +55,8 @@ export default class PlayerController {
     if (v.lengthSq() > 0.01) {
       const norm = v.clone().normalize().scale(PLAYER_SPEED);
       body.setVelocity(norm.x, norm.y);
-      // choose facing by dominant axis
-      if (Math.abs(v.x) > Math.abs(v.y)) {
-        this.facing = v.x > 0 ? 'right' : 'left';
-      } else {
-        this.facing = v.y > 0 ? 'down' : 'up';
-      }
+      if (Math.abs(v.x) > Math.abs(v.y)) this.facing = v.x > 0 ? 'right' : 'left';
+      else this.facing = v.y > 0 ? 'down' : 'up';
       const key = `walk-${this.facing}`;
       if (this.sprite.anims.currentAnim?.key !== key) this.sprite.anims.play(key, true);
     } else {

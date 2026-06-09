@@ -17,7 +17,9 @@ interface PlayerState {
   energy: number;
   energyUpdatedAt: number;
   titleAr: string;
-  avatar: string; // color token for the avatar disc
+  avatar: string; // color token for the avatar disc (fallback)
+  avatarImage: string | null; // AI-generated pixel avatar (data URL)
+  characterTint: string | null; // optional recolor of the in-world sprite
 }
 
 interface PersistedState {
@@ -33,10 +35,15 @@ interface PersistedState {
 interface GameState extends PersistedState {
   // transient UI state (not persisted)
   activeStation: StationId | null;
+  characterOpen: boolean;
 
   // actions
   startGame: (name: string) => void;
   setName: (name: string) => void;
+  setAvatarImage: (dataUrl: string | null) => void;
+  setCharacterTint: (hex: string | null) => void;
+  openCharacter: () => void;
+  closeCharacter: () => void;
   addXp: (amount: number) => void;
   loseEnergy: (amount: number) => void;
   regenEnergy: () => void;
@@ -58,6 +65,8 @@ const initialPlayer: PlayerState = {
   energyUpdatedAt: Date.now(),
   titleAr: careerLadder[0].titleAr,
   avatar: '#00c17a',
+  avatarImage: null,
+  characterTint: null,
 };
 
 const initialPersisted: PersistedState = {
@@ -140,6 +149,13 @@ export const useGameStore = create<GameState>()(
       return {
         ...initialPersisted,
         activeStation: null,
+        characterOpen: false,
+
+        setAvatarImage: (dataUrl) =>
+          set({ player: { ...get().player, avatarImage: dataUrl } }),
+        setCharacterTint: (hex) => set({ player: { ...get().player, characterTint: hex } }),
+        openCharacter: () => set({ characterOpen: true }),
+        closeCharacter: () => set({ characterOpen: false }),
 
         startGame: (name) =>
           commit({ started: true, player: { ...get().player, nameAr: name.trim() || 'لاعب جديد' } }),
@@ -227,7 +243,7 @@ export const useGameStore = create<GameState>()(
         closeStation: () => set({ activeStation: null }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false });
         },
       };
     },
