@@ -1,0 +1,80 @@
+:root {
+  /* ── Primary ── */
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-green: #00c17a;
+  --color-green-light: #b5e8be;
+  --color-green-pale: #b2e2ba;
+
+  /* ── Brand Accents ── */
+  --color-blue: #0072f9;
+  --color-red: #f24935;
+
+  /* ── Extended Palette ── */
+  --color-burgundy: #82003a;
+  --color-hot-pink: #ff00b7;
+  --color-amber: #ffbc0a;
+  --color-yellow-bright: #ffdd56;
+  --color-yellow-pale: #f9e59e;
+  --color-peach: #ff9172;
+  --color-salmon: #ffbaa3;
+  --color-blush: #ffd1c4;
+  --color-pink-light: #ffa5c6;
+  --color-rose: #ffc9d8;
+  --color-lavender: #d1c4e2;
+  --color-sky-blue: #84dbe5;
+  --color-sky-light: #afe2ea;
+  --color-aqua-pale: #d1edef;
+  --color-mint: #b2e2ba;
+
+  /* ── Neutrals ── */
+  --color-dark-slate: #111421;
+  --color-charcoal: #2b2d3f;
+  --color-muted: #494c6b;
+  --color-warm-gray: #efede2;
+  --color-cream: #f4f2ed;
+  --color-off-white: #f7f4ee;
+  --color-warm-white: #f2edea;
+
+  /* ── Semantic ── */
+  --color-success: #00c17a;
+  --color-warning: #ffbc0a;
+  --color-error: #f24935;
+  --color-info: #0072f9;
+
+  /* ── Score Gradation ── */
+  --score-excellent: #00c17a;
+  --score-good: #b2e2ba;
+  --score-average: #ffbc0a;
+  --score-below-average: #ff9172;
+  --score-poor: #f24935;
+
+  /* ── Typography ── */
+  --font-display: 'Thmanyah Serif Display', 'Georgia', serif;
+  --font-body: 'Thmanyah Serif Text', 'Georgia', serif;
+  --font-ui: 'Thmanyah Sans', 'Segoe UI', 'Helvetica Neue', sans-serif;
+
+  /* ── Spacing (8px grid) ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Border Radius ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}

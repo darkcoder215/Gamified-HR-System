@@ -1,0 +1,120 @@
+@import './tokens.css';
+@import './fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-ui);
+    background-color: var(--color-off-white);
+    color: var(--color-black);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Numbers inside Arabic text should always read left-to-right as Western digits */
+  .num {
+    font-family: var(--font-ui);
+    unicode-bidi: plaintext;
+    font-variant-numeric: lining-nums tabular-nums;
+    direction: ltr;
+    display: inline-block;
+  }
+}
+
+@layer components {
+  .highlight {
+    background-color: var(--color-green-light);
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline;
+  }
+
+  /* Thmanyah pill buttons */
+  .btn {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: var(--radius-full);
+    padding: 10px 24px;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+    border: none;
+    line-height: 1.2;
+  }
+  .btn:active {
+    transform: scale(0.96);
+  }
+  .btn-primary {
+    background: var(--color-black);
+    color: var(--color-white);
+  }
+  .btn-accent {
+    background: var(--color-green);
+    color: var(--color-white);
+  }
+  .btn-danger {
+    background: var(--color-red);
+    color: var(--color-white);
+  }
+  .btn-secondary {
+    background: var(--color-white);
+    color: var(--color-black);
+    border: 1px solid var(--color-warm-gray);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-black);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-6);
+  }
+}
+
+/* Custom scrollbars for the luxe feel */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-warm-gray);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
