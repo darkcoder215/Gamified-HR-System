@@ -4,6 +4,7 @@ import { Trophy, Award, Crown, Medal } from 'lucide-react';
 import { useLeaderboard } from '@/state/selectors';
 import { useGameStore } from '@/state/store';
 import { badges as allBadges } from '@/data/badges';
+import { frameStyle } from '@/data/frames';
 import NumberText from '@/ui/NumberText';
 
 type Tab = 'ranking' | 'badges';
@@ -13,6 +14,7 @@ export default function LeaderboardHall() {
   const ranked = useLeaderboard();
   const unlockedMap = useGameStore((s) => s.badges);
   const avatarImage = useGameStore((s) => s.player.avatarImage);
+  const playerFrame = useGameStore((s) => s.player.frame);
 
   return (
     <div>
@@ -59,7 +61,7 @@ export default function LeaderboardHall() {
                 </div>
                 <div
                   className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full font-display text-base font-black text-white"
-                  style={{ background: r.avatar }}
+                  style={{ background: r.avatar, ...(r.isPlayer ? frameStyle(playerFrame) : {}) }}
                 >
                   {r.isPlayer && avatarImage ? (
                     <img src={avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />

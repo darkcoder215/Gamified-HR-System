@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, Sparkles, Trash2, Loader2, Palette, Wand2 } from 'lucide-react';
 import { useGameStore } from '@/state/store';
+import { fileToScaledDataURL, generatePixelAvatar } from '@/lib/avatar';
 import Button from '@/ui/Button';
 
 type Tab = 'ai' | 'color';
@@ -15,27 +16,6 @@ const TINTS: { label: string; hex: string | null }[] = [
   { label: 'سماوي', hex: '#84dbe5' },
   { label: 'عنّابي', hex: '#82003a' },
 ];
-
-// Downscale an uploaded photo to keep the upload payload small.
-function fileToScaledDataURL(file: File, max = 512): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const scale = Math.min(1, max / Math.max(img.width, img.height));
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const c = document.createElement('canvas');
-      c.width = w;
-      c.height = h;
-      c.getContext('2d')!.drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      resolve(c.toDataURL('image/png'));
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
-}
 
 export default function CharacterStudio() {
   const player = useGameStore((s) => s.player);
@@ -58,27 +38,17 @@ export default function CharacterStudio() {
     if (!photo) return;
     setLoading(true);
     setError(null);
-    try {
-      const res = await fetch('/api/generate-character', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: photo }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.status === 501) {
-        setError(
-          'ميزة التوليد بالذكاء الاصطناعي تُفعَّل في بيئة الإنتاج بعد إضافة مفتاح OPENAI_API_KEY. يمكنك الآن اختيار لون الشخصية من تبويب «الألوان».'
-        );
-      } else if (!res.ok || !data.image) {
-        setError(data.message || 'تعذّر توليد الشخصية، حاول مرة أخرى.');
-      } else {
-        setAvatarImage(data.image);
-      }
-    } catch {
-      setError('تعذّر الاتصال بخدمة التوليد.');
-    } finally {
-      setLoading(false);
+    const r = await generatePixelAvatar(photo);
+    if (r.needsKey) {
+      setError(
+        'ميزة التوليد بالذكاء الاصطناعي تُفعَّل في بيئة الإنتاج بعد إضافة مفتاح OPENAI_API_KEY. يمكنك الآن اختيار لون الشخصية من تبويب «الألوان».'
+      );
+    } else if (r.error) {
+      setError(r.error);
+    } else if (r.image) {
+      setAvatarImage(r.image);
     }
+    setLoading(false);
   };
 
   return (

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { EventBus } from '@/game/EventBus';
 import { stations } from '@/game/stations/stationZones';
+import { npcs } from '@/data/npcs';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '@/game/gameConfig';
-
-const SIZE = 150; // displayed minimap size in px
+import { useIsTouch } from '@/hooks/useIsTouch';
 
 export default function MiniMap() {
+  const isTouch = useIsTouch();
+  const SIZE = isTouch ? 104 : 150;
   const [pos, setPos] = useState({ x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 });
 
   useEffect(() => {
@@ -18,9 +20,10 @@ export default function MiniMap() {
   const sy = SIZE / WORLD_HEIGHT;
 
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-20 hidden sm:block">
-      <div className="rounded-xl bg-white p-2 shadow-card">
-        <div className="mb-1 flex items-center justify-between px-0.5">
+    // bottom-left on phones (keeps clear of the interact button), bottom-right on desktop
+    <div className="pointer-events-none fixed bottom-4 left-4 z-20 sm:left-auto sm:right-4">
+      <div className="rounded-xl bg-white p-1.5 shadow-card sm:p-2">
+        <div className="mb-1 hidden items-center justify-between px-0.5 sm:flex">
           <span className="font-ui text-[11px] font-bold text-charcoal">الخريطة</span>
           <span className="num font-ui text-[10px] text-muted">ثمانية</span>
         </div>
@@ -32,20 +35,21 @@ export default function MiniMap() {
             height={SIZE}
             style={{ imageRendering: 'pixelated', display: 'block' }}
           />
+          {/* NPC dots */}
+          {npcs.map((n) => (
+            <span
+              key={n.id}
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full opacity-80"
+              style={{ left: n.x * sx, top: n.y * sy, width: 5, height: 5, background: n.tint, border: '1px solid #fff' }}
+            />
+          ))}
           {/* station dots */}
           {stations.map((st) => (
             <span
               key={st.id}
               title={st.nameAr}
               className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{
-                left: st.x * sx,
-                top: st.y * sy,
-                width: 8,
-                height: 8,
-                background: st.color,
-                border: '1.5px solid #fff',
-              }}
+              style={{ left: st.x * sx, top: st.y * sy, width: 8, height: 8, background: st.color, border: '1.5px solid #fff' }}
             />
           ))}
           {/* player dot */}

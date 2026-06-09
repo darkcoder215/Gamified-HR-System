@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3, Volume2, VolumeX, MessageSquare } from 'lucide-react';
+import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3, Volume2, VolumeX, MessageSquare, ShoppingBag, Coins } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { levelProgress } from '@/state/gamification';
 import { stations } from '@/game/stations/stationZones';
 import { npcs } from '@/data/npcs';
 import { badges as allBadges } from '@/data/badges';
+import { frameStyle } from '@/data/frames';
 import { useFocus } from '@/hooks/useFocus';
 import { useIsTouch } from '@/hooks/useIsTouch';
 import { EventBus } from '@/game/EventBus';
@@ -24,6 +25,8 @@ export default function Hud() {
   const openAnalytics = useGameStore((s) => s.openAnalytics);
   const muted = useGameStore((s) => s.muted);
   const toggleMuted = useGameStore((s) => s.toggleMuted);
+  const openShop = useGameStore((s) => s.openShop);
+  const coins = useGameStore((s) => s.coins);
 
   const prog = levelProgress(player.xp);
   const energyColor =
@@ -46,7 +49,7 @@ export default function Hud() {
         >
           <div
             className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full font-display text-base font-black text-white sm:h-12 sm:w-12 sm:text-xl"
-            style={{ background: player.avatar }}
+            style={{ background: player.avatar, ...frameStyle(player.frame) }}
           >
             {player.avatarImage ? (
               <img src={player.avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
@@ -109,6 +112,10 @@ export default function Hud() {
             <span className="num font-ui text-xs font-bold" style={{ color: energyColor }}>
               <NumberText value={player.energy} />
             </span>
+            <span className="mx-0.5 h-4 w-px bg-warm-gray" />
+            <button onClick={openShop} className="pointer-events-auto flex items-center gap-1 font-ui text-xs font-bold text-black" title="المتجر">
+              <Coins size={14} className="text-amber" /> <NumberText value={coins} group />
+            </button>
           </div>
 
           {unlocked.length > 0 && (
@@ -146,6 +153,14 @@ export default function Hud() {
           title="تحليلاتي"
         >
           <BarChart3 size={14} /> <span className="hidden sm:inline">تحليلاتي</span>
+        </button>
+        <button
+          onClick={openShop}
+          className="pointer-events-auto flex items-center gap-1.5 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold shadow-soft transition hover:opacity-80"
+          style={{ color: 'var(--color-amber)' }}
+          title="المتجر"
+        >
+          <ShoppingBag size={14} /> <span className="hidden sm:inline">المتجر</span>
         </button>
         <button
           onClick={openCharacter}

@@ -8,7 +8,9 @@ import { sfx } from '@/audio/sound';
 export default function DialogueBox() {
   const activeNpc = useGameStore((s) => s.activeNpc);
   const endDialogue = useGameStore((s) => s.endDialogue);
+  const colleagueAvatars = useGameStore((s) => s.colleagueAvatars);
   const npc = activeNpc ? getNpc(activeNpc) : undefined;
+  const avatarImage = activeNpc ? colleagueAvatars[activeNpc] : undefined;
 
   const [line, setLine] = useState(0);
   const [shown, setShown] = useState('');
@@ -78,10 +80,14 @@ export default function DialogueBox() {
           >
             <div className="flex items-start gap-3">
               <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg font-display text-2xl font-black text-white"
+                className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg font-display text-2xl font-black text-white"
                 style={{ background: npc.tint }}
               >
-                {npc.nameAr.trim().charAt(0)}
+                {avatarImage ? (
+                  <img src={avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
+                ) : (
+                  npc.nameAr.trim().charAt(0)
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">

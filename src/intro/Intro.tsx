@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -11,6 +11,7 @@ import {
   BookOpen,
   Palette,
   TrendingUp,
+  ShoppingBag,
 } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { buildingGuides } from '@/data/guide';
@@ -211,6 +212,7 @@ export default function Intro() {
           { icon: <BarChart3 size={20} />, t: 'تحليلاتي', c: '#82003a' },
           { icon: <BookOpen size={20} />, t: 'الدليل', c: '#ffbc0a' },
           { icon: <Palette size={20} />, t: 'الشخصية (AI)', c: '#ff00b7' },
+          { icon: <ShoppingBag size={20} />, t: 'المتجر', c: '#ffbc0a' },
           { icon: <TrendingUp size={20} />, t: 'برج الترقيات', c: '#2b2d3f' },
         ].map((x) => (
           <motion.div key={x.t} variants={item} className="flex flex-col items-center gap-1.5 rounded-lg bg-white p-3 shadow-soft">
@@ -262,6 +264,8 @@ export default function Intro() {
 
   const last = slides.length - 1;
   const isLast = i === last;
+  const go = (dir: 1 | -1) => setI((n) => Math.max(0, Math.min(last, n + dir)));
+  const swipe = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (isLast) celebrate();
@@ -312,8 +316,22 @@ export default function Intro() {
         </button>
       </div>
 
-      {/* slide area */}
-      <div className="relative flex flex-1 items-center justify-center overflow-y-auto px-5 py-2">
+      {/* slide area (swipe left/right to navigate) */}
+      <div
+        className="relative flex flex-1 items-center justify-center overflow-y-auto px-5 py-2"
+        style={{ touchAction: 'pan-y' }}
+        onPointerDown={(e) => {
+          swipe.current = { x: e.clientX, y: e.clientY };
+        }}
+        onPointerUp={(e) => {
+          const s = swipe.current;
+          swipe.current = null;
+          if (!s) return;
+          const dx = e.clientX - s.x;
+          const dy = e.clientY - s.y;
+          if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1);
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={i}

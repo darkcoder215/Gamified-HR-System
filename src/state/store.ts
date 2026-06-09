@@ -20,6 +20,7 @@ interface PlayerState {
   avatar: string; // color token for the avatar disc (fallback)
   avatarImage: string | null; // AI-generated pixel avatar (data URL)
   characterTint: string | null; // optional recolor of the in-world sprite
+  frame: string | null; // equipped cosmetic avatar frame id
 }
 
 interface PersistedState {
@@ -30,6 +31,9 @@ interface PersistedState {
   questProgress: Record<string, { completedSteps: string[]; done: boolean }>;
   badges: Record<string, { unlockedAt: string }>;
   promotionStatus: { currentRung: number; pendingRequest: boolean };
+  coins: number;
+  ownedFrames: Record<string, true>;
+  colleagueAvatars: Record<string, string>; // npc/person id → AI avatar data URL
   onboarding: {
     moved: boolean;
     visited: Partial<Record<StationId, boolean>>;
@@ -47,6 +51,7 @@ interface GameState extends PersistedState {
   introReplay: boolean;
   activeNpc: string | null;
   muted: boolean;
+  shopOpen: boolean;
 
   // actions
   startGame: (name: string) => void;
@@ -76,6 +81,12 @@ interface GameState extends PersistedState {
   talkNpc: (id: string) => void;
   endDialogue: () => void;
   toggleMuted: () => void;
+  openShop: () => void;
+  closeShop: () => void;
+  buyFrame: (id: string, price: number) => void;
+  equipFrame: (id: string | null) => void;
+  buyEnergyRefill: (price: number) => void;
+  setColleagueAvatar: (id: string, dataUrl: string) => void;
   resetSave: () => void;
 }
 
@@ -89,6 +100,7 @@ const initialPlayer: PlayerState = {
   avatar: '#00c17a',
   avatarImage: null,
   characterTint: null,
+  frame: null,
 };
 
 const initialPersisted: PersistedState = {
@@ -99,6 +111,9 @@ const initialPersisted: PersistedState = {
   questProgress: {},
   badges: {},
   promotionStatus: { currentRung: 1, pendingRequest: false },
+  coins: 0,
+  ownedFrames: {},
+  colleagueAvatars: {},
   onboarding: { moved: false, visited: {}, checklistDismissed: false, introSeen: false },
 };
 
@@ -143,6 +158,9 @@ export const useGameStore = create<GameState>()(
           questProgress: partial.questProgress ?? prev.questProgress,
           badges: { ...prev.badges, ...(partial.badges ?? {}) },
           promotionStatus: partial.promotionStatus ?? prev.promotionStatus,
+          coins: partial.coins ?? prev.coins,
+          ownedFrames: partial.ownedFrames ?? prev.ownedFrames,
+          colleagueAvatars: partial.colleagueAvatars ?? prev.colleagueAvatars,
           onboarding: partial.onboarding ?? prev.onboarding,
         };
 
@@ -179,6 +197,30 @@ export const useGameStore = create<GameState>()(
         introReplay: false,
         activeNpc: null,
         muted: false,
+        shopOpen: false,
+
+        openShop: () => set({ shopOpen: true }),
+        closeShop: () => set({ shopOpen: false }),
+        buyFrame: (id, price) => {
+          const s = get();
+          if (s.ownedFrames[id] || s.coins < price) return;
+          commit({
+            coins: s.coins - price,
+            ownedFrames: { ...s.ownedFrames, [id]: true },
+            player: { ...s.player, frame: id },
+          });
+        },
+        equipFrame: (id) => set({ player: { ...get().player, frame: id } }),
+        buyEnergyRefill: (price) => {
+          const s = get();
+          if (s.coins < price || s.player.energy >= MAX_ENERGY) return;
+          commit({
+            coins: s.coins - price,
+            player: { ...s.player, energy: MAX_ENERGY, energyUpdatedAt: Date.now() },
+          });
+        },
+        setColleagueAvatar: (id, dataUrl) =>
+          set({ colleagueAvatars: { ...get().colleagueAvatars, [id]: dataUrl } }),
 
         finishIntro: () =>
           set({ introReplay: false, onboarding: { ...get().onboarding, introSeen: true } }),
@@ -230,6 +272,7 @@ export const useGameStore = create<GameState>()(
           commit({
             assessmentHistory: [result, ...prev.assessmentHistory].slice(0, 50),
             competencyScores: { ...prev.competencyScores, [result.competencyId]: best },
+            coins: prev.coins + result.correct * 5,
             player: { ...prev.player, xp: prev.player.xp + result.xpEarned },
           });
         },
@@ -261,6 +304,7 @@ export const useGameStore = create<GameState>()(
               ...prev.questProgress,
               [questId]: { ...entry, completedSteps: [...entry.completedSteps, '__rewarded__'] },
             },
+            coins: prev.coins + Math.round(xpReward / 4),
             player: { ...prev.player, xp: prev.player.xp + xpReward },
           });
         },
@@ -275,6 +319,7 @@ export const useGameStore = create<GameState>()(
           if (!rung) return;
           commit({
             promotionStatus: { currentRung: nextRungLevel, pendingRequest: false },
+            coins: prev.coins + 60,
             player: { ...prev.player, titleAr: rung.titleAr },
           });
         },
@@ -295,7 +340,7 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false });
         },
       };
     },
@@ -311,6 +356,9 @@ export const useGameStore = create<GameState>()(
         questProgress: state.questProgress,
         badges: state.badges,
         promotionStatus: state.promotionStatus,
+        coins: state.coins,
+        ownedFrames: state.ownedFrames,
+        colleagueAvatars: state.colleagueAvatars,
         onboarding: state.onboarding,
         muted: state.muted,
       }),
