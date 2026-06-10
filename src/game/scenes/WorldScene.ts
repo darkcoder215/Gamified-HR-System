@@ -21,6 +21,8 @@ export default class WorldScene extends Phaser.Scene {
   private rings = new Map<string, Phaser.GameObjects.Arc>();
   private pins = new Map<string, Phaser.GameObjects.Container>();
   private halos = new Map<string, Phaser.GameObjects.Arc>();
+  private lockIcons = new Map<string, Phaser.GameObjects.Text>();
+  private lockedSet = new Set<string>();
   private npcSprites = new Map<string, Phaser.GameObjects.Sprite>();
 
   constructor() {
@@ -109,7 +111,21 @@ export default class WorldScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setDepth(25);
     this.progressText.set(st.id, badge);
+
+    // lock overlay (shown when the station's district is still locked)
+    const lock = this.add.text(st.x, st.signY, '🔒', { fontSize: '22px' }).setOrigin(0.5).setDepth(27).setVisible(false);
+    this.lockIcons.set(st.id, lock);
   }
+
+  private onLocks = (locked: string[]) => {
+    this.lockedSet = new Set(locked);
+    for (const st of stations) {
+      const isLocked = this.lockedSet.has(st.id);
+      this.lockIcons.get(st.id)?.setVisible(isLocked);
+      this.pins.get(st.id)?.setAlpha(isLocked ? 0.45 : 1);
+      this.progressText.get(st.id)?.setAlpha(isLocked ? 0.5 : 1);
+    }
+  };
 
   private createNpc(npc: (typeof npcs)[number], group: Phaser.Physics.Arcade.StaticGroup) {
     const color = Phaser.Display.Color.HexStringToColor(npc.tint).color;
@@ -141,6 +157,7 @@ export default class WorldScene extends Phaser.Scene {
     EventBus.on('input:interact', this.tryInteract, this);
     EventBus.on('progress:update', this.onProgress, this);
     EventBus.on('player:tint', this.onTint, this);
+    EventBus.on('locks:update', this.onLocks, this);
   }
 
   private unbindEvents() {
@@ -151,6 +168,7 @@ export default class WorldScene extends Phaser.Scene {
     EventBus.off('input:interact', this.tryInteract, this);
     EventBus.off('progress:update', this.onProgress, this);
     EventBus.off('player:tint', this.onTint, this);
+    EventBus.off('locks:update', this.onLocks, this);
   }
 
   private onTint = (hex: string | null) => {
@@ -194,6 +212,11 @@ export default class WorldScene extends Phaser.Scene {
     if (this.focus.kind === 'station') {
       const st = stations.find((s) => s.id === this.focus!.id);
       if (!st) return;
+      if (this.lockedSet.has(st.id)) {
+        this.cameras.main.shake(160, 0.006);
+        EventBus.emit('station:locked', { stationId: st.id });
+        return;
+      }
       this.burstAt(st.x, st.signY, Phaser.Display.Color.HexStringToColor(st.color).color);
       const pin = this.pins.get(st.id);
       if (pin) this.tweens.add({ targets: pin, scale: 1.7, duration: 130, yoyo: true, ease: 'Quad.out' });

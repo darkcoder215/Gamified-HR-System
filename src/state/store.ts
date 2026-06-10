@@ -38,6 +38,7 @@ interface PersistedState {
   daily: DailyState;
   streak: number;
   lastActiveDay: string | null;
+  seenZones: Record<string, true>; // zones whose unlock has been celebrated
   onboarding: {
     moved: boolean;
     visited: Partial<Record<StationId, boolean>>;
@@ -57,6 +58,7 @@ interface GameState extends PersistedState {
   muted: boolean;
   shopOpen: boolean;
   dailyOpen: boolean;
+  zonesOpen: boolean;
 
   // actions
   startGame: (name: string) => void;
@@ -95,6 +97,9 @@ interface GameState extends PersistedState {
   openDaily: () => void;
   closeDaily: () => void;
   claimDaily: () => void;
+  openZones: () => void;
+  closeZones: () => void;
+  markZoneSeen: (id: string) => void;
   resetSave: () => void;
 }
 
@@ -136,6 +141,7 @@ const initialPersisted: PersistedState = {
   daily: freshDaily(''), // empty date → first activity rolls to today and starts the streak
   streak: 0,
   lastActiveDay: null,
+  seenZones: {},
   onboarding: { moved: false, visited: {}, checklistDismissed: false, introSeen: false },
 };
 
@@ -186,6 +192,7 @@ export const useGameStore = create<GameState>()(
           daily: partial.daily ?? prev.daily,
           streak: partial.streak ?? prev.streak,
           lastActiveDay: partial.lastActiveDay ?? prev.lastActiveDay,
+          seenZones: { ...prev.seenZones, ...(partial.seenZones ?? {}) },
           onboarding: partial.onboarding ?? prev.onboarding,
         };
 
@@ -224,9 +231,13 @@ export const useGameStore = create<GameState>()(
         muted: false,
         shopOpen: false,
         dailyOpen: false,
+        zonesOpen: false,
 
         openShop: () => set({ shopOpen: true }),
         closeShop: () => set({ shopOpen: false }),
+        openZones: () => set({ zonesOpen: true }),
+        closeZones: () => set({ zonesOpen: false }),
+        markZoneSeen: (id) => set({ seenZones: { ...get().seenZones, [id]: true } }),
         openDaily: () => {
           const r = rollDaily(get());
           commit({ daily: r.daily, streak: r.streak, lastActiveDay: r.lastActiveDay });
@@ -393,7 +404,7 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false, dailyOpen: false });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false, dailyOpen: false, zonesOpen: false });
         },
       };
     },
@@ -415,6 +426,7 @@ export const useGameStore = create<GameState>()(
         daily: state.daily,
         streak: state.streak,
         lastActiveDay: state.lastActiveDay,
+        seenZones: state.seenZones,
         onboarding: state.onboarding,
         muted: state.muted,
       }),

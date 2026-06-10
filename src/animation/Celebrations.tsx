@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Badge } from '@/types';
+import type { Zone } from '@/data/zones';
 import { EventBus } from '@/game/EventBus';
 import { celebrate, smallBurst } from './confetti';
 import NumberText from '@/ui/NumberText';
@@ -10,6 +11,7 @@ import NumberText from '@/ui/NumberText';
 export default function Celebrations() {
   const [levelUp, setLevelUp] = useState<number | null>(null);
   const [badgeQueue, setBadgeQueue] = useState<Badge[]>([]);
+  const [zone, setZone] = useState<Zone | null>(null);
   const current = badgeQueue[0] ?? null;
 
   useEffect(() => {
@@ -22,11 +24,18 @@ export default function Celebrations() {
       setBadgeQueue((q) => [...q, b]);
       smallBurst();
     };
+    const onZone = (z: Zone) => {
+      setZone(z);
+      celebrate();
+      window.setTimeout(() => setZone(null), 3200);
+    };
     EventBus.on('player:levelup', onLevel);
     EventBus.on('badge:unlock', onBadge);
+    EventBus.on('zone:unlock', onZone);
     return () => {
       EventBus.off('player:levelup', onLevel);
       EventBus.off('badge:unlock', onBadge);
+      EventBus.off('zone:unlock', onZone);
     };
   }, []);
 
@@ -38,6 +47,33 @@ export default function Celebrations() {
 
   return (
     <>
+      {/* Zone / district unlocked */}
+      <AnimatePresence>
+        {zone && (
+          <motion.div
+            className="pointer-events-none fixed inset-x-0 top-1/3 z-[60] flex justify-center px-4"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <motion.div
+              className="flex items-center gap-3 rounded-2xl px-6 py-4 text-white shadow-float"
+              style={{ background: `linear-gradient(135deg, ${zone.color}, var(--color-charcoal))` }}
+              initial={{ scale: 0.7 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 14 }}
+            >
+              <span className="text-4xl">{zone.glyph}</span>
+              <div className="text-start">
+                <p className="font-ui text-xs font-bold text-white/80">🎉 فُتح حيٌّ جديد!</p>
+                <p className="font-display text-2xl font-black">{zone.nameAr}</p>
+                <p className="font-ui text-[11px] text-white/80">{zone.descAr}</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Level up */}
       <AnimatePresence>
         {levelUp !== null && (

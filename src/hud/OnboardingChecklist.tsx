@@ -15,7 +15,7 @@ export default function OnboardingChecklist() {
   const items = useMemo(
     () => [
       { id: 'move', label: 'تحرّك واستكشف العالم', done: onboarding.moved },
-      { id: 'org', label: 'زُر المقر وتعرّف على الفريق', done: !!onboarding.visited.org },
+      { id: 'arena', label: 'ادخل ساحة التقييم', done: !!onboarding.visited.arena },
       { id: 'assess', label: 'أكمل تقييمًا في الساحة', done: assessmentHistory.length >= 1 },
       {
         id: 'quest',

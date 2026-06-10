@@ -9,6 +9,8 @@ import QuestBoard from './quests/QuestBoard';
 import CareerLadder from './promotion/CareerLadder';
 import LeaderboardHall from './leaderboard/LeaderboardHall';
 import OrgHierarchy from './org/OrgHierarchy';
+import InteriorScene from './interior/InteriorScene';
+import { isStationUnlocked } from '@/data/zones';
 
 interface StationMeta {
   title: string;
@@ -67,9 +69,12 @@ export default function StationModalRouter() {
   const openStation = useGameStore((s) => s.openStation);
   const closeStation = useGameStore((s) => s.closeStation);
 
-  // Phaser → React: a station was entered.
+  // Phaser → React: a station was entered (ignore still-locked districts).
   useEffect(() => {
-    const handler = (p: { stationId: StationId }) => openStation(p.stationId);
+    const handler = (p: { stationId: StationId }) => {
+      if (!isStationUnlocked(p.stationId, useGameStore.getState().player.level)) return;
+      openStation(p.stationId);
+    };
     EventBus.on('station:enter', handler);
     return () => {
       EventBus.off('station:enter', handler);
@@ -88,7 +93,12 @@ export default function StationModalRouter() {
       accent={meta?.accent}
       maxWidth={meta?.maxWidth}
     >
-      {meta ? <meta.Component /> : null}
+      {meta && activeStation ? (
+        <>
+          <InteriorScene id={activeStation} title={meta.title} />
+          <meta.Component />
+        </>
+      ) : null}
     </Modal>
   );
 }

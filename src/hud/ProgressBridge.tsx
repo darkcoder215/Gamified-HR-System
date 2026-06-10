@@ -3,6 +3,7 @@ import { useGameStore } from '@/state/store';
 import { useLeaderboard } from '@/state/selectors';
 import { competencies } from '@/data/competencies';
 import { quests } from '@/data/quests';
+import { zones, lockedStationIds } from '@/data/zones';
 import { EventBus } from '@/game/EventBus';
 
 // Feeds per-station progress to the Phaser markers and relays world events
@@ -14,6 +15,9 @@ export default function ProgressBridge() {
   const characterTint = useGameStore((s) => s.player.characterTint);
   const markMoved = useGameStore((s) => s.markMoved);
   const talkNpc = useGameStore((s) => s.talkNpc);
+  const level = useGameStore((s) => s.player.level);
+  const seenZones = useGameStore((s) => s.seenZones);
+  const markZoneSeen = useGameStore((s) => s.markZoneSeen);
   const ranked = useLeaderboard();
 
   const assessed = Object.keys(competencyScores).length;
@@ -39,14 +43,26 @@ export default function ProgressBridge() {
       leaderboard: `#${rank}`,
       org: `${team} 👥`,
     };
+    const locked = lockedStationIds(level);
     const emit = () => {
       EventBus.emit('progress:update', payload);
       EventBus.emit('player:tint', characterTint);
+      EventBus.emit('locks:update', locked);
     };
     emit();
     EventBus.on('progress:request', emit);
     return () => EventBus.off('progress:request', emit);
-  }, [assessed, doneQuests, currentRung, rank, team, characterTint]);
+  }, [assessed, doneQuests, currentRung, rank, team, characterTint, level]);
+
+  // Celebrate newly-unlocked districts (skip the starting district).
+  useEffect(() => {
+    for (const z of zones) {
+      if (z.unlockLevel > 1 && level >= z.unlockLevel && !seenZones[z.id]) {
+        markZoneSeen(z.id);
+        EventBus.emit('zone:unlock', z);
+      }
+    }
+  }, [level, seenZones, markZoneSeen]);
 
   return null;
 }

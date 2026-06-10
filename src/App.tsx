@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Palette, BookOpen, BarChart3, ShoppingBag, Flame } from 'lucide-react';
+import { Palette, BookOpen, BarChart3, ShoppingBag, Flame, Map as MapIcon } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { EventBus } from '@/game/EventBus';
 import StartScreen from './StartScreen';
@@ -16,6 +16,8 @@ import GuideModal from './modules/guide/GuideModal';
 import AnalyticsDashboard from './modules/analytics/AnalyticsDashboard';
 import Shop from './modules/shop/Shop';
 import DailyChallenges from './modules/daily/DailyChallenges';
+import ZonesPanel from './modules/zones/ZonesPanel';
+import Toast from './hud/Toast';
 import Intro from './intro/Intro';
 import DialogueBox from './modules/dialogue/DialogueBox';
 import { initAudio, setMuted } from './audio/sound';
@@ -37,6 +39,8 @@ export default function App() {
   const closeShop = useGameStore((s) => s.closeShop);
   const dailyOpen = useGameStore((s) => s.dailyOpen);
   const closeDaily = useGameStore((s) => s.closeDaily);
+  const zonesOpen = useGameStore((s) => s.zonesOpen);
+  const closeZones = useGameStore((s) => s.closeZones);
   const introReplay = useGameStore((s) => s.introReplay);
   const introSeen = useGameStore((s) => s.onboarding.introSeen);
   const showIntro = introReplay || !introSeen;
@@ -59,7 +63,7 @@ export default function App() {
 
   // Freeze the world whenever any dashboard/modal is open.
   const anyModal =
-    !!activeStation || characterOpen || guideOpen || analyticsOpen || shopOpen || dailyOpen || showIntro || !!activeNpc;
+    !!activeStation || characterOpen || guideOpen || analyticsOpen || shopOpen || dailyOpen || zonesOpen || showIntro || !!activeNpc;
   useEffect(() => {
     EventBus.emit(anyModal ? 'game:pause' : 'game:resume');
   }, [anyModal]);
@@ -155,6 +159,18 @@ export default function App() {
       >
         <DailyChallenges />
       </Modal>
+      <Modal
+        open={zonesOpen}
+        onClose={closeZones}
+        title="المناطق"
+        subtitle="أحياء العالم وما يُفتح مع تقدّمك"
+        icon={<MapIcon size={24} />}
+        accent="var(--color-green)"
+        maxWidth="600px"
+      >
+        <ZonesPanel />
+      </Modal>
+      <Toast />
       <DialogueBox />
       <Celebrations />
       {showIntro && <Intro />}
