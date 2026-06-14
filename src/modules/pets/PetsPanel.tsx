@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Lock, Check } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { pets } from '@/data/pets';
+import PetSprite from '@/ui/PetSprite';
 
 export default function PetsPanel() {
   const owned = useGameStore((s) => s.pets);
@@ -30,12 +31,12 @@ export default function PetsPanel() {
               style={{ opacity: has ? 1 : 0.6 }}
             >
               <motion.div
-                className="flex h-16 w-16 items-center justify-center rounded-full text-3xl"
-                style={{ background: has ? p.color : 'var(--color-warm-gray)', filter: has ? 'none' : 'grayscale(1)' }}
-                animate={has ? { y: [0, -6, 0] } : {}}
+                className="flex h-16 w-16 items-center justify-center rounded-full"
+                style={{ background: has ? `${p.color}22` : 'var(--color-warm-gray)' }}
+                animate={has ? { y: [0, -5, 0] } : {}}
                 transition={{ duration: 2 + i * 0.2, repeat: Infinity, ease: 'easeInOut' }}
               >
-                {has ? p.emoji : <Lock size={22} className="text-muted" />}
+                {has ? <PetSprite id={p.id} size={48} /> : <Lock size={22} className="text-muted" />}
               </motion.div>
               <p className="mt-2 font-ui text-sm font-bold text-black">{p.nameAr}</p>
               <span className="rounded-pill px-2 py-0.5 font-ui text-[10px] font-bold" style={{ background: 'var(--color-warm-gray)', color: 'var(--color-muted)' }}>{p.rarity}</span>

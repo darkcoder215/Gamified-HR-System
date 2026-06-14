@@ -4,7 +4,6 @@ import { useLeaderboard } from '@/state/selectors';
 import { competencies } from '@/data/competencies';
 import { quests } from '@/data/quests';
 import { zones, lockedStationIds } from '@/data/zones';
-import { getPet } from '@/data/pets';
 import { EventBus } from '@/game/EventBus';
 
 // Feeds per-station progress to the Phaser markers and relays world events
@@ -46,12 +45,11 @@ export default function ProgressBridge() {
       org: `${team} 👥`,
     };
     const locked = lockedStationIds(level);
-    const petEmoji = getPet(equippedPet)?.emoji ?? null;
     const emit = () => {
       EventBus.emit('progress:update', payload);
       EventBus.emit('player:tint', characterTint);
       EventBus.emit('locks:update', locked);
-      EventBus.emit('player:pet', petEmoji);
+      EventBus.emit('player:pet', equippedPet ?? null);
     };
     emit();
     EventBus.on('progress:request', emit);

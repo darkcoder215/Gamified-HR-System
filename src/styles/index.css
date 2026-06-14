@@ -110,6 +110,15 @@
   background: var(--color-muted);
 }
 
+/* Companion pet spritesheet animation (4 frames) */
+@keyframes pet-walk {
+  from { background-position-x: 0; }
+  to { background-position-x: var(--pet-shift); }
+}
+.pet-sprite {
+  animation: pet-walk 0.55s steps(4) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -6,6 +6,7 @@ import { EventBus } from '@/game/EventBus';
 import { getPet } from '@/data/pets';
 import { celebrate, smallBurst } from './confetti';
 import NumberText from '@/ui/NumberText';
+import PetSprite from '@/ui/PetSprite';
 
 // Listens to EventBus celebration signals emitted by the store and renders
 // full-screen level-up + queued badge-unlock animations.
@@ -13,7 +14,7 @@ export default function Celebrations() {
   const [levelUp, setLevelUp] = useState<number | null>(null);
   const [badgeQueue, setBadgeQueue] = useState<Badge[]>([]);
   const [zone, setZone] = useState<Zone | null>(null);
-  const [pet, setPet] = useState<{ emoji: string; nameAr: string; color: string } | null>(null);
+  const [pet, setPet] = useState<{ id: string; nameAr: string; color: string } | null>(null);
   const current = badgeQueue[0] ?? null;
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function Celebrations() {
     const onPet = (id: string) => {
       const p = getPet(id);
       if (!p) return;
-      setPet({ emoji: p.emoji, nameAr: p.nameAr, color: p.color });
+      setPet({ id: p.id, nameAr: p.nameAr, color: p.color });
       celebrate();
       window.setTimeout(() => setPet(null), 3000);
     };
@@ -74,7 +75,7 @@ export default function Celebrations() {
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 220, damping: 14 }}
             >
-              <motion.span className="text-5xl" animate={{ y: [0, -8, 0] }} transition={{ duration: 1.2, repeat: Infinity }}>{pet.emoji}</motion.span>
+              <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 1.2, repeat: Infinity }}><PetSprite id={pet.id} size={56} /></motion.div>
               <div className="text-start">
                 <p className="font-ui text-xs font-bold text-white/80">🎉 رفيق جديد انضمّ إليك!</p>
                 <p className="font-display text-2xl font-black">{pet.nameAr}</p>

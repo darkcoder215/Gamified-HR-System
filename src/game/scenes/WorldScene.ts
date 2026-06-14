@@ -3,13 +3,14 @@ import { EventBus } from '../EventBus';
 import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN, TILEMAP, PLAYER, PLAYER_ANIMS } from '../gameConfig';
 import { stations, type StationDef } from '../stations/stationZones';
 import { npcs } from '../../data/npcs';
+import { pets } from '../../data/pets';
 import PlayerController from '../player/PlayerController';
 
 type Focus = { kind: 'station' | 'npc'; id: string } | null;
 
 export default class WorldScene extends Phaser.Scene {
   private player!: PlayerController;
-  private petText?: Phaser.GameObjects.Text;
+  private petSprite?: Phaser.GameObjects.Sprite;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private paused = false;
@@ -45,6 +46,14 @@ export default class WorldScene extends Phaser.Scene {
 
     // ── station markers ──
     for (const st of stations) this.createMarker(st);
+
+    // ── companion pet animations ──
+    for (const p of pets) {
+      const key = `petfly-${p.id}`;
+      if (!this.anims.exists(key) && this.textures.exists(`pet-${p.id}`)) {
+        this.anims.create({ key, frames: this.anims.generateFrameNumbers(`pet-${p.id}`, { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
+      }
+    }
 
     // ── NPC colleagues ──
     const npcGroup = this.physics.add.staticGroup();
@@ -180,17 +189,20 @@ export default class WorldScene extends Phaser.Scene {
     else this.player.sprite.clearTint();
   };
 
-  private onPet = (emoji: string | null) => {
-    if (!emoji) {
-      this.petText?.destroy();
-      this.petText = undefined;
+  private onPet = (id: string | null) => {
+    if (!id || !this.textures.exists(`pet-${id}`)) {
+      this.petSprite?.destroy();
+      this.petSprite = undefined;
       return;
     }
-    if (!this.petText) {
-      this.petText = this.add.text(this.player?.sprite.x ?? 0, this.player?.sprite.y ?? 0, emoji, { fontSize: '22px' }).setOrigin(0.5).setDepth(11);
-    } else {
-      this.petText.setText(emoji);
+    const x = this.player?.sprite.x ?? 0;
+    const y = this.player?.sprite.y ?? 0;
+    if (!this.petSprite) {
+      this.petSprite = this.add.sprite(x, y, `pet-${id}`, 0).setOrigin(0.5).setDepth(11).setScale(0.85);
     }
+    this.petSprite.setTexture(`pet-${id}`, 0);
+    const anim = `petfly-${id}`;
+    if (this.anims.exists(anim)) this.petSprite.play(anim, true);
   };
 
   private onPause = () => {
@@ -271,11 +283,12 @@ export default class WorldScene extends Phaser.Scene {
     const py = this.player.sprite.y;
 
     // companion pet follows the player with a gentle bob
-    if (this.petText) {
-      const tx = px - 26;
-      const ty = py - 6 + Math.sin(this.time.now / 350) * 4;
-      this.petText.x += (tx - this.petText.x) * 0.15;
-      this.petText.y += (ty - this.petText.y) * 0.15;
+    if (this.petSprite) {
+      const tx = px - 28;
+      const ty = py - 10 + Math.sin(this.time.now / 350) * 4;
+      this.petSprite.x += (tx - this.petSprite.x) * 0.15;
+      this.petSprite.y += (ty - this.petSprite.y) * 0.15;
+      if (dx !== 0) this.petSprite.setFlipX(dx < 0);
     }
 
     // onboarding: first movement

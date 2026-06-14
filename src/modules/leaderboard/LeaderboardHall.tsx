@@ -5,7 +5,7 @@ import { useLeaderboard } from '@/state/selectors';
 import { useGameStore } from '@/state/store';
 import { badges as allBadges } from '@/data/badges';
 import { frameStyle } from '@/data/frames';
-import { getPet } from '@/data/pets';
+import PetSprite from '@/ui/PetSprite';
 import { hasSupabase, supabase } from '@/lib/supabase';
 import { useAuth } from '@/auth/AuthProvider';
 import type { LeaderboardRow } from '@/lib/dbTypes';
@@ -68,7 +68,6 @@ export default function LeaderboardHall() {
         <div className="overflow-hidden rounded-lg">
           {rows.map((r, i) => {
             const RankIcon = r.rank === 1 ? Crown : r.rank <= 3 ? Medal : null;
-            const petEmoji = getPet(r.pet)?.emoji;
             return (
               <motion.div
                 key={r.id}
@@ -92,7 +91,7 @@ export default function LeaderboardHall() {
                   >
                     {r.avatarImage ? <img src={r.avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} /> : r.nameAr.trim().charAt(0)}
                   </div>
-                  {petEmoji && <span className="absolute -top-1.5 -end-1.5 text-sm">{petEmoji}</span>}
+                  {r.pet && <div className="absolute -top-2 -end-2"><PetSprite id={r.pet} size={20} /></div>}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-ui text-sm font-bold text-black">

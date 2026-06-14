@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PLAYER, TILEMAP } from '../gameConfig';
+import { pets } from '../../data/pets';
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
@@ -22,6 +23,8 @@ export default class BootScene extends Phaser.Scene {
     this.load.image(TILEMAP.tilesetKey, TILEMAP.tilesetPath);
     this.load.tilemapTiledJSON(TILEMAP.key, TILEMAP.path);
     this.load.atlas(PLAYER.key, PLAYER.texturePath, PLAYER.atlasPath);
+    // companion pet sprite sheets (4-frame flap/gallop, 40x40)
+    for (const p of pets) this.load.spritesheet(`pet-${p.id}`, `/game/pets/${p.id}.png`, { frameWidth: 40, frameHeight: 40 });
   }
 
   create() {

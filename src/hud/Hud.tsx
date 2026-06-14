@@ -8,8 +8,8 @@ import { npcs } from '@/data/npcs';
 import { badges as allBadges } from '@/data/badges';
 import { frameStyle } from '@/data/frames';
 import { isStationUnlocked, stationUnlockLevel } from '@/data/zones';
-import { getPet } from '@/data/pets';
 import { PawPrint, Target, Gamepad2 } from 'lucide-react';
+import PetSprite from '@/ui/PetSprite';
 import { useFocus } from '@/hooks/useFocus';
 import { useIsTouch } from '@/hooks/useIsTouch';
 import { EventBus } from '@/game/EventBus';
@@ -39,7 +39,6 @@ export default function Hud() {
   const coins = useGameStore((s) => s.coins);
   const level = useGameStore((s) => s.player.level);
   const [menuOpen, setMenuOpen] = useState(false);
-  const petEmoji = getPet(equippedPet)?.emoji;
 
   const prog = levelProgress(player.xp);
   const energyColor =
@@ -95,14 +94,14 @@ export default function Hud() {
                 player.nameAr.trim().charAt(0) || '؟'
               )}
             </div>
-            {petEmoji && (
-              <motion.span
-                className="absolute -top-1.5 -end-1.5 text-base"
+            {equippedPet && (
+              <motion.div
+                className="absolute -top-2 -end-2"
                 animate={{ y: [0, -3, 0] }}
                 transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
               >
-                {petEmoji}
-              </motion.span>
+                <PetSprite id={equippedPet} size={22} />
+              </motion.div>
             )}
           </div>
           <div className="min-w-0 flex-1">
