@@ -8,6 +8,8 @@ import { npcs } from '@/data/npcs';
 import { badges as allBadges } from '@/data/badges';
 import { frameStyle } from '@/data/frames';
 import { isStationUnlocked, stationUnlockLevel } from '@/data/zones';
+import { getPet } from '@/data/pets';
+import { PawPrint, Target, Gamepad2 } from 'lucide-react';
 import { useFocus } from '@/hooks/useFocus';
 import { useIsTouch } from '@/hooks/useIsTouch';
 import { EventBus } from '@/game/EventBus';
@@ -30,9 +32,14 @@ export default function Hud() {
   const openShop = useGameStore((s) => s.openShop);
   const openDaily = useGameStore((s) => s.openDaily);
   const openZones = useGameStore((s) => s.openZones);
+  const openPets = useGameStore((s) => s.openPets);
+  const openGoals = useGameStore((s) => s.openGoals);
+  const openGames = useGameStore((s) => s.openGames);
+  const equippedPet = useGameStore((s) => s.equippedPet);
   const coins = useGameStore((s) => s.coins);
   const level = useGameStore((s) => s.player.level);
   const [menuOpen, setMenuOpen] = useState(false);
+  const petEmoji = getPet(equippedPet)?.emoji;
 
   const prog = levelProgress(player.xp);
   const energyColor =
@@ -51,8 +58,11 @@ export default function Hud() {
     { id: 'guide', icon: <BookOpen size={15} />, label: 'الدليل', color: 'var(--color-blue)', onClick: openGuide },
     { id: 'zones', icon: <MapIcon size={15} />, label: 'المناطق', color: 'var(--color-green)', onClick: openZones },
     { id: 'daily', icon: <Flame size={15} />, label: 'التحديات', color: 'var(--color-red)', onClick: openDaily },
+    { id: 'goals', icon: <Target size={15} />, label: 'أهدافي', color: 'var(--color-green)', onClick: openGoals },
+    { id: 'games', icon: <Gamepad2 size={15} />, label: 'الألعاب', color: 'var(--color-blue)', onClick: openGames },
     { id: 'analytics', icon: <BarChart3 size={15} />, label: 'تحليلاتي', color: 'var(--color-green)', onClick: openAnalytics },
     { id: 'shop', icon: <ShoppingBag size={15} />, label: 'المتجر', color: 'var(--color-amber)', onClick: openShop },
+    { id: 'pets', icon: <PawPrint size={15} />, label: 'الرفاق', color: 'var(--color-hot-pink)', onClick: openPets },
     { id: 'character', icon: <Palette size={15} />, label: 'الشخصية', color: 'var(--color-charcoal)', onClick: openCharacter },
     {
       id: 'mute',
@@ -74,14 +84,25 @@ export default function Hud() {
           animate={{ y: 0, opacity: 1 }}
           className="pointer-events-auto flex max-w-[56vw] items-center gap-2 rounded-xl bg-white px-2.5 py-2 shadow-card sm:max-w-none sm:min-w-[280px] sm:gap-3 sm:px-4 sm:py-3"
         >
-          <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full font-display text-base font-black text-white sm:h-12 sm:w-12 sm:text-xl"
-            style={{ background: player.avatar, ...frameStyle(player.frame) }}
-          >
-            {player.avatarImage ? (
-              <img src={player.avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
-            ) : (
-              player.nameAr.trim().charAt(0) || '؟'
+          <div className="relative shrink-0">
+            <div
+              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full font-display text-base font-black text-white sm:h-12 sm:w-12 sm:text-xl"
+              style={{ background: player.avatar, ...frameStyle(player.frame) }}
+            >
+              {player.avatarImage ? (
+                <img src={player.avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
+              ) : (
+                player.nameAr.trim().charAt(0) || '؟'
+              )}
+            </div>
+            {petEmoji && (
+              <motion.span
+                className="absolute -top-1.5 -end-1.5 text-base"
+                animate={{ y: [0, -3, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                {petEmoji}
+              </motion.span>
             )}
           </div>
           <div className="min-w-0 flex-1">

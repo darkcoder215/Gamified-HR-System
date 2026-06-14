@@ -1,10 +1,67 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Upload, Loader2, X, Sparkles } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { orgTiers, executive, executiveTitleAr, type OrgPerson } from '@/data/orgChart';
 import { fileToScaledDataURL, generatePixelAvatar } from '@/lib/avatar';
+import { hasSupabase, supabase } from '@/lib/supabase';
+import { useAuth } from '@/auth/AuthProvider';
 import NumberText from '@/ui/NumberText';
+
+interface RealPerson { id: string; full_name: string | null; role: string; avatar_color: string | null; avatar_image_url: string | null; level: number }
+const ROLE_TIERS: { role: string; titleAr: string }[] = [
+  { role: 'hr_admin', titleAr: 'الموارد البشرية' },
+  { role: 'manager', titleAr: 'المديرون' },
+  { role: 'employee', titleAr: 'الموظفون' },
+];
+
+function RealOrg() {
+  const auth = useAuth();
+  const uid = auth?.session?.user.id;
+  const [people, setPeople] = useState<RealPerson[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from('profiles').select('id,full_name,role,avatar_color,avatar_image_url').eq('status', 'active');
+      const list = (data as Omit<RealPerson, 'level'>[]) ?? [];
+      const { data: ps } = await supabase.from('player_state').select('user_id,level').in('user_id', list.map((p) => p.id));
+      const lv = new Map((ps ?? []).map((r: { user_id: string; level: number }) => [r.user_id, r.level]));
+      setPeople(list.map((p) => ({ ...p, level: lv.get(p.id) ?? 1 })));
+    })();
+  }, []);
+
+  return (
+    <div>
+      <p className="mb-5 font-body text-sm text-charcoal">
+        فريق <span className="highlight">ثمانية</span> الحقيقي — موقعك مميَّز بالأخضر.
+      </p>
+      <div className="space-y-3">
+        {ROLE_TIERS.map((tier) => {
+          const members = people.filter((p) => p.role === tier.role);
+          if (!members.length) return null;
+          return (
+            <div key={tier.role} className="rounded-lg border border-warm-gray bg-white p-3">
+              <p className="mb-2 font-ui text-xs font-bold text-charcoal">{tier.titleAr} <span className="num text-muted">({members.length})</span></p>
+              <div className="flex flex-wrap items-start gap-4">
+                {members.map((m) => {
+                  const isMe = m.id === uid;
+                  return (
+                    <div key={m.id} className="flex w-16 flex-col items-center gap-1 text-center">
+                      <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full font-display text-lg font-black text-white" style={{ background: m.avatar_color ?? '#00c17a', boxShadow: isMe ? '0 0 0 3px var(--color-green)' : undefined }}>
+                        {m.avatar_image_url ? <img src={m.avatar_image_url} alt="" className="h-full w-full object-cover" /> : (m.full_name ?? '؟').charAt(0)}
+                      </div>
+                      <span className={`font-ui text-[11px] leading-tight ${isMe ? 'font-bold text-green' : 'text-charcoal'}`}>{m.full_name}{isMe ? ' (أنت)' : ''}</span>
+                      <span className="num font-ui text-[10px] text-muted">م<NumberText value={m.level} /></span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function Avatar({
   person,
@@ -44,6 +101,11 @@ function Avatar({
 }
 
 export default function OrgHierarchy() {
+  if (hasSupabase) return <RealOrg />;
+  return <StaticOrg />;
+}
+
+function StaticOrg() {
   const player = useGameStore((s) => s.player);
   const currentRung = useGameStore((s) => s.promotionStatus.currentRung);
   const colleagueAvatars = useGameStore((s) => s.colleagueAvatars);

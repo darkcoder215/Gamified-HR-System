@@ -9,6 +9,7 @@ type Focus = { kind: 'station' | 'npc'; id: string } | null;
 
 export default class WorldScene extends Phaser.Scene {
   private player!: PlayerController;
+  private petText?: Phaser.GameObjects.Text;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private paused = false;
@@ -158,6 +159,7 @@ export default class WorldScene extends Phaser.Scene {
     EventBus.on('progress:update', this.onProgress, this);
     EventBus.on('player:tint', this.onTint, this);
     EventBus.on('locks:update', this.onLocks, this);
+    EventBus.on('player:pet', this.onPet, this);
   }
 
   private unbindEvents() {
@@ -169,12 +171,26 @@ export default class WorldScene extends Phaser.Scene {
     EventBus.off('progress:update', this.onProgress, this);
     EventBus.off('player:tint', this.onTint, this);
     EventBus.off('locks:update', this.onLocks, this);
+    EventBus.off('player:pet', this.onPet, this);
   }
 
   private onTint = (hex: string | null) => {
     if (!this.player) return;
     if (hex) this.player.sprite.setTint(Phaser.Display.Color.HexStringToColor(hex).color);
     else this.player.sprite.clearTint();
+  };
+
+  private onPet = (emoji: string | null) => {
+    if (!emoji) {
+      this.petText?.destroy();
+      this.petText = undefined;
+      return;
+    }
+    if (!this.petText) {
+      this.petText = this.add.text(this.player?.sprite.x ?? 0, this.player?.sprite.y ?? 0, emoji, { fontSize: '22px' }).setOrigin(0.5).setDepth(11);
+    } else {
+      this.petText.setText(emoji);
+    }
   };
 
   private onPause = () => {
@@ -253,6 +269,14 @@ export default class WorldScene extends Phaser.Scene {
 
     const px = this.player.sprite.x;
     const py = this.player.sprite.y;
+
+    // companion pet follows the player with a gentle bob
+    if (this.petText) {
+      const tx = px - 26;
+      const ty = py - 6 + Math.sin(this.time.now / 350) * 4;
+      this.petText.x += (tx - this.petText.x) * 0.15;
+      this.petText.y += (ty - this.petText.y) * 0.15;
+    }
 
     // onboarding: first movement
     if (!this.movedEmitted && (dx !== 0 || dy !== 0)) {

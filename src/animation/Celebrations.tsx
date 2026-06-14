@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { Badge } from '@/types';
 import type { Zone } from '@/data/zones';
 import { EventBus } from '@/game/EventBus';
+import { getPet } from '@/data/pets';
 import { celebrate, smallBurst } from './confetti';
 import NumberText from '@/ui/NumberText';
 
@@ -12,6 +13,7 @@ export default function Celebrations() {
   const [levelUp, setLevelUp] = useState<number | null>(null);
   const [badgeQueue, setBadgeQueue] = useState<Badge[]>([]);
   const [zone, setZone] = useState<Zone | null>(null);
+  const [pet, setPet] = useState<{ emoji: string; nameAr: string; color: string } | null>(null);
   const current = badgeQueue[0] ?? null;
 
   useEffect(() => {
@@ -29,13 +31,22 @@ export default function Celebrations() {
       celebrate();
       window.setTimeout(() => setZone(null), 3200);
     };
+    const onPet = (id: string) => {
+      const p = getPet(id);
+      if (!p) return;
+      setPet({ emoji: p.emoji, nameAr: p.nameAr, color: p.color });
+      celebrate();
+      window.setTimeout(() => setPet(null), 3000);
+    };
     EventBus.on('player:levelup', onLevel);
     EventBus.on('badge:unlock', onBadge);
     EventBus.on('zone:unlock', onZone);
+    EventBus.on('pet:unlock', onPet);
     return () => {
       EventBus.off('player:levelup', onLevel);
       EventBus.off('badge:unlock', onBadge);
       EventBus.off('zone:unlock', onZone);
+      EventBus.off('pet:unlock', onPet);
     };
   }, []);
 
@@ -47,6 +58,32 @@ export default function Celebrations() {
 
   return (
     <>
+      {/* Companion pet earned */}
+      <AnimatePresence>
+        {pet && (
+          <motion.div
+            className="pointer-events-none fixed inset-x-0 top-1/3 z-[60] flex justify-center px-4"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <motion.div
+              className="flex items-center gap-3 rounded-2xl px-6 py-4 text-white shadow-float"
+              style={{ background: `linear-gradient(135deg, ${pet.color}, var(--color-charcoal))` }}
+              initial={{ scale: 0.7 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 14 }}
+            >
+              <motion.span className="text-5xl" animate={{ y: [0, -8, 0] }} transition={{ duration: 1.2, repeat: Infinity }}>{pet.emoji}</motion.span>
+              <div className="text-start">
+                <p className="font-ui text-xs font-bold text-white/80">🎉 رفيق جديد انضمّ إليك!</p>
+                <p className="font-display text-2xl font-black">{pet.nameAr}</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Zone / district unlocked */}
       <AnimatePresence>
         {zone && (

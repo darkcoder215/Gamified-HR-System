@@ -89,25 +89,35 @@ export default function ManagerDashboard({ onPlay }: { onPlay: () => void }) {
 }
 
 function AssignModal({ member, assignerId, onClose }: { member: Member; assignerId: string; onClose: () => void }) {
-  const [type, setType] = useState<'assessment' | 'task'>('assessment');
+  const [type, setType] = useState<'assessment' | 'task' | 'goal'>('assessment');
   const [competencyId, setCompetencyId] = useState(competencies[0].id);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [due, setDue] = useState('');
+  const [target, setTarget] = useState('');
+  const [unit, setUnit] = useState('');
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
     setSaving(true);
     const comp = competencies.find((c) => c.id === competencyId)!;
-    await supabase.from('assignments').insert({
-      assigner_id: assignerId,
-      assignee_id: member.id,
-      type,
-      ref_id: type === 'assessment' ? competencyId : null,
-      title_ar: type === 'assessment' ? `تقييم: ${comp.nameAr}` : title || 'مهمة',
-      desc_ar: type === 'assessment' ? `أكمل تقييم ${comp.nameAr} في ساحة التقييم` : desc || null,
-      due_date: due || null,
-    });
+    if (type === 'goal') {
+      await supabase.from('goals').insert({
+        owner_id: member.id, created_by: assignerId,
+        title_ar: title || 'هدف', desc_ar: desc || null,
+        target: target ? Number(target) : null, unit: unit || null, due_date: due || null,
+      });
+    } else {
+      await supabase.from('assignments').insert({
+        assigner_id: assignerId,
+        assignee_id: member.id,
+        type,
+        ref_id: type === 'assessment' ? competencyId : null,
+        title_ar: type === 'assessment' ? `تقييم: ${comp.nameAr}` : title || 'مهمة',
+        desc_ar: type === 'assessment' ? `أكمل تقييم ${comp.nameAr} في ساحة التقييم` : desc || null,
+        due_date: due || null,
+      });
+    }
     setSaving(false);
     onClose();
   };
@@ -117,9 +127,9 @@ function AssignModal({ member, assignerId, onClose }: { member: Member; assigner
       <div className="w-full max-w-md rounded-xl bg-off-white p-5 shadow-float" onClick={(e) => e.stopPropagation()}>
         <h3 className="mb-3 font-display text-lg font-black text-black">إسناد إلى {member.full_name}</h3>
         <div className="mb-3 flex rounded-pill bg-warm-gray p-1">
-          {(['assessment', 'task'] as const).map((t) => (
+          {([['assessment', 'تقييم'], ['task', 'مهمة'], ['goal', 'هدف']] as const).map(([t, label]) => (
             <button key={t} onClick={() => setType(t)} className="flex-1 rounded-pill px-3 py-1.5 font-ui text-sm font-bold" style={{ background: type === t ? 'var(--color-black)' : 'transparent', color: type === t ? '#fff' : 'var(--color-muted)' }}>
-              {t === 'assessment' ? 'تقييم مهارة' : 'مهمة مخصّصة'}
+              {label}
             </button>
           ))}
         </div>
@@ -129,8 +139,14 @@ function AssignModal({ member, assignerId, onClose }: { member: Member; assigner
           </select>
         ) : (
           <div className="space-y-2">
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان المهمة" className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={type === 'goal' ? 'عنوان الهدف' : 'عنوان المهمة'} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
             <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="الوصف (اختياري)" rows={2} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+            {type === 'goal' && (
+              <div className="grid grid-cols-2 gap-2">
+                <input value={target} onChange={(e) => setTarget(e.target.value)} type="number" dir="ltr" placeholder="القيمة المستهدفة" className="num rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+                <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="الوحدة (مثال: مهمة)" className="rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+              </div>
+            )}
           </div>
         )}
         <label className="mt-3 block font-ui text-xs text-muted">تاريخ الاستحقاق (اختياري)

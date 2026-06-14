@@ -6,12 +6,13 @@ import { useGameStore, type RemoteSnapshot } from '@/state/store';
 // Loads the player's server state into the store, then mirrors store changes
 // back to Supabase (debounced). Source of truth = Supabase; localStorage = cache.
 async function loadSnapshot(userId: string, profile: Profile): Promise<RemoteSnapshot> {
-  const [ps, cs, qp, bu, of] = await Promise.all([
+  const [ps, cs, qp, bu, of, ep] = await Promise.all([
     supabase.from('player_state').select('*').eq('user_id', userId).maybeSingle(),
     supabase.from('competency_scores').select('competency_id,best_score').eq('user_id', userId),
     supabase.from('quest_progress').select('quest_id,completed_steps,done').eq('user_id', userId),
     supabase.from('badges_unlocked').select('badge_id,unlocked_at').eq('user_id', userId),
     supabase.from('owned_frames').select('frame_id').eq('user_id', userId),
+    supabase.from('earned_pets').select('pet_id,earned_at,equipped').eq('user_id', userId),
   ]);
 
   const row = ps.data as Record<string, unknown> | null;
@@ -23,6 +24,8 @@ async function loadSnapshot(userId: string, profile: Profile): Promise<RemoteSna
     questProgress: Object.fromEntries(((qp.data ?? []) as { quest_id: string; completed_steps: string[]; done: boolean }[]).map((r) => [r.quest_id, { completedSteps: r.completed_steps ?? [], done: r.done }])),
     badges: Object.fromEntries(((bu.data ?? []) as { badge_id: string; unlocked_at: string }[]).map((r) => [r.badge_id, { unlockedAt: r.unlocked_at }])),
     ownedFrames: Object.fromEntries(((of.data ?? []) as { frame_id: string }[]).map((r) => [r.frame_id, true as const])),
+    pets: Object.fromEntries(((ep.data ?? []) as { pet_id: string; earned_at: string }[]).map((r) => [r.pet_id, { earnedAt: r.earned_at }])),
+    equippedPet: ((ep.data ?? []) as { pet_id: string; equipped: boolean }[]).find((r) => r.equipped)?.pet_id ?? null,
   };
 
   if (row) {
@@ -102,6 +105,8 @@ export function useRemoteSync(userId: string | null, profile: Profile | null) {
       if (bu.length) await supabase.from('badges_unlocked').upsert(bu, { onConflict: 'user_id,badge_id' });
       const of = Object.keys(s.ownedFrames).map((frame_id) => ({ user_id: userId, frame_id }));
       if (of.length) await supabase.from('owned_frames').upsert(of, { onConflict: 'user_id,frame_id' });
+      const ep = Object.entries(s.pets).map(([pet_id, v]) => ({ user_id: userId, pet_id, earned_at: v.earnedAt, equipped: s.equippedPet === pet_id }));
+      if (ep.length) await supabase.from('earned_pets').upsert(ep, { onConflict: 'user_id,pet_id' });
 
       // append-only assessment history
       const fresh = s.assessmentHistory.filter((a) => !syncedResults.current.has(a.id));

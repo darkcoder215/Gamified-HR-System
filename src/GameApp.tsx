@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
-import { Palette, BookOpen, BarChart3, ShoppingBag, Flame, Map as MapIcon, Bell, Inbox, Building2, LogOut, LayoutDashboard } from 'lucide-react';
+import { Palette, BookOpen, BarChart3, ShoppingBag, Flame, Map as MapIcon, Bell, Inbox, Building2, LogOut, LayoutDashboard, PawPrint, Target, Gamepad2 } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { EventBus } from '@/game/EventBus';
 import StartScreen from './StartScreen';
@@ -20,6 +20,10 @@ import DailyChallenges from './modules/daily/DailyChallenges';
 import ZonesPanel from './modules/zones/ZonesPanel';
 import Intro from './intro/Intro';
 import DialogueBox from './modules/dialogue/DialogueBox';
+import PetsPanel from './modules/pets/PetsPanel';
+import GoalsPanel from './modules/goals/GoalsPanel';
+import GamesPanel from './modules/games/GamesPanel';
+import { usePetEngine } from './hooks/usePetEngine';
 import NotificationsPanel from './modules/notifications/NotificationsPanel';
 import AssignmentsInbox from './modules/assignments/AssignmentsInbox';
 import Embassy from './modules/embassy/Embassy';
@@ -51,6 +55,12 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
   const closeDaily = useGameStore((s) => s.closeDaily);
   const zonesOpen = useGameStore((s) => s.zonesOpen);
   const closeZones = useGameStore((s) => s.closeZones);
+  const petsOpen = useGameStore((s) => s.petsOpen);
+  const closePets = useGameStore((s) => s.closePets);
+  const goalsOpen = useGameStore((s) => s.goalsOpen);
+  const closeGoals = useGameStore((s) => s.closeGoals);
+  const gamesOpen = useGameStore((s) => s.gamesOpen);
+  const closeGames = useGameStore((s) => s.closeGames);
   const inboxOpen = useGameStore((s) => s.inboxOpen);
   const closeInbox = useGameStore((s) => s.closeInbox);
   const openInbox = useGameStore((s) => s.openInbox);
@@ -68,6 +78,7 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
 
   const [unread, setUnread] = useState(0);
 
+  usePetEngine();
   useEffect(() => { initAudio(); }, []);
   useEffect(() => { setMuted(muted); }, [muted]);
   useEffect(() => {
@@ -90,7 +101,7 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
 
   const anyModal =
     !!activeStation || characterOpen || guideOpen || analyticsOpen || shopOpen || dailyOpen || zonesOpen ||
-    inboxOpen || embassyOpen || notifOpen || showIntro || !!activeNpc;
+    petsOpen || goalsOpen || gamesOpen || inboxOpen || embassyOpen || notifOpen || showIntro || !!activeNpc;
   useEffect(() => {
     EventBus.emit(anyModal ? 'game:pause' : 'game:resume');
   }, [anyModal]);
@@ -139,6 +150,9 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
       <Modal open={shopOpen} onClose={closeShop} title="المتجر" subtitle="أنفق عملاتك على المظهر والمزايا" icon={<ShoppingBag size={24} />} accent="var(--color-amber)" maxWidth="640px"><Shop /></Modal>
       <Modal open={dailyOpen} onClose={closeDaily} title="التحديات اليومية" subtitle="أنجز تحديات اليوم وحافظ على سلسلتك" icon={<Flame size={24} />} accent="var(--color-red)" maxWidth="560px"><DailyChallenges /></Modal>
       <Modal open={zonesOpen} onClose={closeZones} title="المناطق" subtitle="أحياء العالم وما يُفتح مع تقدّمك" icon={<MapIcon size={24} />} accent="var(--color-green)" maxWidth="600px"><ZonesPanel /></Modal>
+      <Modal open={petsOpen} onClose={closePets} title="الرفاق" subtitle="حيواناتك التي كسبتها بإنجازاتك" icon={<PawPrint size={24} />} accent="var(--color-hot-pink)" maxWidth="600px"><PetsPanel /></Modal>
+      {backend && <Modal open={goalsOpen} onClose={closeGoals} title="أهدافي ومؤشّراتي" subtitle="تابع أهدافك ومؤشّرات أدائك" icon={<Target size={24} />} accent="var(--color-green)" maxWidth="620px"><GoalsPanel /></Modal>}
+      <Modal open={gamesOpen} onClose={closeGames} title="الألعاب" subtitle="تحدّيات سريعة تنمّي مهاراتك" icon={<Gamepad2 size={24} />} accent="var(--color-blue)" maxWidth="600px"><GamesPanel /></Modal>
       {backend && <Modal open={notifOpen} onClose={closeNotif} title="الإشعارات" subtitle="آخر التحديثات" icon={<Bell size={24} />} accent="var(--color-blue)" maxWidth="520px"><NotificationsPanel /></Modal>}
       {backend && <Modal open={inboxOpen} onClose={closeInbox} title="مهامي" subtitle="المهام والتقييمات المُسندة إليك" icon={<Inbox size={24} />} accent="var(--color-blue)" maxWidth="600px"><AssignmentsInbox /></Modal>}
       {backend && <Modal open={embassyOpen} onClose={closeEmbassy} title="السفارة" subtitle="الإجازات والطلبات" icon={<Building2 size={24} />} accent="var(--color-amber)" maxWidth="620px"><Embassy /></Modal>}

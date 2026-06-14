@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, ShieldCheck, Check, X } from 'lucide-react';
+import { Users, ShieldCheck, Check, X, Megaphone, Settings2, Send, Save } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/auth/AuthProvider';
 import type { Profile, Role, RequestRow } from '@/lib/dbTypes';
@@ -17,14 +17,33 @@ export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
   const me = session!.user.id;
   const [people, setPeople] = useState<Profile[]>([]);
   const [reqs, setReqs] = useState<RequestRow[]>([]);
+  const [domains, setDomains] = useState('');
+  const [emails, setEmails] = useState('');
+  const [annTitle, setAnnTitle] = useState('');
+  const [annBody, setAnnBody] = useState('');
+  const [annMsg, setAnnMsg] = useState('');
 
   const load = async () => {
     const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: true });
     setPeople((data as Profile[]) ?? []);
     const { data: r } = await supabase.from('requests').select('*').eq('status', 'pending');
     setReqs(((r as RequestRow[]) ?? []).filter((x) => x.requester_id !== me));
+    const { data: s } = await supabase.from('app_settings').select('allowed_domains,allowed_emails').eq('id', 1).maybeSingle();
+    if (s) { setDomains((s.allowed_domains ?? []).join(', ')); setEmails((s.allowed_emails ?? []).join(', ')); }
   };
   useEffect(() => { load(); }, []);
+
+  const saveSettings = async () => {
+    const toArr = (v: string) => v.split(',').map((x) => x.trim().toLowerCase()).filter(Boolean);
+    await supabase.from('app_settings').update({ allowed_domains: toArr(domains), allowed_emails: toArr(emails) }).eq('id', 1);
+  };
+  const broadcast = async () => {
+    if (!annTitle.trim()) return;
+    const { data } = await supabase.rpc('broadcast_announcement', { p_title: annTitle.trim(), p_body: annBody.trim() || null });
+    setAnnMsg(`أُرسل الإعلان إلى ${data ?? 0} موظفًا.`);
+    setAnnTitle(''); setAnnBody('');
+    window.setTimeout(() => setAnnMsg(''), 4000);
+  };
 
   const managers = people.filter((p) => p.role === 'manager' || p.role === 'hr_admin');
 
@@ -54,6 +73,26 @@ export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
             <p className="font-ui text-xs text-muted">{r.label}</p>
           </div>
         ))}
+      </div>
+
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <section className="rounded-lg bg-white p-4 shadow-soft">
+          <h2 className="mb-2 flex items-center gap-2 font-display text-base font-black text-black"><Megaphone size={18} className="text-blue" /> إعلان عام</h2>
+          <input value={annTitle} onChange={(e) => setAnnTitle(e.target.value)} placeholder="عنوان الإعلان" className="mb-2 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+          <textarea value={annBody} onChange={(e) => setAnnBody(e.target.value)} placeholder="نص الإعلان (اختياري)" rows={2} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+          <button onClick={broadcast} className="mt-2 flex items-center gap-1.5 rounded-pill bg-blue px-4 py-2 font-ui text-sm font-bold text-white"><Send size={14} /> إرسال للجميع</button>
+          {annMsg && <p className="mt-2 font-ui text-xs font-bold text-green">{annMsg}</p>}
+        </section>
+        <section className="rounded-lg bg-white p-4 shadow-soft">
+          <h2 className="mb-2 flex items-center gap-2 font-display text-base font-black text-black"><Settings2 size={18} className="text-amber" /> إعدادات التسجيل</h2>
+          <label className="font-ui text-xs text-muted">النطاقات المسموحة (مفصولة بفواصل)
+            <input value={domains} onChange={(e) => setDomains(e.target.value)} dir="ltr" className="num mt-1 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+          </label>
+          <label className="mt-2 block font-ui text-xs text-muted">بريد مسموح إضافي (مفصول بفواصل)
+            <input value={emails} onChange={(e) => setEmails(e.target.value)} dir="ltr" className="num mt-1 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+          </label>
+          <button onClick={saveSettings} className="mt-2 flex items-center gap-1.5 rounded-pill bg-black px-4 py-2 font-ui text-sm font-bold text-white"><Save size={14} /> حفظ</button>
+        </section>
       </div>
 
       <section className="mb-8">

@@ -35,6 +35,8 @@ interface PersistedState {
   coins: number;
   ownedFrames: Record<string, true>;
   colleagueAvatars: Record<string, string>; // npc/person id → AI avatar data URL
+  pets: Record<string, { earnedAt: string }>;
+  equippedPet: string | null;
   daily: DailyState;
   streak: number;
   lastActiveDay: string | null;
@@ -56,6 +58,8 @@ export interface RemoteSnapshot {
   questProgress?: PersistedState['questProgress'];
   badges?: Record<string, { unlockedAt: string }>;
   ownedFrames?: Record<string, true>;
+  pets?: Record<string, { earnedAt: string }>;
+  equippedPet?: string | null;
   coins?: number;
   streak?: number;
   lastActiveDay?: string | null;
@@ -80,6 +84,9 @@ interface GameState extends PersistedState {
   inboxOpen: boolean;
   embassyOpen: boolean;
   notifOpen: boolean;
+  petsOpen: boolean;
+  goalsOpen: boolean;
+  gamesOpen: boolean;
 
   // actions
   openInbox: () => void;
@@ -88,6 +95,14 @@ interface GameState extends PersistedState {
   closeEmbassy: () => void;
   openNotif: () => void;
   closeNotif: () => void;
+  openPets: () => void;
+  closePets: () => void;
+  openGoals: () => void;
+  closeGoals: () => void;
+  openGames: () => void;
+  closeGames: () => void;
+  earnPet: (id: string) => void;
+  equipPet: (id: string | null) => void;
   startGame: (name: string) => void;
   setName: (name: string) => void;
   setAvatarImage: (dataUrl: string | null) => void;
@@ -102,6 +117,7 @@ interface GameState extends PersistedState {
   loseEnergy: (amount: number) => void;
   regenEnergy: () => void;
   recordAssessment: (result: AssessmentResult) => void;
+  recordGameResult: (competencyId: string, scorePct: number, xp: number, coins: number) => void;
   toggleQuestStep: (questId: string, stepId: string, totalSteps: number) => void;
   completeQuest: (questId: string, xpReward: number, badgeId?: string) => void;
   requestPromotion: () => void;
@@ -167,6 +183,8 @@ const initialPersisted: PersistedState = {
   coins: 0,
   ownedFrames: {},
   colleagueAvatars: {},
+  pets: {},
+  equippedPet: null,
   daily: freshDaily(''), // empty date → first activity rolls to today and starts the streak
   streak: 0,
   lastActiveDay: null,
@@ -218,6 +236,8 @@ export const useGameStore = create<GameState>()(
           coins: partial.coins ?? prev.coins,
           ownedFrames: partial.ownedFrames ?? prev.ownedFrames,
           colleagueAvatars: partial.colleagueAvatars ?? prev.colleagueAvatars,
+          pets: { ...prev.pets, ...(partial.pets ?? {}) },
+          equippedPet: partial.equippedPet !== undefined ? partial.equippedPet : prev.equippedPet,
           daily: partial.daily ?? prev.daily,
           streak: partial.streak ?? prev.streak,
           lastActiveDay: partial.lastActiveDay ?? prev.lastActiveDay,
@@ -265,6 +285,23 @@ export const useGameStore = create<GameState>()(
         inboxOpen: false,
         embassyOpen: false,
         notifOpen: false,
+        petsOpen: false,
+        goalsOpen: false,
+        gamesOpen: false,
+
+        openPets: () => set({ petsOpen: true }),
+        closePets: () => set({ petsOpen: false }),
+        openGoals: () => set({ goalsOpen: true }),
+        closeGoals: () => set({ goalsOpen: false }),
+        openGames: () => set({ gamesOpen: true }),
+        closeGames: () => set({ gamesOpen: false }),
+        earnPet: (id) => {
+          if (get().pets[id]) return;
+          const equippedPet = get().equippedPet ?? id; // auto-equip first pet
+          commit({ pets: { [id]: { earnedAt: new Date().toISOString() } }, equippedPet });
+          EventBus.emit('pet:unlock', id);
+        },
+        equipPet: (id) => set({ equippedPet: id }),
 
         openShop: () => set({ shopOpen: true }),
         closeShop: () => set({ shopOpen: false }),
@@ -376,6 +413,20 @@ export const useGameStore = create<GameState>()(
           });
         },
 
+        recordGameResult: (competencyId, scorePct, xp, coins) => {
+          const prev = get();
+          const best = Math.max(prev.competencyScores[competencyId] ?? 0, scorePct);
+          const r = rollDaily(prev);
+          commit({
+            competencyScores: { ...prev.competencyScores, [competencyId]: best },
+            coins: prev.coins + coins,
+            player: { ...prev.player, xp: prev.player.xp + xp },
+            daily: { ...r.daily, xp: r.daily.xp + xp },
+            streak: r.streak,
+            lastActiveDay: r.lastActiveDay,
+          });
+        },
+
         toggleQuestStep: (questId, stepId, totalSteps) => {
           const prev = get();
           const entry = prev.questProgress[questId] ?? { completedSteps: [], done: false };
@@ -443,7 +494,7 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false, dailyOpen: false, zonesOpen: false, inboxOpen: false, embassyOpen: false, notifOpen: false });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false, dailyOpen: false, zonesOpen: false, inboxOpen: false, embassyOpen: false, notifOpen: false, petsOpen: false, goalsOpen: false, gamesOpen: false });
         },
 
         setStarted: (v) => set({ started: v }),
@@ -464,6 +515,8 @@ export const useGameStore = create<GameState>()(
             questProgress: snap.questProgress ?? prev.questProgress,
             badges: snap.badges ?? prev.badges,
             ownedFrames: snap.ownedFrames ?? prev.ownedFrames,
+            pets: snap.pets ?? prev.pets,
+            equippedPet: snap.equippedPet !== undefined ? snap.equippedPet : prev.equippedPet,
             coins: snap.coins ?? prev.coins,
             streak: snap.streak ?? prev.streak,
             lastActiveDay: snap.lastActiveDay ?? prev.lastActiveDay,
@@ -492,6 +545,8 @@ export const useGameStore = create<GameState>()(
         coins: state.coins,
         ownedFrames: state.ownedFrames,
         colleagueAvatars: state.colleagueAvatars,
+        pets: state.pets,
+        equippedPet: state.equippedPet,
         daily: state.daily,
         streak: state.streak,
         lastActiveDay: state.lastActiveDay,

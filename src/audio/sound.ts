@@ -123,6 +123,7 @@ export function initAudio() {
   EventBus.on('station:enter', () => sfx('enter'));
   EventBus.on('npc:talk', () => sfx('talk'));
   EventBus.on('zone:unlock', () => sfx('promote'));
+  EventBus.on('pet:unlock', () => sfx('badge'));
 
   const kick = () => {
     ensure();
