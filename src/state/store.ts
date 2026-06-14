@@ -33,6 +33,7 @@ interface PersistedState {
   badges: Record<string, { unlockedAt: string }>;
   promotionStatus: { currentRung: number; pendingRequest: boolean };
   coins: number;
+  chestsOpened: Record<string, true>;
   ownedFrames: Record<string, true>;
   colleagueAvatars: Record<string, string>; // npc/person id → AI avatar data URL
   pets: Record<string, { earnedAt: string }>;
@@ -136,6 +137,8 @@ interface GameState extends PersistedState {
   buyFrame: (id: string, price: number) => void;
   equipFrame: (id: string | null) => void;
   buyEnergyRefill: (price: number) => void;
+  addCoins: (n: number) => void;
+  openChest: (key: string, amount: number) => boolean;
   setColleagueAvatar: (id: string, dataUrl: string) => void;
   openDaily: () => void;
   closeDaily: () => void;
@@ -181,6 +184,7 @@ const initialPersisted: PersistedState = {
   badges: {},
   promotionStatus: { currentRung: 1, pendingRequest: false },
   coins: 0,
+  chestsOpened: {},
   ownedFrames: {},
   colleagueAvatars: {},
   pets: {},
@@ -234,6 +238,7 @@ export const useGameStore = create<GameState>()(
           badges: { ...prev.badges, ...(partial.badges ?? {}) },
           promotionStatus: partial.promotionStatus ?? prev.promotionStatus,
           coins: partial.coins ?? prev.coins,
+          chestsOpened: { ...prev.chestsOpened, ...(partial.chestsOpened ?? {}) },
           ownedFrames: partial.ownedFrames ?? prev.ownedFrames,
           colleagueAvatars: partial.colleagueAvatars ?? prev.colleagueAvatars,
           pets: { ...prev.pets, ...(partial.pets ?? {}) },
@@ -349,6 +354,13 @@ export const useGameStore = create<GameState>()(
         },
         setColleagueAvatar: (id, dataUrl) =>
           set({ colleagueAvatars: { ...get().colleagueAvatars, [id]: dataUrl } }),
+        addCoins: (n) => commit({ coins: get().coins + n }),
+        openChest: (key, amount) => {
+          const s = get();
+          if (s.chestsOpened[key]) return false;
+          commit({ chestsOpened: { ...s.chestsOpened, [key]: true }, coins: s.coins + amount });
+          return true;
+        },
 
         finishIntro: () =>
           set({ introReplay: false, onboarding: { ...get().onboarding, introSeen: true } }),
@@ -543,6 +555,7 @@ export const useGameStore = create<GameState>()(
         badges: state.badges,
         promotionStatus: state.promotionStatus,
         coins: state.coins,
+        chestsOpened: state.chestsOpened,
         ownedFrames: state.ownedFrames,
         colleagueAvatars: state.colleagueAvatars,
         pets: state.pets,

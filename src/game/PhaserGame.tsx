@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import BootScene from './scenes/BootScene';
 import WorldScene from './scenes/WorldScene';
+import InteriorScene from './scenes/InteriorScene';
 
 const CONTAINER_ID = 'phaser-root';
 
@@ -28,7 +29,7 @@ export default function PhaserGame() {
         default: 'arcade',
         arcade: { gravity: { x: 0, y: 0 }, debug: false },
       },
-      scene: [BootScene, WorldScene],
+      scene: [BootScene, WorldScene, InteriorScene],
     });
     gameRef.current = game;
 

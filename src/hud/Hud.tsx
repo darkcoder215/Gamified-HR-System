@@ -47,8 +47,10 @@ export default function Hud() {
   const unlocked = allBadges.filter((b) => badgeMap[b.id]).slice(-4);
   const stationFocus = focus?.kind === 'station' ? stations.find((s) => s.id === focus.id) : undefined;
   const npcFocus = focus?.kind === 'npc' ? npcs.find((n) => n.id === focus.id) : undefined;
+  const activityFocus = focus?.kind === 'activity' ? stations.find((s) => s.id === focus.id) : undefined;
+  const exitFocus = focus?.kind === 'exit';
   const stationLocked = stationFocus ? !isStationUnlocked(stationFocus.id, level) : false;
-  const showPrompt = !activeStation && !activeNpc && (stationFocus || npcFocus);
+  const showPrompt = !activeStation && !activeNpc && (stationFocus || npcFocus || activityFocus || exitFocus);
 
   const confirmReset = () => {
     if (window.confirm('هل تريد إعادة ضبط كل تقدّمك والبدء من جديد؟')) resetSave();
@@ -261,6 +263,48 @@ export default function Hud() {
                   {isTouch ? 'زر التفاعل ←' : <>اضغط <span className="num">E</span> للدخول</>}
                 </span>
               )}
+            </div>
+          </motion.button>
+        )}
+        {showPrompt && activityFocus && (
+          <motion.button
+            key={`act-${activityFocus.id}`}
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 40, opacity: 0 }}
+            onClick={() => EventBus.emit('station:enter', { stationId: activityFocus.id })}
+            className="pointer-events-auto fixed bottom-32 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float sm:bottom-6"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{activityFocus.glyph}</span>
+              <div className="text-start">
+                <p className="font-display text-lg font-black text-black">{activityFocus.nameAr}</p>
+                <p className="font-ui text-xs text-muted">{activityFocus.hintAr}</p>
+              </div>
+              <span className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-green)' }}>
+                {isTouch ? 'ابدأ ←' : <>اضغط <span className="num">E</span> للبدء</>}
+              </span>
+            </div>
+          </motion.button>
+        )}
+        {showPrompt && exitFocus && (
+          <motion.button
+            key="exit-door"
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 40, opacity: 0 }}
+            onClick={() => EventBus.emit('input:interact')}
+            className="pointer-events-auto fixed bottom-32 left-1/2 -translate-x-1/2 rounded-xl bg-white px-6 py-3 text-center shadow-float sm:bottom-6"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🚪</span>
+              <div className="text-start">
+                <p className="font-display text-lg font-black text-black">الخروج</p>
+                <p className="font-ui text-xs text-muted">العودة إلى المدينة</p>
+              </div>
+              <span className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-charcoal)' }}>
+                {isTouch ? 'اخرج ←' : <>اضغط <span className="num">E</span> للخروج</>}
+              </span>
             </div>
           </motion.button>
         )}

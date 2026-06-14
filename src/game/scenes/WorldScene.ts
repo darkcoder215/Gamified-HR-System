@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { EventBus } from '../EventBus';
 import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN, TILEMAP, PLAYER, PLAYER_ANIMS } from '../gameConfig';
 import { stations, type StationDef } from '../stations/stationZones';
+import type { StationId } from '@/types';
 import { npcs } from '../../data/npcs';
 import { pets } from '../../data/pets';
 import PlayerController from '../player/PlayerController';
@@ -249,12 +250,19 @@ export default class WorldScene extends Phaser.Scene {
       const pin = this.pins.get(st.id);
       if (pin) this.tweens.add({ targets: pin, scale: 1.7, duration: 130, yoyo: true, ease: 'Quad.out' });
       this.cameras.main.flash(220, 255, 255, 255);
-      EventBus.emit('station:enter', { stationId: st.id });
+      this.enterBuilding(st.id);
     } else {
       const s = this.npcSprites.get(this.focus.id);
       if (s) this.burstAt(s.x, s.y, (s.tintTopLeft as number) || 0xffffff);
       EventBus.emit('npc:talk', { npcId: this.focus.id });
     }
+  }
+
+  private enterBuilding(stationId: StationId) {
+    this.focus = null;
+    EventBus.emit('focus:change', null);
+    this.scene.sleep();
+    this.scene.run('Interior', { stationId });
   }
 
   private tryInteract = () => {
