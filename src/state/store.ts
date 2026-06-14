@@ -47,8 +47,26 @@ interface PersistedState {
   };
 }
 
+export interface RemoteSnapshot {
+  nameAr?: string;
+  avatar?: string;
+  avatarImage?: string | null;
+  player?: Partial<PersistedState['player']>;
+  competencyScores?: Record<string, number>;
+  questProgress?: PersistedState['questProgress'];
+  badges?: Record<string, { unlockedAt: string }>;
+  ownedFrames?: Record<string, true>;
+  coins?: number;
+  streak?: number;
+  lastActiveDay?: string | null;
+  daily?: PersistedState['daily'];
+  onboarding?: Partial<PersistedState['onboarding']>;
+  currentRung?: number;
+}
+
 interface GameState extends PersistedState {
   // transient UI state (not persisted)
+  hydrated: boolean;
   activeStation: StationId | null;
   characterOpen: boolean;
   guideOpen: boolean;
@@ -59,8 +77,17 @@ interface GameState extends PersistedState {
   shopOpen: boolean;
   dailyOpen: boolean;
   zonesOpen: boolean;
+  inboxOpen: boolean;
+  embassyOpen: boolean;
+  notifOpen: boolean;
 
   // actions
+  openInbox: () => void;
+  closeInbox: () => void;
+  openEmbassy: () => void;
+  closeEmbassy: () => void;
+  openNotif: () => void;
+  closeNotif: () => void;
   startGame: (name: string) => void;
   setName: (name: string) => void;
   setAvatarImage: (dataUrl: string | null) => void;
@@ -101,6 +128,8 @@ interface GameState extends PersistedState {
   closeZones: () => void;
   markZoneSeen: (id: string) => void;
   resetSave: () => void;
+  hydrateFromRemote: (snap: RemoteSnapshot) => void;
+  setStarted: (v: boolean) => void;
 }
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -222,6 +251,7 @@ export const useGameStore = create<GameState>()(
 
       return {
         ...initialPersisted,
+        hydrated: false,
         activeStation: null,
         characterOpen: false,
         guideOpen: false,
@@ -232,11 +262,20 @@ export const useGameStore = create<GameState>()(
         shopOpen: false,
         dailyOpen: false,
         zonesOpen: false,
+        inboxOpen: false,
+        embassyOpen: false,
+        notifOpen: false,
 
         openShop: () => set({ shopOpen: true }),
         closeShop: () => set({ shopOpen: false }),
         openZones: () => set({ zonesOpen: true }),
         closeZones: () => set({ zonesOpen: false }),
+        openInbox: () => set({ inboxOpen: true }),
+        closeInbox: () => set({ inboxOpen: false }),
+        openEmbassy: () => set({ embassyOpen: true }),
+        closeEmbassy: () => set({ embassyOpen: false }),
+        openNotif: () => set({ notifOpen: true }),
+        closeNotif: () => set({ notifOpen: false }),
         markZoneSeen: (id) => set({ seenZones: { ...get().seenZones, [id]: true } }),
         openDaily: () => {
           const r = rollDaily(get());
@@ -404,7 +443,37 @@ export const useGameStore = create<GameState>()(
           set({ onboarding: { ...get().onboarding, checklistDismissed: true } }),
 
         resetSave: () => {
-          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false, dailyOpen: false, zonesOpen: false });
+          set({ ...initialPersisted, player: { ...initialPlayer, energyUpdatedAt: Date.now() }, activeStation: null, characterOpen: false, guideOpen: false, analyticsOpen: false, introReplay: false, activeNpc: null, shopOpen: false, dailyOpen: false, zonesOpen: false, inboxOpen: false, embassyOpen: false, notifOpen: false });
+        },
+
+        setStarted: (v) => set({ started: v }),
+
+        hydrateFromRemote: (snap) => {
+          const prev = get();
+          set({
+            started: true,
+            hydrated: true,
+            player: {
+              ...prev.player,
+              ...(snap.nameAr !== undefined ? { nameAr: snap.nameAr } : {}),
+              ...(snap.avatar !== undefined ? { avatar: snap.avatar } : {}),
+              ...(snap.avatarImage !== undefined ? { avatarImage: snap.avatarImage } : {}),
+              ...(snap.player ?? {}),
+            },
+            competencyScores: snap.competencyScores ?? prev.competencyScores,
+            questProgress: snap.questProgress ?? prev.questProgress,
+            badges: snap.badges ?? prev.badges,
+            ownedFrames: snap.ownedFrames ?? prev.ownedFrames,
+            coins: snap.coins ?? prev.coins,
+            streak: snap.streak ?? prev.streak,
+            lastActiveDay: snap.lastActiveDay ?? prev.lastActiveDay,
+            daily: snap.daily ?? prev.daily,
+            onboarding: { ...prev.onboarding, ...(snap.onboarding ?? {}) },
+            promotionStatus: {
+              ...prev.promotionStatus,
+              ...(snap.currentRung !== undefined ? { currentRung: snap.currentRung } : {}),
+            },
+          });
         },
       };
     },
