@@ -186,7 +186,7 @@ export default function Hud() {
       </div>
 
       {/* Control toolbar — inline on desktop */}
-      <div className="pointer-events-none fixed top-3 left-1/2 z-30 hidden -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 rounded-pill bg-white/70 p-1 backdrop-blur-sm sm:flex">
+      <div className="pointer-events-none fixed top-3 left-1/2 z-30 hidden -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 rounded-pill bg-white/90 p-1 sm:flex">
         {controls.map((c) => (
           <button
             key={c.id}

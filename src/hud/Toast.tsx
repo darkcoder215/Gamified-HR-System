@@ -41,7 +41,7 @@ export default function Toast() {
           exit={{ opacity: 0, y: 24 }}
           className="pointer-events-none fixed bottom-44 left-1/2 z-50 -translate-x-1/2 sm:bottom-24"
         >
-          <div className="flex items-center gap-2 rounded-pill bg-black/85 px-4 py-2 font-ui text-sm font-bold text-white shadow-float backdrop-blur">
+          <div className="flex items-center gap-2 rounded-pill bg-black/90 px-4 py-2 font-ui text-sm font-bold text-white shadow-float">
             {msg.kind === 'reward' ? (
               <Sparkles size={15} className="text-amber" />
             ) : (

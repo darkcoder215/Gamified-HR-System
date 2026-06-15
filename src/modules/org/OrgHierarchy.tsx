@@ -205,7 +205,7 @@ function StaticOrg() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0 z-10 flex items-center justify-center rounded-xl p-4"
-          style={{ background: 'rgba(247,244,238,0.95)', backdropFilter: 'blur(2px)' }}
+          style={{ background: 'rgba(247,244,238,0.97)' }}
         >
           <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-float">
             <div className="mb-3 flex items-center justify-between">

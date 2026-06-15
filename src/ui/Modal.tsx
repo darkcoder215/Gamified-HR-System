@@ -35,7 +35,7 @@ export default function Modal({
         >
           <motion.div
             className="absolute inset-0"
-            style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)' }}
+            style={{ background: 'rgba(0,0,0,0.55)' }}
             onClick={onClose}
           />
           <motion.div

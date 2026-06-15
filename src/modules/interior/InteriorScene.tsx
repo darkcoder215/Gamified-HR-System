@@ -151,7 +151,7 @@ export default function InteriorScene({ id, title }: { id: StationId; title: str
       />
 
       {/* label */}
-      <div className="absolute bottom-2 right-3 rounded-pill bg-black/55 px-3 py-1 font-display text-sm font-bold text-white backdrop-blur-sm">
+      <div className="absolute bottom-2 right-3 rounded-pill bg-black/65 px-3 py-1 font-display text-sm font-bold text-white">
         {title}
       </div>
     </motion.div>

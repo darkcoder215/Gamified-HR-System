@@ -210,7 +210,7 @@ export default function CareerLadder() {
         {phase !== 'idle' && (
           <motion.div
             className="absolute inset-0 z-10 flex items-center justify-center rounded-xl"
-            style={{ background: 'rgba(247,244,238,0.93)', backdropFilter: 'blur(2px)' }}
+            style={{ background: 'rgba(247,244,238,0.97)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

@@ -84,7 +84,7 @@ export default function MobileControls() {
         <div className="pointer-events-none fixed z-20" style={{ left: origin.x, top: origin.y }}>
           <div
             className="absolute rounded-full border-2 border-white/70"
-            style={{ width: RADIUS * 2, height: RADIUS * 2, transform: 'translate(-50%, -50%)', background: 'rgba(43,45,63,0.35)', backdropFilter: 'blur(3px)' }}
+            style={{ width: RADIUS * 2, height: RADIUS * 2, transform: 'translate(-50%, -50%)', background: 'rgba(43,45,63,0.35)' }}
           />
           <div
             className="absolute h-14 w-14 rounded-full bg-white/90 shadow-card"
