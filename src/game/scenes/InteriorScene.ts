@@ -19,6 +19,7 @@ const THEMES: Record<StationId, { floor: number; floor2: number; wall: number; a
   org: { floor: 0x5a5a66, wall: 0x1c2230, floor2: 0x50505c, accent: '#84dbe5', glyph: '🏢', props: [{ g: '🖥️', x: 150, y: 210 }, { g: '🪴', x: 610, y: 210 }, { g: '📊', x: 120, y: 430 }, { g: '👥', x: 640, y: 430 }] },
 };
 const CHEST_COINS = 25;
+const GEM_COINS = 50;
 
 export default class InteriorScene extends Phaser.Scene {
   private player!: PlayerController;
@@ -29,7 +30,7 @@ export default class InteriorScene extends Phaser.Scene {
   private stationId!: StationId;
   private activity!: { x: number; y: number };
   private exit!: { x: number; y: number };
-  private chests: { x: number; y: number; key: string; obj: Phaser.GameObjects.Container; open: boolean }[] = [];
+  private chests: { x: number; y: number; key: string; obj: Phaser.GameObjects.Container; open: boolean; reward: number; kind: 'chest' | 'gem' }[] = [];
   private focus: 'activity' | 'exit' | null = null;
   private interactBuffered = false;
 
@@ -99,8 +100,25 @@ export default class InteriorScene extends Phaser.Scene {
       const c = this.add.container(spot.x, spot.y).setDepth(4);
       this.drawChest(c, isOpen);
       this.tweens.add({ targets: c, y: spot.y - 4, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-      this.chests.push({ x: spot.x, y: spot.y, key, obj: c, open: isOpen });
+      this.chests.push({ x: spot.x, y: spot.y, key, obj: c, open: isOpen, reward: CHEST_COINS, kind: 'chest' });
     });
+
+    // hidden gem — tucked into the far corner, worth more, easy to miss
+    {
+      const gemKey = `${this.stationId}:gem`;
+      const gemFound = !!opened[gemKey];
+      const gx = ROOM_W - 60;
+      const gy = 104;
+      const c = this.add.container(gx, gy).setDepth(4).setVisible(!gemFound);
+      this.drawGem(c, accent);
+      if (!gemFound) {
+        const glow = this.add.circle(0, 0, 12, accent, 0.3);
+        c.addAt(glow, 0);
+        this.tweens.add({ targets: glow, scale: 1.8, alpha: 0, duration: 1400, repeat: -1 });
+        this.tweens.add({ targets: c, y: gy - 5, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      }
+      this.chests.push({ x: gx, y: gy, key: gemKey, obj: c, open: gemFound, reward: GEM_COINS, kind: 'gem' });
+    }
 
     // exit door
     this.exit = { x: ROOM_W / 2, y: ROOM_H - 40 };
@@ -130,7 +148,33 @@ export default class InteriorScene extends Phaser.Scene {
     EventBus.on('input:interact', this.tryInteract, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.unbind());
 
-    st && void st;
+    // welcome chord on entry
+    sfx('enter');
+
+    // one-time first-visit bonus
+    const bonus = useGameStore.getState().claimInteriorVisit(this.stationId);
+    if (bonus) {
+      this.time.delayedCall(400, () => {
+        EventBus.emit('reward:toast', { text: `أول زيارة لـ«${st.nameAr}» · +${bonus.xp} خبرة · +${bonus.coins} 🪙` });
+        sfx('badge');
+        this.popText(this.player.sprite.x, this.player.sprite.y - 40, `+${bonus.xp} خبرة`, '#00c17a');
+      });
+    }
+  }
+
+  private drawGem(c: Phaser.GameObjects.Container, color: number) {
+    const g = this.add.graphics();
+    g.fillStyle(color, 1);
+    g.beginPath();
+    g.moveTo(0, -11);
+    g.lineTo(9, -2);
+    g.lineTo(0, 13);
+    g.lineTo(-9, -2);
+    g.closePath();
+    g.fillPath();
+    g.fillStyle(0xffffff, 0.55);
+    g.fillTriangle(0, -11, 9, -2, 0, -1);
+    c.add(g);
   }
 
   private drawChest(c: Phaser.GameObjects.Container, open: boolean) {
@@ -191,14 +235,20 @@ export default class InteriorScene extends Phaser.Scene {
     const px = this.player.sprite.x;
     const py = this.player.sprite.y;
 
-    // collect chests on contact
+    // collect chests + hidden gem on contact
     for (const ch of this.chests) {
-      if (!ch.open && (ch.x - px) ** 2 + (ch.y - py) ** 2 < 34 * 34) {
-        if (useGameStore.getState().openChest(ch.key, CHEST_COINS)) {
+      const r = ch.kind === 'gem' ? 30 : 34;
+      if (!ch.open && (ch.x - px) ** 2 + (ch.y - py) ** 2 < r * r) {
+        if (useGameStore.getState().openChest(ch.key, ch.reward)) {
           ch.open = true;
-          this.drawChest(ch.obj, true);
+          if (ch.kind === 'gem') {
+            this.popText(ch.x, ch.y, '💎', '#84dbe5');
+            ch.obj.destroy();
+          } else {
+            this.drawChest(ch.obj, true);
+          }
           sfx('badge');
-          this.popCoins(ch.x, ch.y, CHEST_COINS);
+          this.popText(ch.x, ch.y, `+${ch.reward} 🪙`, '#ffbc0a');
         }
       }
     }
@@ -219,8 +269,8 @@ export default class InteriorScene extends Phaser.Scene {
     }
   }
 
-  private popCoins(x: number, y: number, n: number) {
-    const t = this.add.text(x, y - 20, `+${n} 🪙`, { fontFamily: 'monospace', fontSize: '16px', color: '#ffbc0a', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
+  private popText(x: number, y: number, label: string, color: string) {
+    const t = this.add.text(x, y - 20, label, { fontFamily: 'monospace', fontSize: '16px', color, fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
     this.tweens.add({ targets: t, y: y - 60, alpha: 0, duration: 900, ease: 'Cubic.out', onComplete: () => t.destroy() });
   }
 }

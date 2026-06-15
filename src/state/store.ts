@@ -139,6 +139,7 @@ interface GameState extends PersistedState {
   buyEnergyRefill: (price: number) => void;
   addCoins: (n: number) => void;
   openChest: (key: string, amount: number) => boolean;
+  claimInteriorVisit: (stationId: StationId) => { xp: number; coins: number } | null;
   setColleagueAvatar: (id: string, dataUrl: string) => void;
   openDaily: () => void;
   closeDaily: () => void;
@@ -360,6 +361,18 @@ export const useGameStore = create<GameState>()(
           if (s.chestsOpened[key]) return false;
           commit({ chestsOpened: { ...s.chestsOpened, [key]: true }, coins: s.coins + amount });
           return true;
+        },
+        claimInteriorVisit: (stationId) => {
+          const s = get();
+          const key = `visit:${stationId}`;
+          if (s.chestsOpened[key]) return null;
+          const reward = { xp: 30, coins: 15 };
+          commit({
+            chestsOpened: { ...s.chestsOpened, [key]: true },
+            coins: s.coins + reward.coins,
+            player: { ...s.player, xp: s.player.xp + reward.xp },
+          });
+          return reward;
         },
 
         finishIntro: () =>
