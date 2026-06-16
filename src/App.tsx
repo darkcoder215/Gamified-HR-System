@@ -36,9 +36,9 @@ function RoleHome() {
 
 function AuthedApp() {
   const { session, profile, loading } = useAuth();
-  if (loading) return <Splash text="جارٍ التحميل…" />;
+  if (loading) return <Splash text="Loading…" />;
   if (!session) return <AuthScreen />;
-  if (!profile) return <Splash text="جارٍ تجهيز حسابك…" />;
+  if (!profile) return <Splash text="Setting up your account…" />;
   return <RoleHome />;
 }
 

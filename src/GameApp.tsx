@@ -136,26 +136,26 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
             <Bell size={14} /> Notifications
             {unread > 0 && <span className="num absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">{unread}</span>}
           </button>
-          <button onClick={openInbox} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-blue shadow-card"><Inbox size={14} /> مهامي</button>
-          <button onClick={openEmbassy} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-amber shadow-card"><Building2 size={14} /> السفارة</button>
-          {onExit && <button onClick={onExit} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-black px-3 py-1.5 font-ui text-xs font-bold text-white shadow-card"><LayoutDashboard size={14} /> لوحتي</button>}
-          {signOut && <button onClick={signOut} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white px-2.5 py-1.5 font-ui text-xs font-bold text-muted shadow-card" title="خروج"><LogOut size={14} /></button>}
+          <button onClick={openInbox} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-blue shadow-card"><Inbox size={14} /> My Tasks</button>
+          <button onClick={openEmbassy} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-amber shadow-card"><Building2 size={14} /> Embassy</button>
+          {onExit && <button onClick={onExit} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-black px-3 py-1.5 font-ui text-xs font-bold text-white shadow-card"><LayoutDashboard size={14} /> My Dashboard</button>}
+          {signOut && <button onClick={signOut} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white px-2.5 py-1.5 font-ui text-xs font-bold text-muted shadow-card" title="Sign out"><LogOut size={14} /></button>}
         </div>
       )}
 
       <StationModalRouter />
-      <Modal open={characterOpen} onClose={closeCharacter} title="تخصيص الشخصية" subtitle="اصنع شخصيتك ولونها" icon={<Palette size={24} />} accent="var(--color-hot-pink)" maxWidth="640px"><CharacterStudio /></Modal>
-      <Modal open={guideOpen} onClose={closeGuide} title="الدليل" subtitle="ما الذي يقدّمه كل مبنى وكيف تستفيد" icon={<BookOpen size={24} />} accent="var(--color-blue)" maxWidth="640px"><GuideModal /></Modal>
-      <Modal open={analyticsOpen} onClose={closeAnalytics} title="تحليلاتي" subtitle="أين تقف الآن وكيف تتقدّم" icon={<BarChart3 size={24} />} accent="var(--color-green)" maxWidth="760px"><AnalyticsDashboard /></Modal>
-      <Modal open={shopOpen} onClose={closeShop} title="المتجر" subtitle="أنفق عملاتك على المظهر والمزايا" icon={<ShoppingBag size={24} />} accent="var(--color-amber)" maxWidth="640px"><Shop /></Modal>
-      <Modal open={dailyOpen} onClose={closeDaily} title="التحديات اليومية" subtitle="أنجز تحديات اليوم وحافظ على سلسلتك" icon={<Flame size={24} />} accent="var(--color-red)" maxWidth="560px"><DailyChallenges /></Modal>
-      <Modal open={zonesOpen} onClose={closeZones} title="المناطق" subtitle="أحياء العالم وما يُفتح مع تقدّمك" icon={<MapIcon size={24} />} accent="var(--color-green)" maxWidth="600px"><ZonesPanel /></Modal>
-      <Modal open={petsOpen} onClose={closePets} title="الرفاق" subtitle="حيواناتك التي كسبتها بإنجازاتك" icon={<PawPrint size={24} />} accent="var(--color-hot-pink)" maxWidth="600px"><PetsPanel /></Modal>
-      {backend && <Modal open={goalsOpen} onClose={closeGoals} title="أهدافي ومؤشّراتي" subtitle="تابع أهدافك ومؤشّرات أدائك" icon={<Target size={24} />} accent="var(--color-green)" maxWidth="620px"><GoalsPanel /></Modal>}
-      <Modal open={gamesOpen} onClose={closeGames} title="الألعاب" subtitle="تحدّيات سريعة تنمّي مهاراتك" icon={<Gamepad2 size={24} />} accent="var(--color-blue)" maxWidth="600px"><GamesPanel /></Modal>
-      {backend && <Modal open={notifOpen} onClose={closeNotif} title="الإشعارات" subtitle="آخر التحديثات" icon={<Bell size={24} />} accent="var(--color-blue)" maxWidth="520px"><NotificationsPanel /></Modal>}
-      {backend && <Modal open={inboxOpen} onClose={closeInbox} title="مهامي" subtitle="المهام والتقييمات المُسندة إليك" icon={<Inbox size={24} />} accent="var(--color-blue)" maxWidth="600px"><AssignmentsInbox /></Modal>}
-      {backend && <Modal open={embassyOpen} onClose={closeEmbassy} title="السفارة" subtitle="الإجازات والطلبات" icon={<Building2 size={24} />} accent="var(--color-amber)" maxWidth="620px"><Embassy /></Modal>}
+      <Modal open={characterOpen} onClose={closeCharacter} title="Customize Character" subtitle="Create and color your character" icon={<Palette size={24} />} accent="var(--color-hot-pink)" maxWidth="640px"><CharacterStudio /></Modal>
+      <Modal open={guideOpen} onClose={closeGuide} title="Guide" subtitle="What each building offers and how to make the most of it" icon={<BookOpen size={24} />} accent="var(--color-blue)" maxWidth="640px"><GuideModal /></Modal>
+      <Modal open={analyticsOpen} onClose={closeAnalytics} title="My Analytics" subtitle="Where you stand now and how to progress" icon={<BarChart3 size={24} />} accent="var(--color-green)" maxWidth="760px"><AnalyticsDashboard /></Modal>
+      <Modal open={shopOpen} onClose={closeShop} title="Shop" subtitle="Spend your coins on looks and perks" icon={<ShoppingBag size={24} />} accent="var(--color-amber)" maxWidth="640px"><Shop /></Modal>
+      <Modal open={dailyOpen} onClose={closeDaily} title="Daily Challenges" subtitle="Complete today's challenges and keep your streak" icon={<Flame size={24} />} accent="var(--color-red)" maxWidth="560px"><DailyChallenges /></Modal>
+      <Modal open={zonesOpen} onClose={closeZones} title="Zones" subtitle="The world's districts and what unlocks as you progress" icon={<MapIcon size={24} />} accent="var(--color-green)" maxWidth="600px"><ZonesPanel /></Modal>
+      <Modal open={petsOpen} onClose={closePets} title="Companions" subtitle="The pets you've earned through your achievements" icon={<PawPrint size={24} />} accent="var(--color-hot-pink)" maxWidth="600px"><PetsPanel /></Modal>
+      {backend && <Modal open={goalsOpen} onClose={closeGoals} title="My Goals & KPIs" subtitle="Track your goals and performance indicators" icon={<Target size={24} />} accent="var(--color-green)" maxWidth="620px"><GoalsPanel /></Modal>}
+      <Modal open={gamesOpen} onClose={closeGames} title="Games" subtitle="Quick challenges that build your skills" icon={<Gamepad2 size={24} />} accent="var(--color-blue)" maxWidth="600px"><GamesPanel /></Modal>
+      {backend && <Modal open={notifOpen} onClose={closeNotif} title="Notifications" subtitle="Latest updates" icon={<Bell size={24} />} accent="var(--color-blue)" maxWidth="520px"><NotificationsPanel /></Modal>}
+      {backend && <Modal open={inboxOpen} onClose={closeInbox} title="My Tasks" subtitle="Tasks and assessments assigned to you" icon={<Inbox size={24} />} accent="var(--color-blue)" maxWidth="600px"><AssignmentsInbox /></Modal>}
+      {backend && <Modal open={embassyOpen} onClose={closeEmbassy} title="Embassy" subtitle="Leave and requests" icon={<Building2 size={24} />} accent="var(--color-amber)" maxWidth="620px"><Embassy /></Modal>}
 
       <DialogueBox />
       <Toast />
