@@ -11,31 +11,30 @@ const ROOM_H = 560;
 
 // Depth bands for things that must always sit behind the y-sorted actors.
 const D_FLOOR = -1000;
-const D_RUG = -800;
-const D_LIGHT = -500;
-const D_BEAM = -460;
-const D_LAMP = -440;
-const WARM = 0xfff1d4;
+const D_RUG = -900;
+const D_LIGHT = -850;
+const D_WALL = -800;
 
-// Per-building interior theming. Every room is a furnished open-plan office
-// (desks + seated workers, a meeting table, a lounge) tinted to the building's
-// brand, with a glowing activity podium that opens the matching panel.
+const OUTLINE = 0x15111d;
+
+// Per-building interior theming: every room is a furnished pixel-art office,
+// tinted to the building's brand, with a glowing activity podium.
 const THEMES: Record<
   StationId,
-  { floor: number; floor2: number; grout: number; wallTop: number; wallBot: number; wainscot: number; accent: string; glyph: string; art: string; deskItem: string }
+  { floor: number; floor2: number; seam: number; wall: number; wallLite: number; wallDark: number; accent: number; art: string }
 > = {
-  arena: { floor: 0x6f553d, floor2: 0x644b35, grout: 0x4c3826, wallTop: 0x232535, wallBot: 0x2b2d3f, wainscot: 0x363951, accent: '#00c17a', glyph: '⚔️', art: '🎯', deskItem: '🛡️' },
-  quests: { floor: 0x726045, floor2: 0x67553c, grout: 0x4f4029, wallTop: 0x17304f, wallBot: 0x1f3a5f, wainscot: 0x2c4f7d, accent: '#0072f9', glyph: '📋', art: '🗺️', deskItem: '🗂️' },
-  career: { floor: 0x7d6d54, floor2: 0x72624a, grout: 0x564525, wallTop: 0x2c2310, wallBot: 0x3a2e10, wainscot: 0x554121, accent: '#ffbc0a', glyph: '🏙️', art: '📈', deskItem: '🏆' },
-  leaderboard: { floor: 0x6f4d3c, floor2: 0x644536, grout: 0x4a3326, wallTop: 0x2c0a1a, wallBot: 0x3a0e22, wainscot: 0x551534, accent: '#82003a', glyph: '🏆', art: '🥇', deskItem: '🎖️' },
-  org: { floor: 0x5d5d69, floor2: 0x545460, grout: 0x3d3d48, wallTop: 0x161b27, wallBot: 0x1c2230, wainscot: 0x2c3344, accent: '#84dbe5', glyph: '🏢', art: '📊', deskItem: '🖥️' },
+  arena: { floor: 0x7a5a3c, floor2: 0x6e5034, seam: 0x523a24, wall: 0x2b2d3f, wallLite: 0x3a3d52, wallDark: 0x1d1e2b, accent: 0x00c17a, art: 'target' },
+  quests: { floor: 0x7c6646, floor2: 0x6f5b3d, seam: 0x564327, wall: 0x21426c, wallLite: 0x2f5a8c, wallDark: 0x16314f, accent: 0x2b8cff, art: 'map' },
+  career: { floor: 0x86714f, floor2: 0x796649, seam: 0x5a4828, wall: 0x4a3a18, wallLite: 0x614a22, wallDark: 0x33280f, accent: 0xffbc0a, art: 'chart' },
+  leaderboard: { floor: 0x7a5440, seam: 0x52372a, floor2: 0x6d4a37, wall: 0x4a132c, wallLite: 0x6a1e42, wallDark: 0x320c1d, accent: 0xff2e6e, art: 'cup' },
+  org: { floor: 0x64646f, floor2: 0x5a5a66, seam: 0x44444e, wall: 0x232a39, wallLite: 0x333c4f, wallDark: 0x171b26, accent: 0x84dbe5, art: 'people' },
 };
 const CHEST_COINS = 25;
 const GEM_COINS = 50;
 
 const SKINS = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac];
-const SHIRTS = [0x00c17a, 0x0072f9, 0xffbc0a, 0x82003a, 0x84dbe5, 0xff5da2, 0x6b5cff];
-const HAIRS = [0x2b2118, 0x4a3526, 0x1c1c22, 0x6e4a2b, 0x8a8f99];
+const SHIRTS = [0x18b67a, 0x2b8cff, 0xffbc0a, 0xff2e6e, 0x84dbe5, 0x9b6bff, 0xff7a3d];
+const HAIRS = [0x2b2118, 0x4a3526, 0x101015, 0x6e4a2b, 0x8a8f99];
 
 export default class InteriorScene extends Phaser.Scene {
   private player!: PlayerController;
@@ -63,123 +62,91 @@ export default class InteriorScene extends Phaser.Scene {
     this.paused = false;
     this.pplIdx = 0;
     this.mobileVec.set(0, 0);
-    const theme = THEMES[this.stationId];
+    const t = THEMES[this.stationId];
     const st = stations.find((s) => s.id === this.stationId)!;
-    const accent = Phaser.Display.Color.HexStringToColor(theme.accent).color;
 
     this.physics.world.setBounds(0, 0, ROOM_W, ROOM_H);
     this.solids = this.physics.add.staticGroup();
-    this.makeGlowTexture();
 
-    this.buildFloor(theme, accent);
-    this.buildWall(theme, accent);
+    this.buildFloor(t);
+    this.buildWall(t);
 
-    // collision walls (invisible)
     this.addSolid(ROOM_W / 2, 30, ROOM_W, 60);
     this.addSolid(ROOM_W / 2, ROOM_H - 4, ROOM_W, 8);
     this.addSolid(4, ROOM_H / 2, 8, ROOM_H);
     this.addSolid(ROOM_W - 4, ROOM_H / 2, 8, ROOM_H);
 
-    // section rugs (define zones)
-    this.addRug(178, 332, 210, 300, accent);
-    this.addRug(582, 332, 210, 300, accent);
-    this.addRug(ROOM_W / 2, 372, 230, 156, accent, true);
-
-    // ambient lighting: ceiling lamps, beams, floor pools
-    this.buildLighting(accent);
+    // section rugs
+    this.rug(178, 332, 210, 300, t.accent);
+    this.rug(582, 332, 210, 300, t.accent);
+    this.rug(ROOM_W / 2, 372, 232, 158, t.accent);
 
     // back-wall dressing
-    this.drawFramedArt(ROOM_W / 2, 26, theme.art, accent);
-    this.drawWindow(190, 26, accent);
-    this.drawWindow(570, 26, accent);
-    this.drawClock(686, 26);
-    this.add.text(76, 26, theme.deskItem, { fontSize: '20px' }).setOrigin(0.5).setDepth(26);
+    this.framedArt(ROOM_W / 2, 28, t);
+    this.whiteboard(150, 28, t.accent);
+    this.window(420, 28, t.accent);
+    this.window(610, 28, t.accent);
+    this.clock(694, 28);
 
-    // workspace desks with seated workers (2 left, 2 right)
-    this.deskUnit(178, 250, accent, theme.deskItem, true);
-    this.deskUnit(178, 412, accent, '📄', false);
-    this.deskUnit(582, 250, accent, '☕', false);
-    this.deskUnit(582, 412, accent, theme.deskItem, true);
+    // workspace desks + seated workers
+    this.desk(178, 252, t.accent, true);
+    this.desk(178, 414, t.accent, false);
+    this.desk(582, 252, t.accent, false);
+    this.desk(582, 414, t.accent, true);
 
-    // central meeting table with a small standup
-    this.meetingTable(ROOM_W / 2, 372, accent);
+    // central meeting table
+    this.meetingTable(ROOM_W / 2, 372, t.accent);
 
-    // lounge corner + plants
-    this.lounge(112, 470, accent);
-    this.drawPlant(672, 466);
-    this.drawPlant(244, 486);
+    // lounge + plants + cooler
+    this.lounge(112, 472, t.accent);
+    this.plant(672, 468);
+    this.plant(250, 486);
+    this.cooler(694, 470, t.accent);
 
-    // activity podium (opens the building's panel)
+    // activity podium
     this.activity = { x: ROOM_W / 2, y: 150 };
-    this.addGlow(this.activity.x, this.activity.y + 18, 220, 120, accent, 0.3, D_LIGHT);
-    this.add.ellipse(this.activity.x, this.activity.y + 32, 78, 20, 0x000000, 0.28).setDepth(this.activity.y + 30);
-    const podium = this.add.graphics().setDepth(this.activity.y + 30);
-    podium.fillStyle(0x20222f, 1).fillRoundedRect(this.activity.x - 32, this.activity.y + 6, 64, 28, 7);
-    podium.fillStyle(0x2b2d3f, 1).fillRoundedRect(this.activity.x - 32, this.activity.y + 4, 64, 8, 4);
-    podium.fillStyle(accent, 0.95).fillRoundedRect(this.activity.x - 32, this.activity.y + 4, 64, 4, 2);
-    const icon = this.add.text(this.activity.x, this.activity.y - 6, theme.glyph, { fontSize: '46px' }).setOrigin(0.5).setDepth(this.activity.y + 30);
-    this.tweens.add({ targets: icon, y: this.activity.y - 12, duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-    const ring = this.add.circle(this.activity.x, this.activity.y, 30, accent, 0).setStrokeStyle(3, accent, 0.7).setDepth(this.activity.y + 29);
-    this.tweens.add({ targets: ring, scale: 1.9, alpha: 0, duration: 1700, repeat: -1 });
+    this.podium(this.activity.x, this.activity.y, t.accent);
 
-    // collectible chests (edge lanes)
+    // chests
     const opened = useGameStore.getState().chestsOpened;
-    const chestSpots = [{ x: 70, y: 300 }, { x: ROOM_W - 70, y: 300 }];
-    chestSpots.forEach((spot, i) => {
+    [{ x: 70, y: 300 }, { x: ROOM_W - 70, y: 300 }].forEach((spot, i) => {
       const key = `${this.stationId}:c${i}`;
       const isOpen = !!opened[key];
-      this.addGlow(spot.x, spot.y + 6, 70, 40, 0xffd23f, isOpen ? 0.1 : 0.28, D_LIGHT);
       const c = this.add.container(spot.x, spot.y).setDepth(spot.y + 12);
       this.drawChest(c, isOpen);
       this.tweens.add({ targets: c, y: spot.y - 4, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
       this.chests.push({ x: spot.x, y: spot.y, key, obj: c, open: isOpen, reward: CHEST_COINS, kind: 'chest' });
     });
 
-    // hidden gem — tucked into the far corner, worth more, easy to miss
+    // hidden gem
     {
       const gemKey = `${this.stationId}:gem`;
       const gemFound = !!opened[gemKey];
-      const gx = ROOM_W - 60;
-      const gy = 104;
+      const gx = ROOM_W - 110;
+      const gy = 100;
       const c = this.add.container(gx, gy).setDepth(gy + 12).setVisible(!gemFound);
-      this.drawGem(c, accent);
-      if (!gemFound) {
-        const glow = this.add.circle(0, 0, 12, accent, 0.3);
-        c.addAt(glow, 0);
-        this.tweens.add({ targets: glow, scale: 1.8, alpha: 0, duration: 1400, repeat: -1 });
-        this.tweens.add({ targets: c, y: gy - 5, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-      }
+      this.drawGem(c, t.accent);
+      if (!gemFound) this.tweens.add({ targets: c, y: gy - 5, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
       this.chests.push({ x: gx, y: gy, key: gemKey, obj: c, open: gemFound, reward: GEM_COINS, kind: 'gem' });
     }
 
     // exit door
-    this.exit = { x: ROOM_W / 2, y: ROOM_H - 38 };
-    const ex = this.add.graphics().setDepth(this.exit.y);
-    ex.fillStyle(0x0d1019, 1).fillRoundedRect(this.exit.x - 30, this.exit.y - 32, 60, 64, 6);
-    ex.fillStyle(accent, 0.9).fillRoundedRect(this.exit.x - 24, this.exit.y - 26, 48, 52, 4);
-    ex.fillStyle(0x0d1019, 0.85).fillRoundedRect(this.exit.x - 18, this.exit.y - 20, 36, 40, 3);
-    this.add.text(this.exit.x, this.exit.y - 2, '🚪', { fontSize: '28px' }).setOrigin(0.5).setDepth(this.exit.y);
-    this.addGlow(this.exit.x, this.exit.y + 16, 110, 50, accent, 0.25, D_LIGHT);
+    this.exit = { x: ROOM_W / 2, y: ROOM_H - 36 };
+    this.door(this.exit.x, this.exit.y, t.accent);
 
-    // floating dust motes
-    this.dustMotes(accent);
+    this.dust(t.accent);
 
     // player
-    this.player = new PlayerController(this, this.exit.x, this.exit.y - 74);
+    this.player = new PlayerController(this, this.exit.x, this.exit.y - 78);
     this.physics.add.collider(this.player.sprite, this.solids);
 
     this.cameras.main.setBounds(0, 0, ROOM_W, ROOM_H);
-    this.cameras.main.startFollow(this.player.sprite, true, 0.15, 0.15);
-    this.cameras.main.setZoom(1.5);
+    this.cameras.main.startFollow(this.player.sprite, true, 0.16, 0.16);
+    this.cameras.main.setZoom(1.7);
     this.cameras.main.roundPixels = true;
-    this.cameras.main.fadeIn(280);
-
-    // cinematic post-processing
-    const fx = this.cameras.main.postFX;
-    if (fx) {
-      fx.addVignette(0.5, 0.5, 0.78, 0.45);
-      fx.addBloom(0xffffff, 1, 1, 1, 0.7, 4);
-    }
+    this.cameras.main.fadeIn(260);
+    // vignette only — no bloom (bloom blurs the pixel art)
+    if (this.cameras.main.postFX) this.cameras.main.postFX.addVignette(0.5, 0.5, 0.82, 0.4);
 
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,E,SPACE') as Record<string, Phaser.Input.Keyboard.Key>;
@@ -200,116 +167,24 @@ export default class InteriorScene extends Phaser.Scene {
       this.time.delayedCall(400, () => {
         EventBus.emit('reward:toast', { text: `أول زيارة لـ«${st.nameAr}» · +${bonus.xp} خبرة · +${bonus.coins} 🪙` });
         sfx('badge');
-        this.popText(this.player.sprite.x, this.player.sprite.y - 40, `+${bonus.xp} خبرة`, '#00c17a');
+        this.popText(this.player.sprite.x, this.player.sprite.y - 40, `+${bonus.xp} خبرة`, '#18b67a');
       });
     }
   }
 
-  // ---------------- room shell ----------------
+  // ---------------- pixel-draw helpers ----------------
 
-  private makeGlowTexture() {
-    if (this.textures.exists('int-glow')) return;
-    const size = 256;
-    const tex = this.textures.createCanvas('int-glow', size, size);
-    if (!tex) return;
-    const ctx = tex.getContext();
-    const grd = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-    grd.addColorStop(0, 'rgba(255,255,255,1)');
-    grd.addColorStop(0.5, 'rgba(255,255,255,0.45)');
-    grd.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, size, size);
-    tex.refresh();
+  private shade(color: number, amt: number): number {
+    const c = Phaser.Display.Color.IntegerToColor(color);
+    const f = (v: number) => Phaser.Math.Clamp(Math.round(v + (amt > 0 ? (255 - v) * amt : v * amt)), 0, 255);
+    return Phaser.Display.Color.GetColor(f(c.red), f(c.green), f(c.blue));
   }
 
-  private addGlow(x: number, y: number, w: number, h: number, tint: number, alpha: number, depth: number) {
-    this.add
-      .image(x, y, 'int-glow')
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setTint(tint)
-      .setAlpha(alpha)
-      .setDisplaySize(w, h)
-      .setDepth(depth);
+  // filled block with a 1px dark outline — the staple of the pixel look
+  private box(g: Phaser.GameObjects.Graphics, x: number, y: number, w: number, h: number, fill: number, outline = OUTLINE) {
+    g.fillStyle(outline, 1).fillRect(x - 1, y - 1, w + 2, h + 2);
+    g.fillStyle(fill, 1).fillRect(x, y, w, h);
   }
-
-  private buildFloor(theme: (typeof THEMES)[StationId], accent: number) {
-    const g = this.add.graphics().setDepth(D_FLOOR);
-    const T = 40;
-    for (let y = 56; y < ROOM_H; y += T) {
-      for (let x = 0; x < ROOM_W; x += T) {
-        const even = (x / T + y / T) % 2 === 0;
-        g.fillStyle(even ? theme.floor : theme.floor2, 1).fillRect(x, y, T, T);
-        // soft top-left sheen on each tile
-        g.fillStyle(0xffffff, 0.04).fillRect(x + 1, y + 1, T - 2, 3);
-        g.fillStyle(0xffffff, 0.03).fillRect(x + 1, y + 1, 3, T - 2);
-      }
-    }
-    // grout grid
-    g.lineStyle(1, theme.grout, 0.5);
-    for (let x = 0; x <= ROOM_W; x += T) g.lineBetween(x, 56, x, ROOM_H);
-    for (let y = 56; y <= ROOM_H; y += T) g.lineBetween(0, y, ROOM_W, y);
-    // inner ambient occlusion near walls
-    const ao = this.add.graphics().setDepth(D_FLOOR + 1);
-    ao.fillStyle(0x000000, 0.16).fillRect(0, 56, ROOM_W, 14);
-    ao.fillStyle(0x000000, 0.12).fillRect(0, 56, 12, ROOM_H);
-    ao.fillStyle(0x000000, 0.12).fillRect(ROOM_W - 12, 56, 12, ROOM_H);
-    ao.fillStyle(0x000000, 0.1).fillRect(0, ROOM_H - 12, ROOM_W, 12);
-    // big soft center light on the floor
-    this.addGlow(ROOM_W / 2, ROOM_H / 2 + 40, 760, 520, accent, 0.05, D_FLOOR + 2);
-  }
-
-  private buildWall(theme: (typeof THEMES)[StationId], accent: number) {
-    const g = this.add.graphics().setDepth(D_FLOOR + 3);
-    // vertical gradient via stacked bands
-    const top = Phaser.Display.Color.IntegerToColor(theme.wallTop);
-    const bot = Phaser.Display.Color.IntegerToColor(theme.wallBot);
-    for (let i = 0; i < 56; i += 2) {
-      const t = i / 56;
-      const r = Math.round(top.red + (bot.red - top.red) * t);
-      const gg = Math.round(top.green + (bot.green - top.green) * t);
-      const bb = Math.round(top.blue + (bot.blue - top.blue) * t);
-      g.fillStyle(Phaser.Display.Color.GetColor(r, gg, bb), 1).fillRect(0, i, ROOM_W, 2);
-    }
-    // wainscot panelling line + baseboard with accent LED
-    g.fillStyle(theme.wainscot, 1).fillRect(0, 40, ROOM_W, 4);
-    g.fillStyle(0x000000, 0.3).fillRect(0, 52, ROOM_W, 4);
-    g.fillStyle(accent, 0.6).fillRect(0, 56, ROOM_W, 3);
-    this.addGlow(ROOM_W / 2, 58, 760, 60, accent, 0.12, D_FLOOR + 4);
-  }
-
-  private buildLighting(accent: number) {
-    [190, 380, 570].forEach((x) => {
-      // pendant lamp fixture
-      const lamp = this.add.graphics().setDepth(D_LAMP);
-      lamp.fillStyle(0x11141f, 1).fillRect(x - 1, 56, 2, 16);
-      lamp.fillStyle(0x2b2d3f, 1).fillRoundedRect(x - 16, 70, 32, 10, 4);
-      lamp.fillStyle(WARM, 0.9).fillRoundedRect(x - 13, 76, 26, 4, 2);
-      // downward beam + floor pool
-      this.add
-        .image(x, 80, 'int-glow')
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setTint(WARM)
-        .setAlpha(0.1)
-        .setDisplaySize(150, 360)
-        .setOrigin(0.5, 0)
-        .setDepth(D_BEAM);
-      this.addGlow(x, 300, 280, 360, WARM, 0.06, D_LIGHT - 1);
-    });
-    void accent;
-  }
-
-  private dustMotes(accent: number) {
-    for (let i = 0; i < 16; i++) {
-      const x = Phaser.Math.Between(60, ROOM_W - 60);
-      const y = Phaser.Math.Between(90, ROOM_H - 80);
-      const m = this.add.circle(x, y, Phaser.Math.FloatBetween(1, 2.4), i % 3 === 0 ? accent : WARM, 0.5)
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setDepth(5000);
-      this.tweens.add({ targets: m, y: y - Phaser.Math.Between(20, 50), x: x + Phaser.Math.Between(-16, 16), alpha: { from: 0.15, to: 0.6 }, duration: Phaser.Math.Between(3000, 6000), yoyo: true, repeat: -1, ease: 'Sine.inOut', delay: i * 180 });
-    }
-  }
-
-  // ---------------- furniture & people ----------------
 
   private addSolid(x: number, y: number, w: number, h: number) {
     const r = this.add.rectangle(x, y, w, h).setVisible(false);
@@ -317,201 +192,338 @@ export default class InteriorScene extends Phaser.Scene {
     this.solids.add(r);
   }
 
-  private addRug(x: number, y: number, w: number, h: number, accent: number, oval = false) {
-    const g = this.add.graphics().setDepth(D_RUG);
-    g.fillStyle(accent, 0.1);
-    if (oval) g.fillEllipse(x, y, w, h);
-    else g.fillRoundedRect(x - w / 2, y - h / 2, w, h, 18);
-    g.lineStyle(2, accent, 0.22);
-    if (oval) g.strokeEllipse(x, y, w, h);
-    else g.strokeRoundedRect(x - w / 2, y - h / 2, w, h, 18);
-    g.lineStyle(1, accent, 0.1);
-    if (!oval) g.strokeRoundedRect(x - w / 2 + 10, y - h / 2 + 10, w - 20, h - 20, 14);
+  // ---------------- room shell ----------------
+
+  private buildFloor(t: (typeof THEMES)[StationId]) {
+    const g = this.add.graphics().setDepth(D_FLOOR);
+    const T = 38;
+    for (let y = 56; y < ROOM_H; y += T) {
+      for (let x = 0; x < ROOM_W; x += T) {
+        const even = (Math.floor(x / T) + Math.floor(y / T)) % 2 === 0;
+        g.fillStyle(even ? t.floor : t.floor2, 1).fillRect(x, y, T, T);
+        g.fillStyle(this.shade(even ? t.floor : t.floor2, 0.07), 1).fillRect(x, y, T, 2); // plank sheen
+      }
+    }
+    g.fillStyle(t.seam, 0.6);
+    for (let x = 0; x <= ROOM_W; x += T) g.fillRect(x, 56, 1, ROOM_H);
+    for (let y = 56; y <= ROOM_H; y += T) g.fillRect(0, y, ROOM_W, 1);
+    // hard-edged ambient occlusion near walls/edges
+    const ao = this.add.graphics().setDepth(D_FLOOR + 1);
+    ao.fillStyle(0x000000, 0.18).fillRect(0, 56, ROOM_W, 10);
+    ao.fillStyle(0x000000, 0.1).fillRect(0, 66, ROOM_W, 6);
+    ao.fillStyle(0x000000, 0.12).fillRect(0, 56, 10, ROOM_H).fillRect(ROOM_W - 10, 56, 10, ROOM_H);
+    ao.fillStyle(0x000000, 0.12).fillRect(0, ROOM_H - 10, ROOM_W, 10);
   }
 
-  // A seated worker drawn into a container (origin at the chest, facing viewer).
-  private drawPerson(c: Phaser.GameObjects.Container) {
+  private buildWall(t: (typeof THEMES)[StationId]) {
+    const g = this.add.graphics().setDepth(D_WALL);
+    this.box(g, 0, 0, ROOM_W, 50, t.wall, t.wallDark);
+    g.fillStyle(t.wallLite, 1).fillRect(0, 0, ROOM_W, 3); // crown
+    // panelling
+    g.fillStyle(t.wallDark, 1).fillRect(0, 38, ROOM_W, 2);
+    g.fillStyle(t.wallLite, 0.6);
+    for (let x = 22; x < ROOM_W; x += 64) g.fillRect(x, 8, 2, 28);
+    // baseboard + accent strip
+    g.fillStyle(t.wallDark, 1).fillRect(0, 50, ROOM_W, 4);
+    g.fillStyle(t.accent, 1).fillRect(0, 54, ROOM_W, 2);
+    g.fillStyle(this.shade(t.accent, 0.4), 0.5).fillRect(0, 56, ROOM_W, 2);
+  }
+
+  private rug(x: number, y: number, w: number, h: number, accent: number) {
+    const g = this.add.graphics().setDepth(D_RUG);
+    g.fillStyle(this.shade(accent, -0.55), 0.32).fillRect(x - w / 2, y - h / 2, w, h);
+    g.fillStyle(accent, 0.16).fillRect(x - w / 2 + 6, y - h / 2 + 6, w - 12, h - 12);
+    g.fillStyle(accent, 0.3).fillRect(x - w / 2, y - h / 2, w, 2).fillRect(x - w / 2, y + h / 2 - 2, w, 2);
+    g.fillStyle(accent, 0.3).fillRect(x - w / 2, y - h / 2, 2, h).fillRect(x + w / 2 - 2, y - h / 2, 2, h);
+  }
+
+  private dust(accent: number) {
+    for (let i = 0; i < 12; i++) {
+      const x = Phaser.Math.Between(60, ROOM_W - 60);
+      const y = Phaser.Math.Between(90, ROOM_H - 80);
+      const m = this.add.rectangle(x, y, 2, 2, i % 3 === 0 ? accent : 0xfff1d4, 0.5).setDepth(4000);
+      this.tweens.add({ targets: m, y: y - Phaser.Math.Between(16, 40), alpha: { from: 0.12, to: 0.5 }, duration: Phaser.Math.Between(3000, 6000), yoyo: true, repeat: -1, ease: 'Sine.inOut', delay: i * 200 });
+    }
+  }
+
+  // ---------------- people ----------------
+
+  private worker(x: number, y: number) {
     const skin = SKINS[this.pplIdx % SKINS.length];
     const shirt = SHIRTS[this.pplIdx % SHIRTS.length];
     const hair = HAIRS[this.pplIdx % HAIRS.length];
-    const skinDark = this.shade(skin, -0.18);
-    const shirtDark = this.shade(shirt, -0.2);
-    const shirtLite = this.shade(shirt, 0.16);
     this.pplIdx += 1;
 
-    const shadow = this.add.ellipse(0, 24, 34, 11, 0x000000, 0.2);
-    const chair = this.add.graphics();
-    chair.fillStyle(0x2b3038, 1).fillRoundedRect(-16, -18, 32, 38, 8); // back
-    chair.fillStyle(0x3a414d, 1).fillRoundedRect(-13, -15, 26, 30, 6); // cushion
-    chair.fillStyle(0x21262e, 1).fillRoundedRect(-18, 14, 36, 11, 5); // seat front
-    const body = this.add.graphics();
-    body.fillStyle(shirtDark, 1).fillRoundedRect(-14, -3, 28, 26, 10); // torso shade
-    body.fillStyle(shirt, 1).fillRoundedRect(-13, -3, 24, 24, 9); // torso
-    body.fillStyle(shirtLite, 1).fillRoundedRect(-10, -2, 7, 18, 4); // highlight
-    body.fillStyle(shirt, 1).fillRoundedRect(-18, 2, 8, 17, 4); // left arm
-    body.fillStyle(shirtDark, 1).fillRoundedRect(10, 2, 8, 17, 4); // right arm
-    body.fillStyle(skin, 1).fillCircle(-15, 19, 4).fillCircle(15, 19, 4); // hands
-    const neck = this.add.graphics();
-    neck.fillStyle(skinDark, 1).fillRoundedRect(-4, -8, 8, 8, 2);
-    const head = this.add.circle(0, -14, 8.5, skin);
-    const cheek = this.add.circle(2.5, -12, 3.2, this.shade(skin, 0.12), 0.7);
-    const hairG = this.add.graphics();
-    hairG.fillStyle(hair, 1);
-    hairG.fillRoundedRect(-9, -24, 18, 11, 5); // hair cap
-    hairG.fillRoundedRect(-9, -16, 4, 6, 2); // sideburn
-    hairG.fillRoundedRect(5, -16, 4, 6, 2);
-    const face = this.add.container(0, 0, [neck, head, cheek, hairG]);
-    this.tweens.add({ targets: face, y: -2, duration: 1500 + this.pplIdx * 90, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+    const c = this.add.container(x, y).setDepth(y + 4);
+    const shadow = this.add.ellipse(0, 26, 34, 10, 0x000000, 0.22);
+    const g = this.add.graphics();
+    // office chair back
+    this.box(g, -15, -18, 30, 40, 0x3a414d, OUTLINE);
+    g.fillStyle(0x4d5666, 1).fillRect(-12, -15, 24, 12);
+    // torso
+    this.box(g, -13, 0, 26, 22, shirt, OUTLINE);
+    g.fillStyle(this.shade(shirt, 0.22), 1).fillRect(-10, 1, 5, 18);
+    g.fillStyle(this.shade(shirt, -0.22), 1).fillRect(7, 1, 5, 20);
+    // arms + hands
+    g.fillStyle(shirt, 1).fillRect(-17, 3, 5, 15).fillRect(12, 3, 5, 15);
+    g.fillStyle(skin, 1).fillRect(-17, 16, 5, 5).fillRect(12, 16, 5, 5);
+    c.add([shadow, g]);
 
-    c.add([shadow, chair, body, face]);
+    // head (own object so it can bob crisply)
+    const hg = this.add.graphics();
+    this.box(hg, -8, -16, 16, 15, skin, OUTLINE);
+    hg.fillStyle(hair, 1).fillRect(-8, -16, 16, 5).fillRect(-8, -16, 3, 9).fillRect(5, -16, 3, 9);
+    hg.fillStyle(this.shade(skin, 0.14), 1).fillRect(3, -9, 3, 4); // cheek light
+    hg.fillStyle(OUTLINE, 1).fillRect(-4, -8, 2, 2).fillRect(2, -8, 2, 2); // eyes
+    c.add(hg);
+    this.tweens.add({ targets: hg, y: -2, duration: 1500 + this.pplIdx * 80, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+    return c;
   }
 
-  private deskUnit(x: number, y: number, accent: number, item: string, chatty: boolean) {
-    const accentLite = this.shade(accent, 0.25);
-    // worker behind the desk
-    const person = this.add.container(x, y - 20).setDepth(y - 18);
-    this.drawPerson(person);
+  // ---------------- furniture ----------------
 
-    // desk in front of the worker
-    const desk = this.add.graphics().setDepth(y + 26);
-    desk.fillStyle(0x000000, 0.22).fillEllipse(x, y + 34, 150, 18); // contact shadow
-    desk.fillStyle(0x4a3527, 1).fillRect(x - 56, y + 22, 8, 20).fillRect(x + 48, y + 22, 8, 20); // legs
-    desk.fillStyle(0x5a4230, 1).fillRoundedRect(x - 66, y + 16, 132, 10, 4); // front apron
-    desk.fillStyle(0x7a5c41, 1).fillRoundedRect(x - 66, y - 6, 132, 26, 7); // top
-    desk.fillStyle(0x8a6a4c, 1).fillRoundedRect(x - 66, y - 6, 132, 6, 5); // top sheen
+  private desk(x: number, y: number, accent: number, chatty: boolean) {
+    this.worker(x, y - 24);
+
+    const g = this.add.graphics().setDepth(y + 26);
+    g.fillStyle(0x000000, 0.22).fillEllipse(x, y + 34, 150, 16); // contact shadow
+    // legs
+    g.fillStyle(0x3a2a18, 1).fillRect(x - 58, y + 20, 7, 20).fillRect(x + 51, y + 20, 7, 20);
+    // body
+    this.box(g, x - 66, y - 6, 132, 28, 0x8a5a32);
+    g.fillStyle(0xa9743f, 1).fillRect(x - 66, y - 6, 132, 5); // top sheen
+    g.fillStyle(0x5e3c20, 1).fillRect(x - 66, y + 17, 132, 5); // front shadow
     // monitor
-    desk.fillStyle(0x14161f, 1).fillRoundedRect(x - 20, y - 26, 40, 26, 4);
-    desk.fillStyle(accent, 0.95).fillRoundedRect(x - 17, y - 23, 34, 20, 2); // screen
-    desk.fillStyle(accentLite, 0.9).fillRect(x - 13, y - 19, 16, 3).fillRect(x - 13, y - 13, 24, 3).fillRect(x - 13, y - 7, 12, 3); // ui lines
-    desk.fillStyle(0x14161f, 1).fillRect(x - 4, y - 2, 8, 4).fillRoundedRect(x - 10, y + 1, 20, 3, 2); // stand
-    // desk props
-    desk.fillStyle(0x101019, 1).fillRoundedRect(x - 18, y + 6, 30, 6, 2); // keyboard
-    desk.fillStyle(0xe9e3d6, 1).fillRoundedRect(x + 20, y + 4, 14, 12, 2); // papers
-    this.add.text(x - 40, y + 4, item, { fontSize: '16px' }).setOrigin(0.5).setDepth(y + 27);
-    this.addGlow(x, y - 14, 70, 50, accent, 0.18, D_LIGHT); // screen bloom on desk
+    this.box(g, x - 21, y - 28, 42, 26, 0x14161f);
+    g.fillStyle(accent, 1).fillRect(x - 17, y - 24, 34, 18);
+    g.fillStyle(this.shade(accent, 0.35), 1).fillRect(x - 14, y - 21, 16, 3).fillRect(x - 14, y - 16, 26, 3).fillRect(x - 14, y - 11, 12, 3);
+    g.fillStyle(0x14161f, 1).fillRect(x - 3, y - 2, 6, 4);
+    g.fillStyle(0x0d0f16, 1).fillRect(x - 9, y + 2, 18, 3); // monitor base
+    // keyboard + mouse + papers + mug
+    this.box(g, x - 22, y + 6, 30, 7, 0x2a2f3a);
+    g.fillStyle(0x444b59, 1).fillRect(x - 20, y + 7, 26, 2);
+    this.box(g, x + 12, y + 7, 6, 5, 0x2a2f3a);
+    this.box(g, x + 22, y + 2, 13, 12, 0xe9e3d6); // papers
+    g.fillStyle(0xc9c0ac, 1).fillRect(x + 24, y + 5, 9, 1).fillRect(x + 24, y + 8, 9, 1).fillRect(x + 24, y + 11, 6, 1);
+    this.box(g, x - 40, y + 2, 9, 10, 0xe7eef5); // mug
+    g.fillStyle(0xe7eef5, 1).fillRect(x - 31, y + 4, 3, 5);
+    g.fillStyle(this.shade(accent, 0.2), 1).fillRect(x - 38, y + 4, 5, 2);
 
     if (chatty) {
-      const b = this.add.text(x + 26, y - 40, '💬', { fontSize: '15px' }).setOrigin(0.5).setDepth(y + 40).setAlpha(0);
-      this.tweens.add({ targets: b, alpha: { from: 0, to: 1 }, y: y - 50, duration: 700, hold: 1100, yoyo: true, repeat: -1, repeatDelay: 2600, ease: 'Sine.inOut' });
+      const bx = x + 30;
+      const by = y - 42;
+      const b = this.add.container(bx, by).setDepth(y + 40).setAlpha(0);
+      const bg = this.add.graphics();
+      this.box(bg, -12, -9, 24, 16, 0xffffff);
+      bg.fillStyle(0xffffff, 1).fillTriangle(-4, 7, 4, 7, -6, 14);
+      bg.fillStyle(accent, 1).fillRect(-7, -4, 14, 2).fillRect(-7, 0, 10, 2);
+      b.add(bg);
+      this.tweens.add({ targets: b, alpha: { from: 0, to: 1 }, y: by - 8, duration: 700, hold: 1200, yoyo: true, repeat: -1, repeatDelay: 2600, ease: 'Sine.inOut' });
     }
 
     this.addSolid(x, y + 8, 132, 30);
   }
 
   private meetingTable(x: number, y: number, accent: number) {
-    // colleagues first (behind the table where appropriate)
-    [
-      { sx: x, sy: y - 76 },
-      { sx: x - 104, sy: y + 2 },
-      { sx: x + 104, sy: y + 2 },
-    ].forEach((s) => {
-      const p = this.add.container(s.sx, s.sy).setDepth(s.sy + 2);
-      this.drawPerson(p);
-    });
+    this.worker(x, y - 80);
+    this.worker(x - 106, y - 4);
+    this.worker(x + 106, y - 4);
 
-    const t = this.add.graphics().setDepth(y + 52);
-    t.fillStyle(0x000000, 0.18).fillEllipse(x, y + 40, 210, 30); // shadow
-    t.fillStyle(0x5a4230, 1).fillEllipse(x, y + 10, 178, 110); // table side
-    t.fillStyle(0x7a5a3f, 1).fillEllipse(x, y, 178, 110); // top
-    t.fillStyle(0x8a6a4c, 0.5).fillEllipse(x - 24, y - 18, 90, 40); // sheen
-    t.lineStyle(3, accent, 0.55).strokeEllipse(x, y, 178, 110);
-    this.add.text(x - 36, y + 2, '☕', { fontSize: '16px' }).setOrigin(0.5).setDepth(y + 53);
-    this.add.text(x + 36, y + 2, '📄', { fontSize: '16px' }).setOrigin(0.5).setDepth(y + 53);
-    this.add.text(x, y - 6, '💻', { fontSize: '18px' }).setOrigin(0.5).setDepth(y + 53);
-    this.addGlow(x, y, 200, 120, accent, 0.08, D_LIGHT);
-
+    const g = this.add.graphics().setDepth(y + 52);
+    g.fillStyle(0x000000, 0.2).fillEllipse(x, y + 40, 214, 28); // soft shadow
+    this.pixelEllipse(g, x, y + 2, 92, 58, OUTLINE);
+    this.pixelEllipse(g, x, y + 6, 89, 54, 0x6a4326); // side
+    this.pixelEllipse(g, x, y, 89, 54, 0x8a5a32); // top
+    g.fillStyle(0xa9743f, 0.5).fillEllipse(x - 30, y - 16, 92, 40); // sheen
+    // laptops + cups
+    this.box(g, x - 44, y - 8, 22, 14, 0x20242e);
+    g.fillStyle(accent, 1).fillRect(x - 42, y - 6, 18, 8);
+    this.box(g, x + 22, y - 8, 22, 14, 0x20242e);
+    g.fillStyle(accent, 1).fillRect(x + 24, y - 6, 18, 8);
+    this.box(g, x - 8, y + 6, 8, 8, 0xe7eef5);
+    g.fillStyle(this.shade(accent, 0.2), 1).fillRect(x - 6, y + 8, 4, 2);
     this.addSolid(x, y, 150, 78);
   }
 
   private lounge(x: number, y: number, accent: number) {
-    const accentDark = this.shade(accent, -0.25);
+    const dark = this.shade(accent, -0.35);
+    const lite = this.shade(accent, 0.18);
     const g = this.add.graphics().setDepth(y + 18);
-    g.fillStyle(0x000000, 0.18).fillEllipse(x, y + 24, 130, 18);
-    g.fillStyle(accentDark, 1).fillRoundedRect(-56 + x, y - 22, 112, 40, 12); // sofa body
-    g.fillStyle(accent, 1).fillRoundedRect(-52 + x, y - 18, 104, 26, 10); // back cushion
-    g.fillStyle(this.shade(accent, 0.18), 1).fillRoundedRect(-50 + x, y + 2, 100, 16, 8); // seat cushion
-    g.fillStyle(accentDark, 1).fillRoundedRect(-58 + x, y - 14, 10, 30, 5).fillRoundedRect(48 + x, y - 14, 10, 30, 5); // arms
-    g.fillStyle(0xffffff, 0.18).fillRoundedRect(x + 16, y - 14, 18, 16, 5); // throw pillow
-    // colleague relaxing
-    const p = this.add.container(x - 6, y - 8).setDepth(y - 6);
-    this.drawPerson(p);
+    g.fillStyle(0x000000, 0.2).fillEllipse(x, y + 24, 132, 16);
+    this.box(g, x - 56, y - 22, 112, 40, dark); // body
+    g.fillStyle(accent, 1).fillRect(x - 52, y - 18, 104, 22); // back cushion
+    g.fillStyle(lite, 1).fillRect(x - 50, y - 16, 100, 4);
+    g.fillStyle(this.shade(accent, 0.06), 1).fillRect(x - 50, y + 2, 100, 14); // seat
+    g.fillStyle(dark, 1).fillRect(x - 56, y - 14, 8, 30).fillRect(x + 48, y - 14, 8, 30); // arms
+    g.fillStyle(0xffffff, 0.85).fillRect(x + 16, y - 14, 16, 14); // pillow
+    g.fillStyle(0xd9dde6, 1).fillRect(x + 16, y - 1, 16, 2);
+
+    this.worker(x - 4, y - 12);
+
     // coffee table
-    this.add.ellipse(x + 78, y + 10, 42, 18, 0x4a3527, 1).setDepth(y + 12);
-    this.add.ellipse(x + 78, y + 7, 42, 18, 0x5e4636, 1).setDepth(y + 12);
-    this.add.text(x + 78, y + 4, '🍵', { fontSize: '15px' }).setOrigin(0.5).setDepth(y + 13);
+    const ct = this.add.graphics().setDepth(y + 14);
+    ct.fillStyle(0x000000, 0.18).fillEllipse(x + 80, y + 16, 46, 12);
+    this.box(ct, x + 62, y + 2, 36, 10, 0x6a4326);
+    ct.fillStyle(0x8a5a32, 1).fillRect(x + 62, y + 2, 36, 4);
+    ct.fillStyle(0x2a2f3a, 1).fillRect(x + 70, y + 4, 12, 5); // book
+    ct.fillStyle(accent, 1).fillRect(x + 70, y + 4, 12, 1);
     this.addSolid(x, y + 6, 116, 30);
   }
 
-  private drawPlant(x: number, y: number) {
+  private plant(x: number, y: number) {
     const g = this.add.graphics().setDepth(y + 12);
-    g.fillStyle(0x000000, 0.18).fillEllipse(x, y + 18, 32, 9);
-    g.fillStyle(0x6f4424, 1).fillRoundedRect(x - 12, y + 2, 24, 18, 4); // pot
-    g.fillStyle(0x8a5a2b, 1).fillRoundedRect(x - 12, y + 2, 24, 5, 3); // rim
-    this.add.text(x, y - 8, '🪴', { fontSize: '28px' }).setOrigin(0.5).setDepth(y + 13);
+    g.fillStyle(0x000000, 0.18).fillEllipse(x, y + 18, 34, 9);
+    // pot
+    this.box(g, x - 12, y + 4, 24, 16, 0xb5683a);
+    g.fillStyle(0xc97c4a, 1).fillRect(x - 12, y + 4, 24, 4);
+    g.fillStyle(0x8f4f2a, 1).fillRect(x - 12, y + 16, 24, 4);
+    // foliage (layered green blocks)
+    g.fillStyle(0x1f6b34, 1).fillRect(x - 14, y - 16, 28, 20);
+    g.fillStyle(0x2f8a45, 1).fillRect(x - 11, y - 20, 22, 18);
+    g.fillStyle(0x3fa657, 1).fillRect(x - 7, y - 22, 8, 10).fillRect(x + 2, y - 18, 7, 8);
+    g.fillStyle(0x1f6b34, 1).fillRect(x - 2, y - 14, 4, 14); // stem hint
     this.addSolid(x, y + 10, 26, 16);
   }
 
-  private drawWindow(x: number, y: number, accent: number) {
-    const g = this.add.graphics().setDepth(y);
-    g.fillStyle(0x0d1422, 1).fillRoundedRect(x - 38, y - 17, 76, 36, 5);
-    g.fillStyle(0x1d3a5c, 1).fillRect(x - 33, y - 12, 66, 27); // sky
-    g.fillStyle(0x16314f, 1).fillRect(x - 33, y - 2, 66, 17); // horizon
-    g.fillStyle(0x274b73, 1);
-    [-28, -16, -2, 12, 24].forEach((bx, i) => g.fillRect(x + bx, y - 6 + (i % 2) * 5, 11, 20)); // skyline
-    g.fillStyle(accent, 0.85).fillCircle(x + 22, y - 7, 4); // sun/moon
-    this.addGlow(x, y, 80, 40, accent, 0.12, y - 1);
-    g.lineStyle(3, 0x3a3d52, 1).strokeRoundedRect(x - 38, y - 17, 76, 36, 5);
-    g.lineStyle(2, 0x3a3d52, 1).lineBetween(x, y - 15, x, y + 17).lineBetween(x - 36, y, x + 36, y);
+  private cooler(x: number, y: number, accent: number) {
+    const g = this.add.graphics().setDepth(y + 12);
+    g.fillStyle(0x000000, 0.18).fillEllipse(x, y + 20, 30, 9);
+    this.box(g, x - 11, y - 6, 22, 26, 0xdfe7ee); // body
+    this.box(g, x - 9, y - 18, 18, 14, 0x9fd6ea); // bottle
+    g.fillStyle(0x7cc3dd, 1).fillRect(x - 7, y - 16, 14, 6);
+    g.fillStyle(accent, 1).fillRect(x - 8, y + 4, 16, 3); // spout panel
+    g.fillStyle(0x2a2f3a, 1).fillRect(x - 5, y + 9, 10, 7);
+    this.addSolid(x, y + 8, 24, 22);
   }
 
-  private drawFramedArt(x: number, y: number, glyph: string, accent: number) {
-    const g = this.add.graphics().setDepth(y);
-    g.fillStyle(0x0d1019, 0.85).fillRoundedRect(x - 24, y - 20, 48, 40, 5);
-    g.lineStyle(3, accent, 1).strokeRoundedRect(x - 24, y - 20, 48, 40, 5);
-    this.add.text(x, y, glyph, { fontSize: '26px' }).setOrigin(0.5).setDepth(y + 1);
+  private podium(x: number, y: number, accent: number) {
+    this.add.ellipse(x, y + 34, 84, 18, 0x000000, 0.26).setDepth(y + 30);
+    const g = this.add.graphics().setDepth(y + 30);
+    this.box(g, x - 30, y + 6, 60, 28, 0x262838); // base
+    g.fillStyle(0x33364a, 1).fillRect(x - 30, y + 6, 60, 5);
+    g.fillStyle(accent, 1).fillRect(x - 30, y + 6, 60, 2);
+    g.fillStyle(this.shade(accent, -0.3), 1).fillRect(x - 30, y + 30, 60, 4);
+    // soft hard-edged light pool (no blur)
+    this.add.rectangle(x, y + 16, 150, 70, accent, 0.06).setDepth(D_LIGHT);
+    this.add.rectangle(x, y + 16, 100, 46, accent, 0.06).setDepth(D_LIGHT);
+
+    // floating accent crystal
+    const cz = this.add.container(x, y - 6).setDepth(y + 31);
+    const cg = this.add.graphics();
+    this.pixelDiamond(cg, 0, 0, 16, accent);
+    cg.fillStyle(0xffffff, 0.85).fillRect(-4, -8, 4, 8); // glint
+    cg.fillStyle(this.shade(accent, -0.4), 1).fillRect(0, 2, 6, 8); // facet shade
+    cz.add(cg);
+    this.tweens.add({ targets: cz, y: y - 14, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+    this.tweens.add({ targets: cz, angle: { from: -4, to: 4 }, duration: 2600, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+
+    const ring = this.add.circle(x, y, 22, accent, 0).setStrokeStyle(2, accent, 0.7).setDepth(y + 29);
+    this.tweens.add({ targets: ring, scale: 2, alpha: 0, duration: 1700, repeat: -1 });
   }
 
-  private drawClock(x: number, y: number) {
-    const g = this.add.graphics().setDepth(y);
-    g.fillStyle(0xf7f4ee, 1).fillCircle(x, y, 13);
-    g.lineStyle(2, 0x2b2d3f, 1).strokeCircle(x, y, 13);
-    g.lineStyle(2, 0x2b2d3f, 1).lineBetween(x, y, x, y - 8).lineBetween(x, y, x + 6, y + 2);
+  private pixelEllipse(g: Phaser.GameObjects.Graphics, cx: number, cy: number, rx: number, ry: number, color: number) {
+    g.fillStyle(color, 1);
+    for (let dy = -ry; dy <= ry; dy++) {
+      const w = Math.round(rx * Math.sqrt(Math.max(0, 1 - (dy * dy) / (ry * ry))));
+      g.fillRect(cx - w, cy + dy, w * 2 + 1, 1);
+    }
   }
+
+  private pixelDiamond(g: Phaser.GameObjects.Graphics, cx: number, cy: number, r: number, color: number) {
+    g.fillStyle(OUTLINE, 1);
+    for (let dy = -r - 1; dy <= r + 1; dy++) {
+      const w = Math.round((r + 1) * (1 - Math.abs(dy) / (r + 1)));
+      g.fillRect(cx - w, cy + dy, w * 2 + 1, 1);
+    }
+    g.fillStyle(color, 1);
+    for (let dy = -r; dy <= r; dy++) {
+      const w = Math.round(r * (1 - Math.abs(dy) / r));
+      g.fillRect(cx - w, cy + dy, w * 2 + 1, 1);
+    }
+  }
+
+  // ---------------- wall decor ----------------
+
+  private framedArt(x: number, y: number, t: (typeof THEMES)[StationId]) {
+    const g = this.add.graphics().setDepth(D_WALL + 1);
+    this.box(g, x - 26, y - 18, 52, 36, 0x2a2233, 0x0d0a12); // frame
+    g.fillStyle(this.shade(t.accent, -0.5), 1).fillRect(x - 22, y - 14, 44, 28); // canvas
+    g.fillStyle(t.accent, 1);
+    if (t.art === 'target') { g.fillCircle(x, y, 9); g.fillStyle(0x2a2233, 1).fillCircle(x, y, 6); g.fillStyle(t.accent, 1).fillCircle(x, y, 3); }
+    else if (t.art === 'cup') { g.fillRect(x - 7, y - 8, 14, 8); g.fillRect(x - 3, y, 6, 6); g.fillRect(x - 6, y + 6, 12, 3); }
+    else if (t.art === 'chart') { g.fillRect(x - 12, y + 6, 5, 6).fillRect(x - 5, y, 5, 12).fillRect(x + 2, y - 6, 5, 18); }
+    else if (t.art === 'map') { g.fillRect(x - 14, y - 8, 28, 16); g.fillStyle(this.shade(t.accent, -0.4), 1).fillRect(x - 10, y - 4, 8, 3).fillRect(x + 2, y + 1, 9, 3); }
+    else { g.fillCircle(x - 6, y - 2, 4).fillCircle(x + 6, y - 2, 4); g.fillRect(x - 11, y + 3, 10, 7).fillRect(x + 1, y + 3, 10, 7); }
+  }
+
+  private whiteboard(x: number, y: number, accent: number) {
+    const g = this.add.graphics().setDepth(D_WALL + 1);
+    this.box(g, x - 30, y - 16, 60, 32, 0xf2f4f7, 0x9aa1ab);
+    g.fillStyle(accent, 0.9).fillRect(x - 24, y - 10, 22, 2).fillRect(x - 24, y - 4, 34, 2);
+    g.fillStyle(0x9aa1ab, 1).fillRect(x - 24, y + 3, 28, 2).fillRect(x - 24, y + 8, 16, 2);
+    g.fillStyle(this.shade(accent, -0.2), 1).fillRect(x + 8, y - 11, 14, 14); // sticky note
+  }
+
+  private window(x: number, y: number, accent: number) {
+    const g = this.add.graphics().setDepth(D_WALL + 1);
+    this.box(g, x - 26, y - 17, 52, 34, 0x121a2a, 0x0c1018);
+    g.fillStyle(0x244a73, 1).fillRect(x - 22, y - 13, 44, 26); // sky
+    g.fillStyle(0x1b3a5c, 1).fillRect(x - 22, y + 1, 44, 12); // lower sky
+    g.fillStyle(accent, 0.8).fillRect(x + 12, y - 9, 5, 5); // sun
+    g.fillStyle(0x2d567f, 1);
+    [-18, -8, 4, 14].forEach((bx, i) => g.fillRect(x + bx, y - 2 + (i % 2) * 4, 8, 15)); // skyline
+    g.fillStyle(0x0c1018, 1).fillRect(x - 1, y - 13, 2, 26).fillRect(x - 22, y, 44, 2); // mullions
+  }
+
+  private clock(x: number, y: number) {
+    const g = this.add.graphics().setDepth(D_WALL + 1);
+    g.fillStyle(0x0d0a12, 1).fillCircle(x, y, 12);
+    g.fillStyle(0xf7f4ee, 1).fillCircle(x, y, 10);
+    g.fillStyle(0x2b2d3f, 1).fillRect(x - 1, y - 7, 2, 8).fillRect(x, y - 1, 6, 2);
+  }
+
+  private door(x: number, y: number, accent: number) {
+    const g = this.add.graphics().setDepth(y);
+    this.box(g, x - 30, y - 34, 60, 66, 0x0d1019, 0x05070c); // frame
+    this.box(g, x - 24, y - 28, 48, 58, this.shade(accent, -0.15));
+    g.fillStyle(this.shade(accent, 0.2), 1).fillRect(x - 24, y - 28, 48, 4);
+    g.fillStyle(0x0d1019, 0.55).fillRect(x - 18, y - 22, 36, 46); // inner panel
+    g.fillStyle(accent, 1).fillRect(x - 18, y - 24, 36, 2);
+    g.fillStyle(0xffd23f, 1).fillRect(x + 12, y + 2, 4, 6); // handle
+    // EXIT arrow above
+    const ag = this.add.graphics().setDepth(y);
+    ag.fillStyle(accent, 0.9).fillTriangle(x, y - 44, x - 8, y - 36, x + 8, y - 36);
+    ag.fillRect(x - 3, y - 38, 6, 6);
+  }
+
+  // ---------------- collectibles ----------------
 
   private drawGem(c: Phaser.GameObjects.Container, color: number) {
     const g = this.add.graphics();
-    g.fillStyle(color, 1);
-    g.beginPath();
-    g.moveTo(0, -11);
-    g.lineTo(9, -2);
-    g.lineTo(0, 13);
-    g.lineTo(-9, -2);
-    g.closePath();
-    g.fillPath();
-    g.fillStyle(0xffffff, 0.55);
-    g.fillTriangle(0, -11, 9, -2, 0, -1);
+    this.pixelDiamond(g, 0, 0, 11, color);
+    g.fillStyle(0xffffff, 0.8).fillRect(-3, -6, 3, 6);
+    g.fillStyle(this.shade(color, -0.4), 1).fillRect(1, 2, 4, 6);
     c.add(g);
   }
 
   private drawChest(c: Phaser.GameObjects.Container, open: boolean) {
     c.removeAll(true);
-    const base = this.add.graphics();
+    const g = this.add.graphics();
+    g.fillStyle(0x000000, 0.22).fillEllipse(0, 14, 36, 9);
+    this.box(g, -16, -4, 32, 18, 0x9a6630); // body
+    g.fillStyle(0x7a4d24, 1).fillRect(-16, 8, 32, 6);
+    g.fillStyle(0xc99a4e, 1).fillRect(-16, -4, 32, 3);
     if (open) {
-      base.fillStyle(0x8a5a2b, 1).fillRoundedRect(-14, -6, 28, 16, 3);
-      base.fillStyle(0x5a3a1b, 1).fillRoundedRect(-15, -16, 30, 8, 3);
-      base.fillStyle(0xffd23f, 0.8).fillRect(-8, -8, 16, 3);
+      this.box(g, -16, -18, 32, 8, 0x7a4d24); // lid up
+      g.fillStyle(0xffd23f, 1).fillRect(-9, -2, 18, 4); // gold
+      g.fillStyle(0xfff0a8, 1).fillRect(-7, -1, 6, 2);
     } else {
-      base.fillStyle(0x9a6630, 1).fillRoundedRect(-15, -8, 30, 18, 4);
-      base.fillStyle(0xb87a3a, 1).fillRoundedRect(-15, -16, 30, 10, 4);
-      base.fillStyle(0xffd23f, 1).fillRect(-3, -10, 6, 6);
+      this.box(g, -16, -12, 32, 8, 0xb87a3a); // lid
+      g.fillStyle(0xc99a4e, 1).fillRect(-16, -12, 32, 2);
+      g.fillStyle(0xffd23f, 1).fillRect(-3, -8, 6, 8); // lock
+      g.fillStyle(0x9a6630, 1).fillRect(-1, -5, 2, 3);
     }
-    c.add(base);
-  }
-
-  private shade(color: number, amt: number): number {
-    const c = Phaser.Display.Color.IntegerToColor(color);
-    const f = (v: number) => Phaser.Math.Clamp(Math.round(v + (amt > 0 ? (255 - v) * amt : v * amt)), 0, 255);
-    return Phaser.Display.Color.GetColor(f(c.red), f(c.green), f(c.blue));
+    c.add(g);
   }
 
   // ---------------- input & lifecycle ----------------
@@ -558,9 +570,8 @@ export default class InteriorScene extends Phaser.Scene {
 
     const px = this.player.sprite.x;
     const py = this.player.sprite.y;
-    this.player.sprite.setDepth(py + 20); // y-sort against furniture
+    this.player.sprite.setDepth(py + 22);
 
-    // collect chests + hidden gem on contact
     for (const ch of this.chests) {
       const r = ch.kind === 'gem' ? 30 : 34;
       if (!ch.open && (ch.x - px) ** 2 + (ch.y - py) ** 2 < r * r) {
@@ -578,12 +589,11 @@ export default class InteriorScene extends Phaser.Scene {
       }
     }
 
-    // focus: activity vs exit
     const dAct = (this.activity.x - px) ** 2 + (this.activity.y - py) ** 2;
     const dExit = (this.exit.x - px) ** 2 + (this.exit.y - py) ** 2;
     let f: 'activity' | 'exit' | null = null;
-    if (dExit < 56 * 56) f = 'exit';
-    else if (dAct < 84 * 84) f = 'activity';
+    if (dExit < 58 * 58) f = 'exit';
+    else if (dAct < 86 * 86) f = 'activity';
     if (f !== this.focus) {
       this.focus = f;
       EventBus.emit('focus:change', f ? { kind: f, id: this.stationId } : null);
