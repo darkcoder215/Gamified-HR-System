@@ -32,7 +32,7 @@ function RealOrg() {
   return (
     <div>
       <p className="mb-5 font-body text-sm text-charcoal">
-        The real <span className="highlight">POWR</span> team — your position is highlighted in green.
+        The real <span className="highlight">POWR</span> team — your position is highlighted.
       </p>
       <div className="space-y-3">
         {ROLE_TIERS.map((tier) => {
@@ -141,7 +141,7 @@ function StaticOrg() {
     <div className="relative">
       <p className="mb-5 font-body text-sm text-charcoal">
         This is the <span className="highlight">POWR</span> team. The more you advance, the higher you climb in the Org Chart and the closer you get to leadership.
-        Your position is highlighted in green — and you can generate AI images of your colleagues using the <Camera size={12} className="inline" /> button.
+        Your position is highlighted — and you can generate AI images of your colleagues using the <Camera size={12} className="inline" /> button.
       </p>
 
       {/* Executive */}
