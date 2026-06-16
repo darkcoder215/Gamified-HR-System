@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3, Volume2, VolumeX, MessageSquare, ShoppingBag, Coins, Flame, Menu, X, Map as MapIcon, Lock } from 'lucide-react';
+import { Zap, Sparkles, RotateCcw, Palette, BookOpen, BarChart3, Volume2, VolumeX, MessageSquare, ShoppingBag, Coins, Flame, Menu, X, Map as MapIcon, Lock, Bell, Inbox, Building2, LogOut, LayoutDashboard } from 'lucide-react';
 import { useGameStore } from '@/state/store';
 import { levelProgress } from '@/state/gamification';
 import { stations } from '@/game/stations/stationZones';
@@ -16,9 +16,19 @@ import { EventBus } from '@/game/EventBus';
 import NumberText from '@/ui/NumberText';
 import ProgressBar from '@/ui/ProgressBar';
 
-export default function Hud() {
+interface HudProps {
+  backend?: boolean;
+  unread?: number;
+  onExit?: () => void;
+  signOut?: () => void;
+}
+
+export default function Hud({ backend, unread = 0, onExit, signOut }: HudProps = {}) {
   const player = useGameStore((s) => s.player);
   const badgeMap = useGameStore((s) => s.badges);
+  const openNotif = useGameStore((s) => s.openNotif);
+  const openInbox = useGameStore((s) => s.openInbox);
+  const openEmbassy = useGameStore((s) => s.openEmbassy);
   const focus = useFocus();
   const isTouch = useIsTouch();
   const activeStation = useGameStore((s) => s.activeStation);
@@ -83,7 +93,7 @@ export default function Hud() {
         <motion.div
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="pointer-events-auto flex max-w-[56vw] items-center gap-2 rounded-xl bg-white px-2.5 py-2 shadow-card sm:max-w-none sm:min-w-[280px] sm:gap-3 sm:px-4 sm:py-3"
+          className="pointer-events-auto flex max-w-[44vw] items-center gap-2 rounded-xl bg-white px-2.5 py-2 shadow-card sm:max-w-none sm:min-w-[280px] sm:gap-3 sm:px-4 sm:py-3"
         >
           <div className="relative shrink-0">
             <div
@@ -110,10 +120,10 @@ export default function Hud() {
             <div className="flex items-center gap-2">
               <span className="truncate font-display text-base font-bold text-black">{player.nameAr}</span>
               <span
-                className="shrink-0 rounded-pill px-2 py-0.5 font-ui text-[11px] font-bold text-white"
+                className="shrink-0 whitespace-nowrap rounded-pill px-1.5 py-0.5 font-ui text-[11px] font-bold text-white"
                 style={{ background: 'var(--color-black)' }}
               >
-                Level <NumberText value={prog.level} />
+                LV <NumberText value={prog.level} />
               </span>
             </div>
             <p className="hidden font-ui text-xs text-muted sm:block">{player.titleAr}</p>
@@ -200,36 +210,64 @@ export default function Hud() {
         ))}
       </div>
 
-      {/* Control menu — collapsible on mobile */}
-      <div className="pointer-events-none fixed top-3 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-2 sm:hidden">
+      {/* Control menu — full-screen sheet on mobile (keeps clear of the HUD bars) */}
+      <div className="sm:hidden">
         <button
           onClick={() => setMenuOpen((o) => !o)}
-          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-card"
+          className="pointer-events-auto fixed top-3 left-1/2 z-40 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full bg-white text-black shadow-card"
           aria-label="Menu"
         >
           {menuOpen ? <X size={18} /> : <Menu size={18} />}
+          {backend && unread > 0 && !menuOpen && (
+            <span className="num absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">{unread}</span>
+          )}
         </button>
         <AnimatePresence>
           {menuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.96 }}
-              className="pointer-events-auto grid grid-cols-2 gap-1.5 rounded-xl bg-white p-2 shadow-float"
+              className="pointer-events-auto fixed inset-0 z-[39] flex items-start justify-center bg-black/40 p-4 pt-16"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuOpen(false)}
             >
-              {controls.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => {
-                    c.onClick();
-                    setMenuOpen(false);
-                  }}
-                  className="flex items-center gap-1.5 rounded-pill bg-off-white px-3 py-2 font-ui text-xs font-bold"
-                  style={{ color: c.color }}
-                >
-                  {c.icon} {c.label}
-                </button>
-              ))}
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.97 }}
+                onClick={(e) => e.stopPropagation()}
+                className="max-h-[78vh] w-full max-w-xs overflow-y-auto rounded-xl bg-white p-3 shadow-float"
+              >
+                <p className="mb-1.5 px-1 font-ui text-[11px] font-bold uppercase tracking-wide text-muted">Menu</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {controls.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => { c.onClick(); setMenuOpen(false); }}
+                      className="flex items-center gap-1.5 rounded-pill bg-off-white px-3 py-2 font-ui text-xs font-bold"
+                      style={{ color: c.color }}
+                    >
+                      {c.icon} {c.label}
+                    </button>
+                  ))}
+                </div>
+
+                {backend && (
+                  <>
+                    <p className="mb-1.5 mt-3 px-1 font-ui text-[11px] font-bold uppercase tracking-wide text-muted">Workspace</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <button onClick={() => { openNotif(); setMenuOpen(false); }} className="relative flex items-center gap-1.5 rounded-pill bg-off-white px-3 py-2 font-ui text-xs font-bold text-charcoal">
+                        <Bell size={15} /> Notifications
+                        {unread > 0 && <span className="num absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">{unread}</span>}
+                      </button>
+                      <button onClick={() => { openInbox(); setMenuOpen(false); }} className="flex items-center gap-1.5 rounded-pill bg-off-white px-3 py-2 font-ui text-xs font-bold text-blue"><Inbox size={15} /> My Tasks</button>
+                      <button onClick={() => { openEmbassy(); setMenuOpen(false); }} className="flex items-center gap-1.5 rounded-pill bg-off-white px-3 py-2 font-ui text-xs font-bold text-amber"><Building2 size={15} /> Embassy</button>
+                      {onExit && <button onClick={() => { onExit(); setMenuOpen(false); }} className="flex items-center gap-1.5 rounded-pill bg-black px-3 py-2 font-ui text-xs font-bold text-white"><LayoutDashboard size={15} /> Dashboard</button>}
+                      {signOut && <button onClick={() => { signOut(); setMenuOpen(false); }} className="col-span-2 flex items-center justify-center gap-1.5 rounded-pill bg-off-white px-3 py-2 font-ui text-xs font-bold text-muted"><LogOut size={15} /> Sign out</button>}
+                    </div>
+                  </>
+                )}
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

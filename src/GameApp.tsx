@@ -123,15 +123,17 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
       <div className="pointer-events-none absolute inset-0 z-10" style={{ background: 'radial-gradient(120% 120% at 50% 35%, rgba(0,193,122,0.10), rgba(0,114,249,0.06) 55%, rgba(130,0,58,0.10) 100%)', mixBlendMode: 'soft-light' }} />
       <div className="pointer-events-none absolute inset-0 z-10" style={{ background: 'radial-gradient(110% 110% at 50% 45%, transparent 60%, rgba(17,20,33,0.34) 100%)' }} />
 
-      <Hud />
+      <Hud backend={backend} unread={unread} onExit={onExit} signOut={signOut} />
       <ProgressBridge />
       <MiniMap />
       <OnboardingChecklist />
       <MobileControls />
 
-      {/* Backend toolbar (auth mode): notifications, inbox, embassy, exit/sign-out */}
+      {/* Backend toolbar (auth mode): notifications, inbox, embassy, exit/sign-out.
+          Desktop only — on mobile these live in the HUD menu sheet to avoid
+          colliding with the minimap and Interact button. */}
       {backend && (
-        <div className="pointer-events-none fixed bottom-2 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5">
+        <div className="pointer-events-none fixed bottom-2 left-1/2 z-30 hidden -translate-x-1/2 items-center gap-1.5 sm:flex">
           <button onClick={openNotif} className="pointer-events-auto relative flex items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-charcoal shadow-card">
             <Bell size={14} /> Notifications
             {unread > 0 && <span className="num absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">{unread}</span>}
