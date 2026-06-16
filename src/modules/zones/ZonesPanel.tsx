@@ -14,7 +14,7 @@ export default function ZonesPanel() {
   return (
     <div>
       <p className="mb-5 font-body text-sm text-charcoal">
-        ينمو عالم <span className="highlight">ثمانية</span> معك — تُفتح أحياء جديدة كلما ارتفع مستواك، ومعها مبانٍ
+        ينمو عالم <span className="highlight">باور</span> معك — تُفتح أحياء جديدة كلما ارتفع مستواك، ومعها مبانٍ
         ومزايا إضافية.
       </p>
       <div className="space-y-3">

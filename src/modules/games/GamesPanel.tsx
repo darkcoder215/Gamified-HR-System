@@ -94,12 +94,12 @@ export default function GamesPanel() {
                   whileTap={{ scale: 0.97 }}
                   className="flex items-center justify-center gap-2 rounded-xl border-2 py-4 font-ui text-lg font-bold transition"
                   style={{
-                    background: isAns ? 'var(--color-green-light)' : isWrongPick ? 'var(--color-blush)' : 'var(--color-white)',
-                    borderColor: isAns ? 'var(--color-green)' : isWrongPick ? 'var(--color-red)' : 'var(--color-warm-gray)',
+                    background: isAns ? 'var(--color-mint)' : isWrongPick ? 'var(--color-blush)' : 'var(--color-white)',
+                    borderColor: isAns ? 'var(--color-success)' : isWrongPick ? 'var(--color-error)' : 'var(--color-warm-gray)',
                     color: 'var(--color-black)',
                   }}
                 >
-                  {val ? <Check size={20} className="text-green" /> : <X size={20} className="text-red" />} {val ? 'صحيح' : 'خطأ'}
+                  {val ? <Check size={20} style={{ color: 'var(--color-success)' }} /> : <X size={20} style={{ color: 'var(--color-error)' }} />} {val ? 'صحيح' : 'خطأ'}
                 </motion.button>
               );
             })}

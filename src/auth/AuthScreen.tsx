@@ -53,9 +53,9 @@ export default function AuthScreen() {
         transition={{ type: 'spring', stiffness: 120, damping: 18 }}
         className="relative z-10 w-full max-w-md rounded-xl bg-off-white p-8 text-center shadow-float"
       >
-        <img src="/logo/thamanyah.png" alt="ثمانية" className="mx-auto mb-3 h-14 w-14 rounded-lg bg-black p-2" />
+        <img src="/logo/made-in-powr.svg" alt="made in POWR" className="mx-auto mb-4 h-12 w-auto" />
         <h1 className="font-display text-3xl font-black text-black">رحلة التطوّر</h1>
-        <p className="mt-1 font-body text-sm text-charcoal">منصّة <b>ثمانية</b> لتطوير الموظفين وتقييمهم وترقيتهم</p>
+        <p className="mt-1 font-body text-sm text-charcoal">منصّة <b>باور</b> لتطوير الموظفين وتقييمهم وترقيتهم</p>
 
         {confirm ? (
           <div className="mt-6 rounded-lg bg-green-light p-5 text-center">

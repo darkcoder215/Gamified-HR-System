@@ -44,16 +44,16 @@ export default function StartScreen() {
         className="relative z-10 w-full max-w-lg rounded-xl bg-off-white p-8 text-center shadow-float"
       >
         <motion.img
-          src="/logo/thamanyah.png"
-          alt="ثمانية"
-          className="mx-auto mb-4 h-16 w-16 rounded-lg bg-black p-2"
+          src="/logo/made-in-powr.svg"
+          alt="made in POWR"
+          className="mx-auto mb-5 h-14 w-auto"
           initial={{ rotate: -10, scale: 0 }}
           animate={{ rotate: 0, scale: 1 }}
           transition={{ delay: 0.2, type: 'spring' }}
         />
         <h1 className="font-display text-4xl font-black text-black">رحلة التطوّر</h1>
         <p className="mt-1 font-body text-base text-charcoal">
-          منصّة <span className="highlight">ثمانية</span> لتطوير الموظفين وتقييمهم وترقيتهم
+          منصّة <span className="highlight">باور</span> لتطوير الموظفين وتقييمهم وترقيتهم
         </p>
 
         <div className="my-6 grid grid-cols-4 gap-2">

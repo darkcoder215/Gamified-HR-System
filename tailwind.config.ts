@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 // Tailwind theme is driven by the CSS variables defined in src/styles/tokens.css,
-// which come verbatim from the Thmanyah brand guide. The variables are the
+// which come verbatim from the POWR brand guide. The variables are the
 // single source of truth; these mappings just expose them as utilities.
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],

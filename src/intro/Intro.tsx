@@ -96,9 +96,9 @@ export default function Intro() {
     // 0 — Welcome
     <Slide key="welcome">
       <motion.img
-        src="/logo/thamanyah.png"
-        alt="ثمانية"
-        className="mb-4 h-20 w-20 rounded-2xl bg-black p-3"
+        src="/logo/made-in-powr.svg"
+        alt="made in POWR"
+        className="mb-5 h-16 w-auto"
         initial={{ scale: 0, rotate: -20 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.1 }}
@@ -107,7 +107,7 @@ export default function Intro() {
         رحلة التطوّر
       </motion.h1>
       <motion.p variants={item} className="mt-2 font-body text-lg text-charcoal">
-        أهلًا <span className="highlight">{playerName}</span>! منصّة <b>ثمانية</b> لتطوير الموظفين وتقييمهم وترقيتهم —
+        أهلًا <span className="highlight">{playerName}</span>! منصّة <b>باور</b> لتطوير الموظفين وتقييمهم وترقيتهم —
         في عالم تفاعلي ممتع.
       </motion.p>
       <motion.img
@@ -258,7 +258,7 @@ export default function Intro() {
         transition={{ x: { repeat: Infinity, duration: 1.2 }, opacity: { duration: 0.4 } }}
       />
       <motion.h2 variants={item} className="font-display text-5xl font-black text-black">هيّا نبدأ!</motion.h2>
-      <motion.p variants={item} className="mt-2 font-body text-lg text-charcoal">عالم <b>ثمانية</b> بانتظارك. تطوّر، تنافس، وارتقِ إلى القمّة.</motion.p>
+      <motion.p variants={item} className="mt-2 font-body text-lg text-charcoal">عالم <b>باور</b> بانتظارك. تطوّر، تنافس، وارتقِ إلى القمّة.</motion.p>
     </Slide>,
   ];
 
@@ -308,8 +308,8 @@ export default function Intro() {
       {/* top bar: brand + skip */}
       <div className="flex items-center justify-between p-5">
         <div className="flex items-center gap-2">
-          <img src="/logo/thamanyah.png" alt="ثمانية" className="h-8 w-8 rounded-lg bg-black p-1.5" />
-          <span className="font-display text-lg font-bold text-black">ثمانية</span>
+          <img src="/logo/powr-mark.svg" alt="POWR" className="h-8 w-8" />
+          <span className="font-display text-lg font-bold text-black">باور</span>
         </div>
         <button onClick={finishIntro} className="rounded-pill px-4 py-1.5 font-ui text-sm font-bold text-muted transition hover:text-black">
           تخطّي

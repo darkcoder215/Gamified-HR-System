@@ -214,13 +214,16 @@ export default function AssessmentArena() {
               const isChosen = selected === i;
               let style = 'bg-white border-warm-gray text-charcoal';
               let icon = null;
+              let borderColor: string | undefined;
               if (selected !== null) {
                 if (isCorrect) {
-                  style = 'border-green text-black';
-                  icon = <Check size={18} className="text-green" />;
+                  style = 'text-black';
+                  borderColor = 'var(--color-success)';
+                  icon = <Check size={18} style={{ color: 'var(--color-success)' }} />;
                 } else if (isChosen) {
-                  style = 'border-red text-black';
-                  icon = <X size={18} className="text-red" />;
+                  style = 'text-black';
+                  borderColor = 'var(--color-error)';
+                  icon = <X size={18} style={{ color: 'var(--color-error)' }} />;
                 } else {
                   style = 'border-warm-gray text-muted opacity-60';
                 }
@@ -234,7 +237,8 @@ export default function AssessmentArena() {
                   whileTap={selected === null ? { scale: 0.98 } : undefined}
                   className={`flex items-center justify-between rounded-lg border-2 px-4 py-3 text-start font-ui text-sm font-medium transition ${style}`}
                   style={{
-                    background: selected !== null && isCorrect ? 'var(--color-green-light)' : undefined,
+                    borderColor,
+                    background: selected !== null && isCorrect ? 'var(--color-mint)' : undefined,
                   }}
                 >
                   <span>{choice}</span>

@@ -1,8 +1,8 @@
-# رحلة التطوّر — منصّة ثمانية لتطوير الموظفين
+# رحلة التطوّر — منصّة باور لتطوير الموظفين
 
-منصّة تفاعلية مُمتعة (gamified) لتطوير الموظفين وتقييم مهاراتهم وترقيتهم، بأسلوب لعبة RPG ثنائية الأبعاد ولوحات تحكّم فاخرة بهوية **ثمانية**. واجهة عربية بالكامل (RTL)، وحركات سلسة، وأداء سريع، وجاهزة للنشر على Vercel.
+منصّة تفاعلية مُمتعة (gamified) لتطوير الموظفين وتقييم مهاراتهم وترقيتهم، بأسلوب لعبة RPG ثنائية الأبعاد ولوحات تحكّم فاخرة بهوية **باور**. واجهة عربية بالكامل (RTL)، وحركات سلسة، وأداء سريع، وجاهزة للنشر على Vercel.
 
-A gamified HR employee improvement, assessment, and promotion system. It blends a pixel-art RPG overworld (a walking character + interactive stations) with luxurious Thmanyah-branded dashboards. Fully Arabic / RTL, highly animated, front-end only (mock data + `localStorage`).
+A gamified HR employee improvement, assessment, and promotion system. It blends a pixel-art RPG overworld (a walking character + interactive stations) with luxurious POWR-branded dashboards. Fully Arabic / RTL, highly animated, front-end only (mock data + `localStorage`).
 
 ## التشغيل المحلي
 
@@ -41,14 +41,14 @@ npm run preview   # معاينة نسخة الإنتاج
 - **تقدّم متعدّد المناطق:** أحياء تُفتح تباعًا مع ارتفاع المستوى (حي البداية → حي الفريق → حي القيادة)،
   مع أقفال مرئية على المباني المغلقة، لوحة «المناطق»، واحتفال عند فتح حيٍّ جديد.
 - **حركات تفاعل أغنى مع المباني:** تكبير العلامة عند الاقتراب + ومضة وتموّج عند الدخول.
-- **تدرّج لوني بهوية ثمانية** فوق العالم لانسجام بصري مع العلامة.
+- **تدرّج لوني بهوية باور** فوق العالم لانسجام بصري مع العلامة.
 
 ## البنية التقنية
 
 | المجال | الأداة |
 |---|---|
 | البناء | Vite + React 18 + TypeScript |
-| التنسيق | Tailwind CSS (مدفوع بمتغيّرات هوية ثمانية في `src/styles/tokens.css`) |
+| التنسيق | Tailwind CSS (مدفوع بمتغيّرات هوية باور في `src/styles/tokens.css`) |
 | عالم البكسل | Phaser 3 (محمّل ككتلة منفصلة كسولة) |
 | الحركات | Framer Motion + canvas-confetti |
 | الحالة | Zustand مع حفظ في `localStorage` |
@@ -110,4 +110,4 @@ VITE_SUPABASE_ANON_KEY=...   # المفتاح العام (publishable)
 - زر «إعادة ضبط» أعلى الشاشة (على الحاسوب) يمسح التقدّم لتجربة كل الوحدات من جديد.
 - الصوت (موسيقى/مؤثرات) غير مفعّل في هذه النسخة (مرحلة لاحقة اختيارية).
 
-> مشروع تجريبي مستوحى من أسلوب بناء LennyRPG، مع تطبيق هوية ثمانية البصرية.
+> مشروع تجريبي مستوحى من أسلوب بناء LennyRPG، مع تطبيق هوية باور البصرية.

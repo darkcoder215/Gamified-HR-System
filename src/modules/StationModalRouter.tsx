@@ -56,7 +56,7 @@ const META: Record<StationId, StationMeta> = {
   },
   org: {
     title: 'الهيكل التنظيمي',
-    subtitle: 'فريق ثمانية وموقعك فيه',
+    subtitle: 'فريق باور وموقعك فيه',
     accent: 'var(--color-charcoal)',
     icon: <Building2 size={24} />,
     Component: OrgHierarchy,

@@ -1,4 +1,4 @@
-// Force Western Arabic numerals (0-9) per the Thmanyah brand guide.
+// Force Western Arabic numerals (0-9) per the POWR brand guide.
 const ARABIC_INDIC = /[٠-٩۰-۹]/g;
 const MAP: Record<string, string> = {
   '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',

@@ -11,7 +11,7 @@ export default function DashShell({
     <div className="h-full w-full overflow-y-auto bg-off-white" dir="rtl">
       <header className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-black px-4 py-3 shadow-card sm:px-6">
         <div className="flex items-center gap-3">
-          <img src="/logo/thamanyah.png" alt="ثمانية" className="h-9 w-9 rounded-lg bg-black p-1.5" />
+          <img src="/logo/powr-mark.svg" alt="POWR" className="h-9 w-9" />
           <div>
             <p className="font-display text-lg font-black text-white">{title}</p>
             <p className="font-ui text-[11px] text-white/60">{name} · {ROLE_AR[role]}</p>

@@ -34,7 +34,7 @@ export default function GuideModal() {
       {tab === 'buildings' && (
         <div className="space-y-3">
           <p className="font-body text-sm text-charcoal">
-            تجوّل في عالم <span className="highlight">ثمانية</span> وزُر المباني الخمسة — لكل مبنى دور يساعدك على
+            تجوّل في عالم <span className="highlight">باور</span> وزُر المباني الخمسة — لكل مبنى دور يساعدك على
             التطوّر والترقية:
           </p>
           {buildingGuides.map((b, i) => (

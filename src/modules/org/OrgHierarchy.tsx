@@ -32,7 +32,7 @@ function RealOrg() {
   return (
     <div>
       <p className="mb-5 font-body text-sm text-charcoal">
-        فريق <span className="highlight">ثمانية</span> الحقيقي — موقعك مميَّز بالأخضر.
+        فريق <span className="highlight">باور</span> الحقيقي — موقعك مميَّز بالأخضر.
       </p>
       <div className="space-y-3">
         {ROLE_TIERS.map((tier) => {
@@ -140,7 +140,7 @@ function StaticOrg() {
   return (
     <div className="relative">
       <p className="mb-5 font-body text-sm text-charcoal">
-        هذا هو فريق <span className="highlight">ثمانية</span>. كلما ارتقيت صعدت في الهيكل التنظيمي واقتربت من القيادة.
+        هذا هو فريق <span className="highlight">باور</span>. كلما ارتقيت صعدت في الهيكل التنظيمي واقتربت من القيادة.
         موقعك مميَّز بالأخضر — ويمكنك توليد صور الزملاء بالذكاء الاصطناعي عبر زر <Camera size={12} className="inline" />.
       </p>
 

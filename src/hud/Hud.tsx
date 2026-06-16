@@ -139,8 +139,8 @@ export default function Hud() {
           <div className="flex items-center gap-3 rounded-xl bg-black p-2 shadow-card sm:py-2 sm:pe-4 sm:ps-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black sm:h-10 sm:w-10">
               <img
-                src="/logo/thamanyah.png"
-                alt="ثمانية"
+                src="/logo/powr-mark.svg"
+                alt="POWR"
                 className="h-7 w-7 select-none sm:h-8 sm:w-8"
                 draggable={false}
                 style={{ imageRendering: 'auto' }}
@@ -148,7 +148,7 @@ export default function Hud() {
             </span>
             <span className="hidden h-8 w-px bg-white/15 sm:block" />
             <div className="hidden text-end leading-none sm:block">
-              <p className="font-display text-base font-bold text-white">ثمانية</p>
+              <p className="font-display text-base font-bold text-white">باور</p>
               <p className="mt-0.5 font-ui text-[10px] text-white/55">تطوير الموظفين</p>
             </div>
           </div>

@@ -170,7 +170,7 @@ const initialPlayer: PlayerState = {
   energy: MAX_ENERGY,
   energyUpdatedAt: Date.now(),
   titleAr: careerLadder[0].titleAr,
-  avatar: '#00c17a',
+  avatar: '#d71f29',
   avatarImage: null,
   characterTint: null,
   frame: null,
@@ -556,7 +556,7 @@ export const useGameStore = create<GameState>()(
       };
     },
     {
-      name: 'thmanyah-hr-save',
+      name: 'powr-hr-save',
       version: 1,
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({

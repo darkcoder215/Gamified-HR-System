@@ -14,5 +14,5 @@ the loader is asset-agnostic (`src/game/gameConfig.ts` → `TILEMAP` / `PLAYER`)
 Tuxemon assets: https://github.com/Tuxemon/Tuxemon — sourced from
 https://github.com/mikewesthad/phaser-3-tilemap-blog-posts
 
-Brand assets (logo + Thmanyah fonts) in `Usable/` are property of Thmanyah and are
+Brand assets (logo + POWR fonts) in `Usable/` are property of POWR and are
 used per the provided design guide.
