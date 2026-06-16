@@ -9,7 +9,7 @@ import Pill from '@/ui/Pill';
 import ProgressBar from '@/ui/ProgressBar';
 import NumberText from '@/ui/NumberText';
 
-const DIFF_LABEL: Record<string, string> = { easy: 'سهل', medium: 'متوسط', hard: 'متقدّم' };
+const DIFF_LABEL: Record<string, string> = { easy: 'Easy', medium: 'Medium', hard: 'Advanced' };
 
 export default function QuestBoard() {
   const questProgress = useGameStore((s) => s.questProgress);
@@ -46,7 +46,7 @@ export default function QuestBoard() {
     return (
       <div>
         <button onClick={() => setSelectedId(null)} className="mb-4 flex items-center gap-1 font-ui text-sm font-bold text-blue">
-          <ChevronLeft size={16} /> كل المهام
+          <ChevronLeft size={16} /> All Quests
         </button>
         <div className="mb-5">
           <div className="flex items-center gap-2">
@@ -87,12 +87,12 @@ export default function QuestBoard() {
         <div className="mt-5 flex items-center justify-between rounded-lg bg-green-light p-4">
           <div className="flex items-center gap-2">
             <Trophy size={18} className="text-black" />
-            <span className="font-ui text-sm font-bold text-black">المكافأة</span>
+            <span className="font-ui text-sm font-bold text-black">Reward</span>
           </div>
-          <span className="font-display text-lg font-black text-black">+<NumberText value={selected.xpReward} /> خبرة</span>
+          <span className="font-display text-lg font-black text-black">+<NumberText value={selected.xpReward} /> XP</span>
         </div>
         {entry.done && (
-          <p className="mt-3 text-center font-ui text-sm font-bold text-green">✓ أكملت هذه المهمة!</p>
+          <p className="mt-3 text-center font-ui text-sm font-bold text-green">✓ You completed this quest!</p>
         )}
       </div>
     );
@@ -119,8 +119,8 @@ export default function QuestBoard() {
                   <p className="mt-1 font-ui text-xs text-muted">{quest.descAr}</p>
                   <div className="mt-3"><ProgressBar pct={pct} height={6} /></div>
                   <div className="mt-2 flex items-center justify-between font-ui text-[11px] text-muted">
-                    <span><NumberText value={completedCount} />/<NumberText value={quest.steps.length} /> خطوات</span>
-                    <span className="font-bold text-blue">+<NumberText value={quest.xpReward} /> خبرة</span>
+                    <span><NumberText value={completedCount} />/<NumberText value={quest.steps.length} /> steps</span>
+                    <span className="font-bold text-blue">+<NumberText value={quest.xpReward} /> XP</span>
                   </div>
                 </Card>
               );

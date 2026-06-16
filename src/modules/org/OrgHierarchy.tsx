@@ -10,9 +10,9 @@ import NumberText from '@/ui/NumberText';
 
 interface RealPerson { id: string; full_name: string | null; role: string; avatar_color: string | null; avatar_image_url: string | null; level: number }
 const ROLE_TIERS: { role: string; titleAr: string }[] = [
-  { role: 'hr_admin', titleAr: 'الموارد البشرية' },
-  { role: 'manager', titleAr: 'المديرون' },
-  { role: 'employee', titleAr: 'الموظفون' },
+  { role: 'hr_admin', titleAr: 'HR' },
+  { role: 'manager', titleAr: 'Managers' },
+  { role: 'employee', titleAr: 'Employees' },
 ];
 
 function RealOrg() {
@@ -32,7 +32,7 @@ function RealOrg() {
   return (
     <div>
       <p className="mb-5 font-body text-sm text-charcoal">
-        فريق <span className="highlight">باور</span> الحقيقي — موقعك مميَّز بالأخضر.
+        The real <span className="highlight">POWR</span> team — your position is highlighted in green.
       </p>
       <div className="space-y-3">
         {ROLE_TIERS.map((tier) => {
@@ -47,10 +47,10 @@ function RealOrg() {
                   return (
                     <div key={m.id} className="flex w-16 flex-col items-center gap-1 text-center">
                       <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full font-display text-lg font-black text-white" style={{ background: m.avatar_color ?? '#00c17a', boxShadow: isMe ? '0 0 0 3px var(--color-green)' : undefined }}>
-                        {m.avatar_image_url ? <img src={m.avatar_image_url} alt="" className="h-full w-full object-cover" /> : (m.full_name ?? '؟').charAt(0)}
+                        {m.avatar_image_url ? <img src={m.avatar_image_url} alt="" className="h-full w-full object-cover" /> : (m.full_name ?? '?').charAt(0)}
                       </div>
-                      <span className={`font-ui text-[11px] leading-tight ${isMe ? 'font-bold text-green' : 'text-charcoal'}`}>{m.full_name}{isMe ? ' (أنت)' : ''}</span>
-                      <span className="num font-ui text-[10px] text-muted">م<NumberText value={m.level} /></span>
+                      <span className={`font-ui text-[11px] leading-tight ${isMe ? 'font-bold text-green' : 'text-charcoal'}`}>{m.full_name}{isMe ? ' (You)' : ''}</span>
+                      <span className="num font-ui text-[10px] text-muted">L<NumberText value={m.level} /></span>
                     </div>
                   );
                 })}
@@ -90,7 +90,7 @@ function Avatar({
       {onGenerate && (
         <button
           onClick={onGenerate}
-          title="توليد صورة بالذكاء الاصطناعي"
+          title="Generate AI image"
           className="absolute -bottom-1 -start-1 flex h-5 w-5 items-center justify-center rounded-full bg-black text-white shadow-card transition hover:bg-charcoal"
         >
           <Camera size={11} />
@@ -128,7 +128,7 @@ function StaticOrg() {
     setLoading(true);
     setMsg(null);
     const r = await generatePixelAvatar(photo);
-    if (r.needsKey) setMsg('يعمل التوليد في بيئة الإنتاج بعد إضافة مفتاح OPENAI_API_KEY.');
+    if (r.needsKey) setMsg('Generation works in the production environment once the OPENAI_API_KEY is added.');
     else if (r.error) setMsg(r.error);
     else if (r.image) {
       setColleagueAvatar(gen.id, r.image);
@@ -140,8 +140,8 @@ function StaticOrg() {
   return (
     <div className="relative">
       <p className="mb-5 font-body text-sm text-charcoal">
-        هذا هو فريق <span className="highlight">باور</span>. كلما ارتقيت صعدت في الهيكل التنظيمي واقتربت من القيادة.
-        موقعك مميَّز بالأخضر — ويمكنك توليد صور الزملاء بالذكاء الاصطناعي عبر زر <Camera size={12} className="inline" />.
+        This is the <span className="highlight">POWR</span> team. The more you advance, the higher you climb in the Org Chart and the closer you get to leadership.
+        Your position is highlighted in green — and you can generate AI images of your colleagues using the <Camera size={12} className="inline" /> button.
       </p>
 
       {/* Executive */}
@@ -173,7 +173,7 @@ function StaticOrg() {
               <div className="mb-2 flex items-center justify-between">
                 <span className="font-ui text-xs font-bold text-charcoal">{tier.titleAr}</span>
                 <span className="rounded-pill bg-warm-gray px-2 py-0.5 font-ui text-[10px] font-bold text-muted">
-                  المستوى <NumberText value={tier.level} />
+                  Level <NumberText value={tier.level} />
                 </span>
               </div>
               <div className="flex flex-wrap items-start gap-4">
@@ -190,7 +190,7 @@ function StaticOrg() {
                       image={player.avatarImage}
                       ring
                     />
-                    <span className="font-ui text-[11px] font-bold leading-tight text-green">{player.nameAr} (أنت)</span>
+                    <span className="font-ui text-[11px] font-bold leading-tight text-green">{player.nameAr} (You)</span>
                   </div>
                 )}
               </div>
@@ -209,7 +209,7 @@ function StaticOrg() {
         >
           <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-float">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-display text-lg font-black text-black">توليد صورة {gen.name}</h3>
+              <h3 className="font-display text-lg font-black text-black">Generate image for {gen.name}</h3>
               <button onClick={() => setGen(null)} className="text-muted hover:text-black"><X size={18} /></button>
             </div>
             <button
@@ -221,7 +221,7 @@ function StaticOrg() {
               ) : (
                 <>
                   <Upload size={24} />
-                  <span className="font-ui text-xs font-bold">اختر صورة الزميل</span>
+                  <span className="font-ui text-xs font-bold">Choose colleague's photo</span>
                 </>
               )}
             </button>
@@ -234,7 +234,7 @@ function StaticOrg() {
               disabled={!photo || loading}
               className="mt-3 flex w-full items-center justify-center gap-2 rounded-pill bg-green py-2.5 font-ui text-sm font-bold text-white disabled:opacity-50"
             >
-              {loading ? <><Loader2 size={16} className="animate-spin" /> جارٍ التوليد…</> : <><Sparkles size={16} /> ولّد الصورة</>}
+              {loading ? <><Loader2 size={16} className="animate-spin" /> Generating…</> : <><Sparkles size={16} /> Generate image</>}
             </button>
             {msg && <p className="mt-3 rounded-lg bg-yellow-pale p-2 font-ui text-[11px] text-charcoal" style={{ background: 'var(--color-yellow-pale)' }}>{msg}</p>}
           </div>

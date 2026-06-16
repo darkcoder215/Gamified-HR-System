@@ -16,8 +16,8 @@ export interface StationDef {
 export const stations: StationDef[] = [
   {
     id: 'career',
-    nameAr: 'برج الترقيات',
-    hintAr: 'تابع مسارك المهني واطلب الترقية',
+    nameAr: 'Promotions Tower',
+    hintAr: 'Track your career path and request a promotion',
     x: 700,
     y: 300,
     signY: 40,
@@ -26,8 +26,8 @@ export const stations: StationDef[] = [
   },
   {
     id: 'arena',
-    nameAr: 'ساحة التقييم',
-    hintAr: 'اختبر مهاراتك في نزالات معرفية',
+    nameAr: 'Assessment Arena',
+    hintAr: 'Test your skills in knowledge battles',
     x: 560,
     y: 575,
     signY: 412,
@@ -36,8 +36,8 @@ export const stations: StationDef[] = [
   },
   {
     id: 'quests',
-    nameAr: 'مركز المهام',
-    hintAr: 'أكمل مهام التطوير واكسب الخبرة',
+    nameAr: 'Quests Hub',
+    hintAr: 'Complete development quests and earn XP',
     x: 660,
     y: 880,
     signY: 700,
@@ -46,8 +46,8 @@ export const stations: StationDef[] = [
   },
   {
     id: 'leaderboard',
-    nameAr: 'قاعة الصدارة',
-    hintAr: 'قارن ترتيبك واستعرض أوسمتك',
+    nameAr: 'Leaderboard Hall',
+    hintAr: 'Compare your ranking and browse your badges',
     x: 270,
     y: 1165,
     signY: 985,
@@ -56,8 +56,8 @@ export const stations: StationDef[] = [
   },
   {
     id: 'org',
-    nameAr: 'المقر — الهيكل التنظيمي',
-    hintAr: 'تعرّف على فريق الشركة وموقعك فيه',
+    nameAr: 'Headquarters — Org Chart',
+    hintAr: 'Get to know the company team and your place in it',
     x: 230,
     y: 300,
     signY: 150,

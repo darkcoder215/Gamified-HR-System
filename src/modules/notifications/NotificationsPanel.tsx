@@ -27,19 +27,19 @@ export default function NotificationsPanel() {
     setRows((r) => r.map((n) => ({ ...n, read: true })));
   };
 
-  if (loading) return <p className="py-8 text-center font-ui text-sm text-muted">جارٍ التحميل…</p>;
+  if (loading) return <p className="py-8 text-center font-ui text-sm text-muted">Loading…</p>;
   if (!rows.length)
     return (
       <div className="py-10 text-center text-muted">
         <BellOff size={32} className="mx-auto mb-2" />
-        <p className="font-ui text-sm">لا توجد إشعارات بعد.</p>
+        <p className="font-ui text-sm">No notifications yet.</p>
       </div>
     );
 
   return (
     <div>
       <button onClick={markAll} className="mb-3 flex items-center gap-1.5 rounded-pill bg-warm-gray px-3 py-1.5 font-ui text-xs font-bold text-charcoal">
-        <CheckCheck size={14} /> تحديد الكل كمقروء
+        <CheckCheck size={14} /> Mark all as read
       </button>
       <div className="space-y-2">
         {rows.map((n) => (

@@ -14,8 +14,8 @@ export interface Zone {
 export const zones: Zone[] = [
   {
     id: 'd1',
-    nameAr: 'حي البداية',
-    descAr: 'انطلاقتك: اختبر مهاراتك وأكمل أولى مهامك.',
+    nameAr: 'Starter District',
+    descAr: 'Your launch: test your skills and complete your first quests.',
     unlockLevel: 1,
     stations: ['arena', 'quests'],
     color: '#00c17a',
@@ -23,8 +23,8 @@ export const zones: Zone[] = [
   },
   {
     id: 'd2',
-    nameAr: 'حي الفريق',
-    descAr: 'تعرّف على فريق الشركة ونافس زملاءك على الصدارة.',
+    nameAr: 'Team District',
+    descAr: 'Get to know the company team and compete with your peers for the leaderboard.',
     unlockLevel: 3,
     stations: ['org', 'leaderboard'],
     color: '#0072f9',
@@ -32,8 +32,8 @@ export const zones: Zone[] = [
   },
   {
     id: 'd3',
-    nameAr: 'حي القيادة',
-    descAr: 'الطريق إلى القمّة — اطلب ترقيتك وتسلّق برج القيادة.',
+    nameAr: 'Leadership District',
+    descAr: 'The road to the top — request your promotion and climb the leadership tower.',
     unlockLevel: 5,
     stations: ['career'],
     color: '#ffbc0a',

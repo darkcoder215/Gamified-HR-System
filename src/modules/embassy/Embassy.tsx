@@ -6,13 +6,13 @@ import { useAuth } from '@/auth/AuthProvider';
 import type { RequestRow } from '@/lib/dbTypes';
 
 const TYPES = [
-  { id: 'holiday', label: 'إجازة', icon: <Plane size={18} />, dates: true, color: '#00c17a' },
-  { id: 'sick_leave', label: 'إجازة مرضية', icon: <Stethoscope size={18} />, dates: true, color: '#f24935' },
-  { id: 'remote', label: 'عمل عن بُعد', icon: <Home size={18} />, dates: true, color: '#0072f9' },
-  { id: 'question', label: 'سؤال للموارد البشرية', icon: <HelpCircle size={18} />, dates: false, color: '#ffbc0a' },
+  { id: 'holiday', label: 'Leave', icon: <Plane size={18} />, dates: true, color: '#00c17a' },
+  { id: 'sick_leave', label: 'Sick Leave', icon: <Stethoscope size={18} />, dates: true, color: '#f24935' },
+  { id: 'remote', label: 'Remote Work', icon: <Home size={18} />, dates: true, color: '#0072f9' },
+  { id: 'question', label: 'Ask HR', icon: <HelpCircle size={18} />, dates: false, color: '#ffbc0a' },
 ] as const;
 
-const STATUS_AR: Record<string, string> = { pending: 'قيد المراجعة', approved: 'مقبول', rejected: 'مرفوض', answered: 'تمت الإجابة' };
+const STATUS_AR: Record<string, string> = { pending: 'Under Review', approved: 'Approved', rejected: 'Rejected', answered: 'Answered' };
 const STATUS_COLOR: Record<string, string> = { pending: '#ffbc0a', approved: '#00c17a', rejected: '#f24935', answered: '#0072f9' };
 
 export default function Embassy() {
@@ -53,7 +53,7 @@ export default function Embassy() {
   return (
     <div>
       <p className="mb-4 font-body text-sm text-charcoal">
-        أهلًا بك في <span className="highlight">السفارة</span> — قدّم طلب إجازة أو اسأل الموارد البشرية، وستصل طلباتك لمن يلزم مع إشعار بالنتيجة.
+        Welcome to the <span className="highlight">Embassy</span> — submit a leave request or ask HR, and your requests will reach the right people with a notification of the outcome.
       </p>
 
       <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -73,33 +73,33 @@ export default function Embassy() {
       <form onSubmit={submit} className="rounded-lg bg-white p-4 shadow-soft">
         {meta.dates && (
           <div className="mb-3 grid grid-cols-2 gap-3">
-            <label className="font-ui text-xs text-muted">من<input type="date" required value={start} onChange={(e) => setStart(e.target.value)} className="mt-1 w-full rounded-lg border border-warm-gray px-2 py-1.5 font-ui text-sm" /></label>
-            <label className="font-ui text-xs text-muted">إلى<input type="date" required value={end} onChange={(e) => setEnd(e.target.value)} className="mt-1 w-full rounded-lg border border-warm-gray px-2 py-1.5 font-ui text-sm" /></label>
+            <label className="font-ui text-xs text-muted">From<input type="date" required value={start} onChange={(e) => setStart(e.target.value)} className="mt-1 w-full rounded-lg border border-warm-gray px-2 py-1.5 font-ui text-sm" /></label>
+            <label className="font-ui text-xs text-muted">To<input type="date" required value={end} onChange={(e) => setEnd(e.target.value)} className="mt-1 w-full rounded-lg border border-warm-gray px-2 py-1.5 font-ui text-sm" /></label>
           </div>
         )}
         <textarea
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder={meta.dates ? 'السبب (اختياري)' : 'اكتب سؤالك هنا'}
+          placeholder={meta.dates ? 'Reason (optional)' : 'Write your question here'}
           required={!meta.dates}
           rows={2}
           className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm outline-none"
         />
         <motion.button whileTap={{ scale: 0.97 }} disabled={sending} className="mt-3 flex w-full items-center justify-center gap-2 rounded-pill bg-black py-2.5 font-ui text-sm font-bold text-white disabled:opacity-60">
-          {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} إرسال الطلب
+          {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Submit Request
         </motion.button>
       </form>
 
       {rows.length > 0 && (
         <div className="mt-5">
-          <h3 className="mb-2 font-display text-base font-black text-black">طلباتي</h3>
+          <h3 className="mb-2 font-display text-base font-black text-black">My Requests</h3>
           <div className="space-y-2">
             {rows.map((r) => (
               <div key={r.id} className="flex items-center justify-between rounded-lg bg-white p-3 shadow-soft">
                 <div>
                   <p className="font-ui text-sm font-bold text-black">{TYPES.find((t) => t.id === r.type)?.label}</p>
                   {r.reason_ar && <p className="font-ui text-xs text-muted">{r.reason_ar}</p>}
-                  {r.response_ar && <p className="mt-0.5 font-ui text-xs" style={{ color: 'var(--color-blue)' }}>ردّ: {r.response_ar}</p>}
+                  {r.response_ar && <p className="mt-0.5 font-ui text-xs" style={{ color: 'var(--color-blue)' }}>Reply: {r.response_ar}</p>}
                 </div>
                 <span className="rounded-pill px-3 py-1 font-ui text-[11px] font-bold text-white" style={{ background: STATUS_COLOR[r.status] }}>
                   {STATUS_AR[r.status]}

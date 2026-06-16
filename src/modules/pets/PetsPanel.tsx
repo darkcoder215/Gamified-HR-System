@@ -14,8 +14,8 @@ export default function PetsPanel() {
   return (
     <div>
       <p className="mb-4 font-body text-sm text-charcoal">
-        رفاقك يرافقونك في العالم ويظهرون لزملائك في <span className="highlight">لوحة الصدارة</span> — تُكتسب
-        بإنجازاتك الحقيقية. لديك <span className="num">{count}</span> من <span className="num">{pets.length}</span>.
+        Your companions follow you around the world and appear to your colleagues on the <span className="highlight">leaderboard</span> — they're earned
+        through your real achievements. You have <span className="num">{count}</span> of <span className="num">{pets.length}</span>.
       </p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {pets.map((p, i) => {
@@ -47,7 +47,7 @@ export default function PetsPanel() {
                   className="mt-2 w-full rounded-pill py-1.5 font-ui text-[11px] font-bold text-white"
                   style={{ background: isEq ? 'var(--color-muted)' : 'var(--color-green)' }}
                 >
-                  {isEq ? <span className="flex items-center justify-center gap-1"><Check size={12} /> مُرافِق</span> : 'اصطحبه'}
+                  {isEq ? <span className="flex items-center justify-center gap-1"><Check size={12} /> Companion</span> : 'Take along'}
                 </button>
               )}
             </motion.div>

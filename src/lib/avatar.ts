@@ -37,9 +37,9 @@ export async function generatePixelAvatar(imageBase64: string): Promise<GenResul
     });
     const data = await res.json().catch(() => ({}));
     if (res.status === 501) return { needsKey: true };
-    if (!res.ok || !data.image) return { error: data.message || 'تعذّر توليد الصورة، حاول مرة أخرى.' };
+    if (!res.ok || !data.image) return { error: data.message || 'Could not generate the image, please try again.' };
     return { image: data.image as string };
   } catch {
-    return { error: 'تعذّر الاتصال بخدمة التوليد.' };
+    return { error: 'Could not connect to the generation service.' };
   }
 }

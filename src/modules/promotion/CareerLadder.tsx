@@ -69,7 +69,7 @@ export default function CareerLadder() {
           player.nameAr.trim().charAt(0)
         )}
       </span>
-      <span className="font-ui text-[11px] font-bold text-white">أنت</span>
+      <span className="font-ui text-[11px] font-bold text-white">You</span>
     </motion.div>
   );
 
@@ -85,20 +85,20 @@ export default function CareerLadder() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-ui text-xs font-bold text-white/80">ترقيتك القادمة</p>
+              <p className="font-ui text-xs font-bold text-white/80">Your Next Promotion</p>
               <h3 className="font-display text-2xl font-black">{elig.next.titleAr}</h3>
             </div>
             <div className="text-center">
               <p className="font-display text-3xl font-black">
                 <NumberText value={prog.level} />
               </p>
-              <p className="font-ui text-[10px] text-white/80">مستواك</p>
+              <p className="font-ui text-[10px] text-white/80">Your Level</p>
             </div>
           </div>
 
           <div className="mt-3">
             <div className="mb-1 flex items-center justify-between font-ui text-[11px] text-white/90">
-              <span>الخبرة</span>
+              <span>XP</span>
               <span className="num">
                 <NumberText value={Math.min(player.xp, elig.next.xpThreshold)} group /> / <NumberText value={elig.next.xpThreshold} group />
               </span>
@@ -135,7 +135,7 @@ export default function CareerLadder() {
           <div className="mt-4 flex items-center justify-between">
             {needsApproval && (
               <span className="flex items-center gap-1 font-ui text-[11px] text-white/80">
-                <UserCheck size={13} /> تتطلّب موافقة المدير
+                <UserCheck size={13} /> Requires manager approval
               </span>
             )}
             <button
@@ -144,18 +144,18 @@ export default function CareerLadder() {
               className="ms-auto flex items-center gap-1.5 rounded-pill bg-white px-5 py-2.5 font-ui text-sm font-bold text-black shadow-card transition disabled:opacity-50"
             >
               <ChevronUp size={16} />
-              {elig.allMet ? 'اطلب الترقية الآن' : 'أكمل المتطلبات أولًا'}
+              {elig.allMet ? 'Request Promotion Now' : 'Complete Requirements First'}
             </button>
           </div>
         </div>
       ) : (
         <div className="mb-6 rounded-xl bg-green-light p-5 text-center">
-          <p className="font-display text-xl font-black text-black">🎉 بلغت قمّة المسار المهني!</p>
+          <p className="font-display text-xl font-black text-black">🎉 You've reached the top of the career path!</p>
         </div>
       )}
 
       {/* The tower */}
-      <p className="mb-3 font-ui text-xs font-bold text-muted">سلّم الترقيات — من الأسفل إلى القمّة</p>
+      <p className="mb-3 font-ui text-xs font-bold text-muted">Promotion Track — from bottom to top</p>
       <div className="space-y-2">
         {rungs.map((rung, idx) => {
           const isCurrent = rung.level === currentRung;
@@ -179,7 +179,7 @@ export default function CareerLadder() {
               }}
             >
               {isTop && (
-                <span className="absolute -top-2 right-4 text-lg" title="القمّة">
+                <span className="absolute -top-2 right-4 text-lg" title="Top">
                   👑
                 </span>
               )}
@@ -193,7 +193,7 @@ export default function CareerLadder() {
                 <div className="flex items-center gap-2">
                   <h4 className="font-ui text-sm font-bold text-black">{rung.titleAr}</h4>
                   <span className="num rounded-pill bg-warm-gray px-2 py-0.5 font-ui text-[10px] font-bold text-muted">
-                    <NumberText value={rung.xpThreshold} group /> خبرة
+                    <NumberText value={rung.xpThreshold} group /> XP
                   </span>
                 </div>
                 <p className="font-ui text-[11px] text-muted">{rung.descAr}</p>
@@ -228,9 +228,9 @@ export default function CareerLadder() {
               <p className="mt-4 font-display text-xl font-black text-black">
                 {phase === 'requesting'
                   ? needsApproval
-                    ? 'يراجع مديرك طلب ترقيتك…'
-                    : 'جارٍ ترقيتك…'
-                  : 'تمّت الموافقة على ترقيتك! 🎉'}
+                    ? 'Your manager is reviewing your promotion request…'
+                    : 'Processing your promotion…'
+                  : 'Your promotion has been approved! 🎉'}
               </p>
             </div>
           </motion.div>

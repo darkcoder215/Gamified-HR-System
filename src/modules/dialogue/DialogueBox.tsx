@@ -113,7 +113,7 @@ export default function DialogueBox() {
                 ))}
               </div>
               <span className="flex items-center gap-1 font-ui text-xs font-bold" style={{ color: npc.tint }}>
-                {typing ? 'تخطّي' : isLast ? 'تم' : 'التالي'} <ChevronLeft size={14} />
+                {typing ? 'Skip' : isLast ? 'Done' : 'Next'} <ChevronLeft size={14} />
               </span>
             </div>
           </motion.div>

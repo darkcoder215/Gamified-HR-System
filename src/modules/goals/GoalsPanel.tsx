@@ -35,14 +35,14 @@ export default function GoalsPanel() {
     setKpis((cur) => cur.map((k) => (k.id === id ? { ...k, current_value } : k)));
   };
 
-  if (loading) return <p className="py-8 text-center font-ui text-sm text-muted">جارٍ التحميل…</p>;
+  if (loading) return <p className="py-8 text-center font-ui text-sm text-muted">Loading…</p>;
 
   return (
     <div className="space-y-6">
       <section>
-        <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-black text-black"><Target size={18} className="text-green" /> أهدافي</h3>
+        <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-black text-black"><Target size={18} className="text-green" /> My Goals</h3>
         {goals.length === 0 ? (
-          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">لا توجد أهداف بعد. يضع مديرك أهدافك أو يمكنك متابعتها هنا عند إضافتها.</p>
+          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">No goals yet. Your manager sets your goals, or you can track them here once they're added.</p>
         ) : (
           <div className="space-y-3">
             {goals.map((g) => {
@@ -64,9 +64,9 @@ export default function GoalsPanel() {
       </section>
 
       <section>
-        <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-black text-black"><Gauge size={18} className="text-blue" /> مؤشّرات الأداء</h3>
+        <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-black text-black"><Gauge size={18} className="text-blue" /> Performance Indicators</h3>
         {kpis.length === 0 ? (
-          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">لا توجد مؤشّرات أداء بعد.</p>
+          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">No performance indicators yet.</p>
         ) : (
           <div className="space-y-3">
             {kpis.map((k) => {
@@ -101,7 +101,7 @@ function UpdateRow({ value, onSave }: { value: number; onSave: (v: number) => vo
         dir="ltr"
       />
       <button onClick={() => onSave(Number(v) || 0)} className="flex items-center gap-1 rounded-pill bg-black px-3 py-1.5 font-ui text-xs font-bold text-white">
-        <Save size={12} /> تحديث
+        <Save size={12} /> Update
       </button>
     </div>
   );

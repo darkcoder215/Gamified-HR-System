@@ -8,7 +8,7 @@ import DashShell from './DashShell';
 
 interface Member extends Profile { level?: number; xp?: number; last_active_day?: string | null }
 
-const REQ_LABEL: Record<string, string> = { sick_leave: 'إجازة مرضية', holiday: 'إجازة', remote: 'عمل عن بُعد', question: 'سؤال', other: 'أخرى' };
+const REQ_LABEL: Record<string, string> = { sick_leave: 'Sick leave', holiday: 'Leave', remote: 'Remote work', question: 'Question', other: 'Other' };
 
 export default function ManagerDashboard({ onPlay }: { onPlay: () => void }) {
   const { session, profile, signOut } = useAuth();
@@ -38,23 +38,23 @@ export default function ManagerDashboard({ onPlay }: { onPlay: () => void }) {
   };
 
   return (
-    <DashShell title="لوحة المدير" role="manager" name={profile?.full_name ?? ''} onPlay={onPlay} signOut={signOut}>
+    <DashShell title="Manager Dashboard" role="manager" name={profile?.full_name ?? ''} onPlay={onPlay} signOut={signOut}>
       <section className="mb-8">
-        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><Users size={20} className="text-green" /> فريقي <span className="num text-muted">({team.length})</span></h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><Users size={20} className="text-green" /> My Team <span className="num text-muted">({team.length})</span></h2>
         {team.length === 0 ? (
-          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">لا يوجد أعضاء في فريقك بعد. تُسند الفِرق من قِبَل الموارد البشرية.</p>
+          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">You don't have any team members yet. Teams are assigned by HR.</p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {team.map((m) => (
               <div key={m.id} className="flex items-center gap-3 rounded-lg bg-white p-4 shadow-soft">
                 <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full font-display text-base font-black text-white" style={{ background: m.avatar_color ?? '#00c17a' }}>
-                  {m.avatar_image_url ? <img src={m.avatar_image_url} alt="" className="h-full w-full object-cover" /> : (m.full_name ?? '؟').charAt(0)}
+                  {m.avatar_image_url ? <img src={m.avatar_image_url} alt="" className="h-full w-full object-cover" /> : (m.full_name ?? '?').charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-ui text-sm font-bold text-black">{m.full_name}</p>
-                  <p className="font-ui text-[11px] text-muted">{m.job_title || m.department || 'موظف'} · المستوى <span className="num">{m.level ?? 1}</span> · <span className="num">{m.xp ?? 0}</span> خبرة</p>
+                  <p className="font-ui text-[11px] text-muted">{m.job_title || m.department || 'Employee'} · Level <span className="num">{m.level ?? 1}</span> · <span className="num">{m.xp ?? 0}</span> XP</p>
                 </div>
-                <button onClick={() => setAssignFor(m)} className="flex items-center gap-1 rounded-pill bg-black px-3 py-1.5 font-ui text-xs font-bold text-white"><Plus size={13} /> أسند</button>
+                <button onClick={() => setAssignFor(m)} className="flex items-center gap-1 rounded-pill bg-black px-3 py-1.5 font-ui text-xs font-bold text-white"><Plus size={13} /> Assign</button>
               </div>
             ))}
           </div>
@@ -62,9 +62,9 @@ export default function ManagerDashboard({ onPlay }: { onPlay: () => void }) {
       </section>
 
       <section>
-        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><Inbox size={20} className="text-amber" /> طلبات بانتظار موافقتك <span className="num text-muted">({reqs.length})</span></h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><Inbox size={20} className="text-amber" /> Requests awaiting your approval <span className="num text-muted">({reqs.length})</span></h2>
         {reqs.length === 0 ? (
-          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">لا توجد طلبات معلّقة.</p>
+          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">No pending requests.</p>
         ) : (
           <div className="space-y-2">
             {reqs.map((r) => (
@@ -104,7 +104,7 @@ function AssignModal({ member, assignerId, onClose }: { member: Member; assigner
     if (type === 'goal') {
       await supabase.from('goals').insert({
         owner_id: member.id, created_by: assignerId,
-        title_ar: title || 'هدف', desc_ar: desc || null,
+        title_ar: title || 'Goal', desc_ar: desc || null,
         target: target ? Number(target) : null, unit: unit || null, due_date: due || null,
       });
     } else {
@@ -113,8 +113,8 @@ function AssignModal({ member, assignerId, onClose }: { member: Member; assigner
         assignee_id: member.id,
         type,
         ref_id: type === 'assessment' ? competencyId : null,
-        title_ar: type === 'assessment' ? `تقييم: ${comp.nameAr}` : title || 'مهمة',
-        desc_ar: type === 'assessment' ? `أكمل تقييم ${comp.nameAr} في ساحة التقييم` : desc || null,
+        title_ar: type === 'assessment' ? `Assessment: ${comp.nameAr}` : title || 'Task',
+        desc_ar: type === 'assessment' ? `Complete the ${comp.nameAr} assessment in the Assessment Arena` : desc || null,
         due_date: due || null,
       });
     }
@@ -125,9 +125,9 @@ function AssignModal({ member, assignerId, onClose }: { member: Member; assigner
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div className="w-full max-w-md rounded-xl bg-off-white p-5 shadow-float" onClick={(e) => e.stopPropagation()}>
-        <h3 className="mb-3 font-display text-lg font-black text-black">إسناد إلى {member.full_name}</h3>
+        <h3 className="mb-3 font-display text-lg font-black text-black">Assign to {member.full_name}</h3>
         <div className="mb-3 flex rounded-pill bg-warm-gray p-1">
-          {([['assessment', 'تقييم'], ['task', 'مهمة'], ['goal', 'هدف']] as const).map(([t, label]) => (
+          {([['assessment', 'Assessment'], ['task', 'Task'], ['goal', 'Goal']] as const).map(([t, label]) => (
             <button key={t} onClick={() => setType(t)} className="flex-1 rounded-pill px-3 py-1.5 font-ui text-sm font-bold" style={{ background: type === t ? 'var(--color-black)' : 'transparent', color: type === t ? '#fff' : 'var(--color-muted)' }}>
               {label}
             </button>
@@ -139,22 +139,22 @@ function AssignModal({ member, assignerId, onClose }: { member: Member; assigner
           </select>
         ) : (
           <div className="space-y-2">
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={type === 'goal' ? 'عنوان الهدف' : 'عنوان المهمة'} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
-            <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="الوصف (اختياري)" rows={2} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={type === 'goal' ? 'Goal title' : 'Task title'} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+            <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Description (optional)" rows={2} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
             {type === 'goal' && (
               <div className="grid grid-cols-2 gap-2">
-                <input value={target} onChange={(e) => setTarget(e.target.value)} type="number" dir="ltr" placeholder="القيمة المستهدفة" className="num rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
-                <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="الوحدة (مثال: مهمة)" className="rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+                <input value={target} onChange={(e) => setTarget(e.target.value)} type="number" dir="ltr" placeholder="Target value" className="num rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+                <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit (e.g. task)" className="rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
               </div>
             )}
           </div>
         )}
-        <label className="mt-3 block font-ui text-xs text-muted">تاريخ الاستحقاق (اختياري)
+        <label className="mt-3 block font-ui text-xs text-muted">Due date (optional)
           <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className="mt-1 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
         </label>
         <div className="mt-4 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-pill bg-warm-gray px-4 py-2 font-ui text-sm font-bold text-charcoal">إلغاء</button>
-          <button onClick={save} disabled={saving} className="rounded-pill bg-green px-5 py-2 font-ui text-sm font-bold text-white disabled:opacity-60">إسناد</button>
+          <button onClick={onClose} className="rounded-pill bg-warm-gray px-4 py-2 font-ui text-sm font-bold text-charcoal">Cancel</button>
+          <button onClick={save} disabled={saving} className="rounded-pill bg-green px-5 py-2 font-ui text-sm font-bold text-white disabled:opacity-60">Assign</button>
         </div>
       </div>
     </div>

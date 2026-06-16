@@ -126,7 +126,7 @@ export default function AssessmentArena() {
     return (
       <div>
         <p className="mb-4 font-body text-base text-charcoal">
-          اختر مهارةً لتخوض فيها نزالًا معرفيًا. كل إجابة صحيحة تمنحك خبرة، والإجابة الخاطئة تُنقص طاقتك.
+          Choose a skill to take on a knowledge battle. Every correct answer earns you XP, and a wrong answer drains your energy.
         </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {competencies.map((c, idx) => (
@@ -165,22 +165,22 @@ export default function AssessmentArena() {
     return (
       <div className="flex flex-col items-center text-center">
         <ScoreBadge score={scorePct} />
-        <h3 className="mt-4 font-display text-2xl font-black text-black">انتهى نزال {comp?.nameAr}</h3>
+        <h3 className="mt-4 font-display text-2xl font-black text-black">{comp?.nameAr} Battle Finished</h3>
         <div className="mt-4 grid w-full max-w-sm grid-cols-2 gap-3">
           <div className="rounded-lg bg-white p-3 shadow-soft">
-            <p className="font-ui text-xs text-muted">إجابات صحيحة</p>
+            <p className="font-ui text-xs text-muted">Correct Answers</p>
             <p className="font-display text-2xl font-black text-green">
               <NumberText value={correctCount} /> / <NumberText value={total} />
             </p>
           </div>
           <div className="rounded-lg bg-white p-3 shadow-soft">
-            <p className="font-ui text-xs text-muted">خبرة مكتسبة</p>
+            <p className="font-ui text-xs text-muted">XP Earned</p>
             <p className="font-display text-2xl font-black text-blue">+<NumberText value={xpEarned} /></p>
           </div>
         </div>
         <div className="mt-6 flex gap-3">
           <Button variant="accent" onClick={() => setPhase('select')}>
-            <RotateCcw size={16} className="ms-1 inline" /> نزال آخر
+            <RotateCcw size={16} className="ms-1 inline" /> Another Battle
           </Button>
         </div>
       </div>
@@ -192,10 +192,10 @@ export default function AssessmentArena() {
     <div className={wrongFx ? 'animate-shake' : ''}>
       <div className="mb-4 flex items-center justify-between">
         <span className="rounded-pill bg-warm-gray px-3 py-1 font-ui text-xs font-bold text-charcoal">
-          سؤال <NumberText value={qIndex + 1} /> / <NumberText value={battleQuestions.length} />
+          Question <NumberText value={qIndex + 1} /> / <NumberText value={battleQuestions.length} />
         </span>
         <span className="flex items-center gap-1 font-ui text-xs font-bold" style={{ color: energy > 25 ? 'var(--color-green)' : 'var(--color-red)' }}>
-          <Zap size={14} /> الطاقة <NumberText value={energy} />
+          <Zap size={14} /> Energy <NumberText value={energy} />
         </span>
       </div>
 
@@ -264,7 +264,7 @@ export default function AssessmentArena() {
           {selected !== null && (
             <div className="mt-5 flex justify-end">
               <Button variant="primary" onClick={next}>
-                {qIndex >= battleQuestions.length - 1 || energy <= 0 ? 'إنهاء النزال' : 'السؤال التالي'}
+                {qIndex >= battleQuestions.length - 1 || energy <= 0 ? 'Finish Battle' : 'Next Question'}
               </Button>
             </div>
           )}

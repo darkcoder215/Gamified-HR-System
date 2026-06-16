@@ -165,9 +165,9 @@ export default class InteriorScene extends Phaser.Scene {
     const bonus = useGameStore.getState().claimInteriorVisit(this.stationId);
     if (bonus) {
       this.time.delayedCall(400, () => {
-        EventBus.emit('reward:toast', { text: `أول زيارة لـ«${st.nameAr}» · +${bonus.xp} خبرة · +${bonus.coins} 🪙` });
+        EventBus.emit('reward:toast', { text: `First visit to «${st.nameAr}» · +${bonus.xp} XP · +${bonus.coins} 🪙` });
         sfx('badge');
-        this.popText(this.player.sprite.x, this.player.sprite.y - 40, `+${bonus.xp} خبرة`, '#18b67a');
+        this.popText(this.player.sprite.x, this.player.sprite.y - 40, `+${bonus.xp} XP`, '#18b67a');
       });
     }
   }

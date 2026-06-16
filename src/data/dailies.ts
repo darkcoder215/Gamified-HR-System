@@ -16,9 +16,9 @@ export interface DailyChallenge {
 }
 
 export const dailies: DailyChallenge[] = [
-  { id: 'assess', labelAr: 'أكمل تقييمين اليوم', target: 2, done: (d) => d.assess >= 2, current: (d) => Math.min(d.assess, 2) },
-  { id: 'xp', labelAr: 'اكسب 150 نقطة خبرة اليوم', target: 150, done: (d) => d.xp >= 150, current: (d) => Math.min(d.xp, 150) },
-  { id: 'talk', labelAr: 'تحدّث مع أحد الزملاء', target: 1, done: (d) => d.talk, current: (d) => (d.talk ? 1 : 0) },
+  { id: 'assess', labelAr: 'Complete two assessments today', target: 2, done: (d) => d.assess >= 2, current: (d) => Math.min(d.assess, 2) },
+  { id: 'xp', labelAr: 'Earn 150 XP today', target: 150, done: (d) => d.xp >= 150, current: (d) => Math.min(d.xp, 150) },
+  { id: 'talk', labelAr: 'Talk to one of your colleagues', target: 1, done: (d) => d.talk, current: (d) => (d.talk ? 1 : 0) },
 ];
 
 export const DAILY_REWARD = { coins: 60, xp: 120 };

@@ -10,11 +10,11 @@ export interface Frame {
 
 // Cosmetic avatar frames sold in the rewards shop.
 export const frames: Frame[] = [
-  { id: 'emerald', nameAr: 'إطار زمردي', price: 100, ring: '#00c17a', glow: true },
-  { id: 'gold', nameAr: 'إطار ذهبي', price: 120, ring: '#ffbc0a', glow: true },
-  { id: 'royal', nameAr: 'إطار ملكي', price: 140, ring: '#82003a' },
-  { id: 'diamond', nameAr: 'إطار ماسي', price: 180, ring: '#84dbe5', glow: true },
-  { id: 'neon', nameAr: 'إطار نيون', price: 200, ring: '#ff00b7', glow: true },
+  { id: 'emerald', nameAr: 'Emerald Frame', price: 100, ring: '#00c17a', glow: true },
+  { id: 'gold', nameAr: 'Gold Frame', price: 120, ring: '#ffbc0a', glow: true },
+  { id: 'royal', nameAr: 'Royal Frame', price: 140, ring: '#82003a' },
+  { id: 'diamond', nameAr: 'Diamond Frame', price: 180, ring: '#84dbe5', glow: true },
+  { id: 'neon', nameAr: 'Neon Frame', price: 200, ring: '#ff00b7', glow: true },
 ];
 
 export function frameStyle(id: string | null | undefined): CSSProperties {

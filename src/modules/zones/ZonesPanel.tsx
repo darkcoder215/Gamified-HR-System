@@ -14,8 +14,8 @@ export default function ZonesPanel() {
   return (
     <div>
       <p className="mb-5 font-body text-sm text-charcoal">
-        ينمو عالم <span className="highlight">باور</span> معك — تُفتح أحياء جديدة كلما ارتفع مستواك، ومعها مبانٍ
-        ومزايا إضافية.
+        The world of <span className="highlight">POWR</span> grows with you — new zones unlock as your level rises, bringing
+        more buildings and extra perks.
       </p>
       <div className="space-y-3">
         {zones.map((z, i) => {
@@ -41,11 +41,11 @@ export default function ZonesPanel() {
                     <h3 className="font-display text-lg font-black text-black">{z.nameAr}</h3>
                     {unlocked ? (
                       <span className="flex items-center gap-1 rounded-pill bg-green-light px-2 py-0.5 font-ui text-[10px] font-bold text-black">
-                        <Check size={11} /> مفتوح
+                        <Check size={11} /> Unlocked
                       </span>
                     ) : (
                       <span className="rounded-pill bg-warm-gray px-2 py-0.5 font-ui text-[10px] font-bold text-muted">
-                        يفتح عند المستوى <NumberText value={z.unlockLevel} />
+                        Unlocks at Level <NumberText value={z.unlockLevel} />
                       </span>
                     )}
                   </div>
@@ -62,8 +62,8 @@ export default function ZonesPanel() {
               {!unlocked && (
                 <div className="px-4 pb-3">
                   <div className="mb-1 flex items-center justify-between font-ui text-[10px] text-muted">
-                    <span>تقدّمك</span>
-                    <span className="num">المستوى <NumberText value={level} /> / <NumberText value={z.unlockLevel} /></span>
+                    <span>Your progress</span>
+                    <span className="num">Level <NumberText value={level} /> / <NumberText value={z.unlockLevel} /></span>
                   </div>
                   <ProgressBar pct={Math.min(100, (level / z.unlockLevel) * 100)} color={z.color} height={6} />
                 </div>

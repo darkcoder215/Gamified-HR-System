@@ -98,22 +98,22 @@ export default function AnalyticsDashboard() {
   // "How to progress" recommendations, derived from state.
   const tips = useMemo(() => {
     const out: string[] = [];
-    if (assessmentHistory.length === 0) out.push('ابدأ بأول تقييم في «ساحة التقييم» لرفع مهاراتك وكسب الخبرة.');
+    if (assessmentHistory.length === 0) out.push('Start with your first assessment in the "Assessment Arena" to boost your skills and earn XP.');
     const unmet = elig.competencyChecks.filter((c) => !c.met).sort((a, b) => a.score - b.score);
     if (unmet[0]) {
       const comp = getCompetency(unmet[0].competencyId);
       out.push(
-        `ارفع مهارة «${comp?.nameAr}» في الساحة — الحالي ${unmet[0].score}% والمطلوب ${unmet[0].minScore}% للترقية القادمة.`
+        `Improve your "${comp?.nameAr}" skill in the arena — currently ${unmet[0].score}% and ${unmet[0].minScore}% is required for the next promotion.`
       );
     }
     if (elig.next && !elig.xpMet) {
-      out.push(`تحتاج ${Math.max(0, elig.next.xpThreshold - player.xp)} نقطة خبرة إضافية للترقية — أكمل مهامًا أو تقييمات.`);
+      out.push(`You need ${Math.max(0, elig.next.xpThreshold - player.xp)} more XP for the promotion — complete tasks or assessments.`);
     }
     const remainingQuests = quests.length - doneQuests;
-    if (remainingQuests > 0) out.push(`أكمل المهام المتبقية (${remainingQuests}) لكسب خبرة وأوسمة إضافية.`);
-    if (player.energy <= 25) out.push('طاقتك منخفضة — انتظر قليلًا لتتعافى قبل خوض نزال جديد.');
-    if (elig.allMet) out.push('أنت مؤهّل للترقية الآن! توجّه إلى «برج الترقيات» واطلبها. 🎉');
-    if (!elig.next) out.push('بلغت أعلى رتبة في المسار — حافظ على صدارتك وارفع كل مهاراتك إلى الإتقان.');
+    if (remainingQuests > 0) out.push(`Complete the remaining quests (${remainingQuests}) to earn extra XP and badges.`);
+    if (player.energy <= 25) out.push('Your energy is low — wait a little to recover before starting a new battle.');
+    if (elig.allMet) out.push('You are eligible for promotion now! Head to the "Promotion Tower" and request it. 🎉');
+    if (!elig.next) out.push('You have reached the top rank on the track — keep your lead and raise all your skills to mastery.');
     return out.slice(0, 4);
   }, [assessmentHistory, elig, player.xp, player.energy, doneQuests]);
 
@@ -121,20 +121,20 @@ export default function AnalyticsDashboard() {
     <div className="space-y-5">
       {/* top stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat icon={<TrendingUp size={15} />} label="المستوى" value={<NumberText value={prog.level} />} color="var(--color-green)" />
-        <Stat icon={<ArrowUpRight size={15} />} label="الخبرة" value={<NumberText value={player.xp} group />} color="var(--color-blue)" />
-        <Stat icon={<Award size={15} />} label="الترتيب" value={<>#<NumberText value={rank} /></>} color="var(--color-burgundy)" />
-        <Stat icon={<Zap size={15} />} label="الطاقة" value={<NumberText value={player.energy} />} color="var(--color-amber)" />
+        <Stat icon={<TrendingUp size={15} />} label="Level" value={<NumberText value={prog.level} />} color="var(--color-green)" />
+        <Stat icon={<ArrowUpRight size={15} />} label="XP" value={<NumberText value={player.xp} group />} color="var(--color-blue)" />
+        <Stat icon={<Award size={15} />} label="Rank" value={<>#<NumberText value={rank} /></>} color="var(--color-burgundy)" />
+        <Stat icon={<Zap size={15} />} label="Energy" value={<NumberText value={player.energy} />} color="var(--color-amber)" />
       </div>
 
       {/* radar + competency bars */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-lg bg-white p-3 shadow-soft">
-          <h3 className="mb-1 text-center font-display text-base font-black text-black">خريطة المهارات</h3>
+          <h3 className="mb-1 text-center font-display text-base font-black text-black">Skills Map</h3>
           <Radar scores={competencyScores} />
         </div>
         <div className="rounded-lg bg-white p-4 shadow-soft">
-          <h3 className="mb-3 font-display text-base font-black text-black">تفصيل المهارات</h3>
+          <h3 className="mb-3 font-display text-base font-black text-black">Skills Breakdown</h3>
           <div className="space-y-2.5">
             {competencies.map((comp) => {
               const v = competencyScores[comp.id] ?? 0;
@@ -156,20 +156,20 @@ export default function AnalyticsDashboard() {
 
       {/* activity stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat icon={<Swords size={15} />} label="تقييمات" value={<NumberText value={assessmentHistory.length} />} color="var(--color-green)" />
-        <Stat icon={<TrendingUp size={15} />} label="متوسط الدقة" value={<><NumberText value={avgAccuracy} />%</>} color="var(--color-blue)" />
-        <Stat icon={<ClipboardList size={15} />} label="مهام مكتملة" value={<><NumberText value={doneQuests} />/<NumberText value={quests.length} /></>} color="var(--color-amber)" />
-        <Stat icon={<Award size={15} />} label="أوسمة" value={<><NumberText value={badgeCount} />/<NumberText value={allBadges.length} /></>} color="var(--color-burgundy)" />
+        <Stat icon={<Swords size={15} />} label="Assessments" value={<NumberText value={assessmentHistory.length} />} color="var(--color-green)" />
+        <Stat icon={<TrendingUp size={15} />} label="Average accuracy" value={<><NumberText value={avgAccuracy} />%</>} color="var(--color-blue)" />
+        <Stat icon={<ClipboardList size={15} />} label="Completed quests" value={<><NumberText value={doneQuests} />/<NumberText value={quests.length} /></>} color="var(--color-amber)" />
+        <Stat icon={<Award size={15} />} label="Badges" value={<><NumberText value={badgeCount} />/<NumberText value={allBadges.length} /></>} color="var(--color-burgundy)" />
       </div>
 
       {/* next promotion */}
       {elig.next && (
         <div className="rounded-lg bg-white p-4 shadow-soft">
           <h3 className="mb-2 font-display text-base font-black text-black">
-            نحو الترقية: <span className="highlight">{elig.next.titleAr}</span>
+            Toward promotion: <span className="highlight">{elig.next.titleAr}</span>
           </h3>
           <div className="mb-1 flex items-center justify-between font-ui text-xs">
-            <span className="font-bold text-charcoal">الخبرة</span>
+            <span className="font-bold text-charcoal">XP</span>
             <span className="num text-muted">
               <NumberText value={Math.min(player.xp, elig.next.xpThreshold)} group /> / <NumberText value={elig.next.xpThreshold} group />
             </span>
@@ -181,7 +181,7 @@ export default function AnalyticsDashboard() {
       {/* recommendations */}
       <div className="rounded-lg p-4" style={{ background: 'var(--color-aqua-pale)' }}>
         <h3 className="mb-2 flex items-center gap-2 font-display text-base font-black text-black">
-          <Lightbulb size={18} className="text-blue" /> كيف تتقدّم من هنا
+          <Lightbulb size={18} className="text-blue" /> How to progress from here
         </h3>
         <ul className="space-y-2">
           {tips.map((t, i) => (

@@ -17,8 +17,8 @@ export default function DailyChallenges() {
       {/* streak */}
       <div className="mb-5 flex items-center justify-between rounded-lg p-4" style={{ background: 'var(--color-blush)' }}>
         <div>
-          <p className="font-ui text-xs font-bold text-charcoal">سلسلة الأيام المتتالية</p>
-          <p className="font-ui text-[11px] text-muted">واصل النشاط يوميًا لتكبر سلسلتك</p>
+          <p className="font-ui text-xs font-bold text-charcoal">Daily streak</p>
+          <p className="font-ui text-[11px] text-muted">Stay active every day to grow your streak</p>
         </div>
         <span className="flex items-center gap-1.5 font-display text-3xl font-black text-black">
           <Flame size={26} className="text-red" /> <NumberText value={streak} />
@@ -26,7 +26,7 @@ export default function DailyChallenges() {
       </div>
 
       <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-black text-black">
-        <Sparkles size={18} className="text-green" /> تحديات اليوم
+        <Sparkles size={18} className="text-green" /> Today's Challenges
       </h3>
       <div className="space-y-3">
         {dailies.map((c) => {
@@ -62,16 +62,16 @@ export default function DailyChallenges() {
       >
         {daily.claimed ? (
           <>
-            <Check size={16} /> تم استلام مكافأة اليوم
+            <Check size={16} /> Today's reward claimed
           </>
         ) : (
           <>
-            <Gift size={16} /> استلم المكافأة: <Coins size={14} className="text-amber" /> <NumberText value={DAILY_REWARD.coins} /> + <NumberText value={DAILY_REWARD.xp} /> خبرة
+            <Gift size={16} /> Claim reward: <Coins size={14} className="text-amber" /> <NumberText value={DAILY_REWARD.coins} /> + <NumberText value={DAILY_REWARD.xp} /> XP
           </>
         )}
       </motion.button>
       {!allDone && !daily.claimed && (
-        <p className="mt-2 text-center font-ui text-[11px] text-muted">أكمل كل التحديات لاستلام المكافأة.</p>
+        <p className="mt-2 text-center font-ui text-[11px] text-muted">Complete all challenges to claim the reward.</p>
       )}
     </div>
   );

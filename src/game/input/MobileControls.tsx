@@ -96,7 +96,7 @@ export default function MobileControls() {
       {/* First-time movement hint */}
       {showHint && !origin && (
         <div className="pointer-events-none fixed bottom-28 left-1/2 z-20 -translate-x-1/2 animate-pulse rounded-pill bg-black/80 px-4 py-2 font-ui text-xs font-bold text-white">
-          اسحب في أي مكان للتحرّك 👆
+          Drag anywhere to move 👆
         </div>
       )}
 
@@ -109,10 +109,10 @@ export default function MobileControls() {
           e.stopPropagation();
           EventBus.emit('input:interact');
         }}
-        aria-label="تفاعل"
+        aria-label="Interact"
       >
         <Hand size={26} />
-        <span className="font-ui text-[10px] font-bold">تفاعل</span>
+        <span className="font-ui text-[10px] font-bold">Interact</span>
       </button>
     </>
   );

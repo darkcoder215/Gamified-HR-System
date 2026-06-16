@@ -2,13 +2,13 @@ import type { ReactNode } from 'react';
 import { Gamepad2, LogOut } from 'lucide-react';
 import type { Role } from '@/lib/dbTypes';
 
-const ROLE_AR: Record<Role, string> = { employee: 'موظف', manager: 'مدير', hr_admin: 'الموارد البشرية' };
+const ROLE_AR: Record<Role, string> = { employee: 'Employee', manager: 'Manager', hr_admin: 'HR' };
 
 export default function DashShell({
   title, role, name, onPlay, signOut, children,
 }: { title: string; role: Role; name: string; onPlay: () => void; signOut: () => void; children: ReactNode }) {
   return (
-    <div className="h-full w-full overflow-y-auto bg-off-white" dir="rtl">
+    <div className="h-full w-full overflow-y-auto bg-off-white" dir="ltr">
       <header className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-black px-4 py-3 shadow-card sm:px-6">
         <div className="flex items-center gap-3">
           <img src="/logo/powr-mark.svg" alt="POWR" className="h-9 w-9" />
@@ -19,9 +19,9 @@ export default function DashShell({
         </div>
         <div className="flex items-center gap-2">
           <button onClick={onPlay} className="flex items-center gap-1.5 rounded-pill bg-green px-4 py-2 font-ui text-sm font-bold text-white">
-            <Gamepad2 size={16} /> العب لعبتي
+            <Gamepad2 size={16} /> Play my game
           </button>
-          <button onClick={signOut} className="flex h-9 w-9 items-center justify-center rounded-pill bg-white/10 text-white" title="خروج">
+          <button onClick={signOut} className="flex h-9 w-9 items-center justify-center rounded-pill bg-white/10 text-white" title="Sign out">
             <LogOut size={16} />
           </button>
         </div>

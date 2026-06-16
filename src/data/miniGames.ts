@@ -2,20 +2,20 @@
 export interface TFStatement {
   id: string;
   textAr: string;
-  answer: boolean; // true = صحيح
+  answer: boolean; // true = correct
 }
 
 export const decisionBank: TFStatement[] = [
-  { id: 'd1', textAr: 'تعريف المشكلة بدقّة قبل البحث عن حل يوفّر الوقت لاحقًا.', answer: true },
-  { id: 'd2', textAr: 'الأفضل دائمًا اختيار أسرع حل دون النظر إلى أثره.', answer: false },
-  { id: 'd3', textAr: 'أسلوب «الأسباب الخمسة» يساعد في بلوغ السبب الجذري.', answer: true },
-  { id: 'd4', textAr: 'تجاهل البيانات والاعتماد على الحدس وحده قرار حكيم.', answer: false },
-  { id: 'd5', textAr: 'موازنة الأثر مقابل الجهد تفيد في ترتيب الأولويات.', answer: true },
-  { id: 'd6', textAr: 'إشراك الفريق في الحلول يقلّل من جودة القرار.', answer: false },
-  { id: 'd7', textAr: 'تقسيم المشكلة الكبيرة إلى أجزاء أصغر يسهّل حلّها.', answer: true },
-  { id: 'd8', textAr: 'اختبار فرضية واحدة فقط دائمًا أفضل من عدّة فرضيات.', answer: false },
-  { id: 'd9', textAr: 'توثيق القرار وأسبابه يفيد عند مراجعته مستقبلًا.', answer: true },
-  { id: 'd10', textAr: 'تأجيل القرارات الصعبة بلا سبب يحسّن النتائج.', answer: false },
+  { id: 'd1', textAr: 'Defining the problem precisely before looking for a solution saves time later.', answer: true },
+  { id: 'd2', textAr: 'It is always best to pick the fastest solution without considering its impact.', answer: false },
+  { id: 'd3', textAr: 'The "Five Whys" method helps you get to the root cause.', answer: true },
+  { id: 'd4', textAr: 'Ignoring the data and relying on intuition alone is a wise decision.', answer: false },
+  { id: 'd5', textAr: 'Weighing impact against effort helps in setting priorities.', answer: true },
+  { id: 'd6', textAr: 'Involving the team in solutions reduces the quality of the decision.', answer: false },
+  { id: 'd7', textAr: 'Breaking a big problem into smaller parts makes it easier to solve.', answer: true },
+  { id: 'd8', textAr: 'Testing only a single hypothesis is always better than several hypotheses.', answer: false },
+  { id: 'd9', textAr: 'Documenting a decision and its reasons is useful when reviewing it in the future.', answer: true },
+  { id: 'd10', textAr: 'Postponing hard decisions for no reason improves outcomes.', answer: false },
 ];
 
 export const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);

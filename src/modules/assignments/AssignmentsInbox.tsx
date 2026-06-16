@@ -13,7 +13,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   goal: <Target size={16} />,
 };
 const STATUS_AR: Record<string, string> = {
-  assigned: 'جديدة', in_progress: 'قيد التنفيذ', submitted: 'بانتظار المراجعة', completed: 'مكتملة', overdue: 'متأخرة',
+  assigned: 'New', in_progress: 'In Progress', submitted: 'Awaiting Review', completed: 'Completed', overdue: 'Overdue',
 };
 
 export default function AssignmentsInbox() {
@@ -45,12 +45,12 @@ export default function AssignmentsInbox() {
     }
   };
 
-  if (loading) return <p className="py-8 text-center font-ui text-sm text-muted">جارٍ التحميل…</p>;
+  if (loading) return <p className="py-8 text-center font-ui text-sm text-muted">Loading…</p>;
   if (!rows.length)
     return (
       <div className="py-10 text-center text-muted">
         <ClipboardCheck size={32} className="mx-auto mb-2" />
-        <p className="font-ui text-sm">لا توجد مهام مُسندة إليك حاليًا.</p>
+        <p className="font-ui text-sm">No tasks assigned to you right now.</p>
       </div>
     );
 
@@ -68,7 +68,7 @@ export default function AssignmentsInbox() {
             </div>
           </div>
           {(a.type === 'assessment' || a.type === 'quest') && a.status !== 'completed' && (
-            <button onClick={() => start(a)} className="rounded-pill bg-green px-3 py-1.5 font-ui text-xs font-bold text-white">ابدأ</button>
+            <button onClick={() => start(a)} className="rounded-pill bg-green px-3 py-1.5 font-ui text-xs font-bold text-white">Start</button>
           )}
         </div>
       ))}

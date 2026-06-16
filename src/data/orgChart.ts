@@ -17,45 +17,45 @@ export interface OrgTier {
 // Top of the company (above the ladder) — the executive.
 export const executive: OrgPerson = {
   id: 'ceo',
-  nameAr: 'منيرة الشهري',
+  nameAr: 'Munira Al-Shehri',
   avatar: '#000000',
   glyph: '👑',
 };
-export const executiveTitleAr = 'الرئيسة التنفيذية';
+export const executiveTitleAr = 'Chief Executive Officer';
 
 export const orgTiers: OrgTier[] = [
   {
     level: 5,
-    titleAr: 'مدير',
-    people: [{ id: 'p1', nameAr: 'سارة العتيبي', avatar: '#82003a', glyph: '🧭' }],
+    titleAr: 'Manager',
+    people: [{ id: 'p1', nameAr: 'Sarah Al-Otaibi', avatar: '#82003a', glyph: '🧭' }],
   },
   {
     level: 4,
-    titleAr: 'قائد فريق',
+    titleAr: 'Team Lead',
     people: [
-      { id: 'p2', nameAr: 'خالد الدوسري', avatar: '#0072f9' },
-      { id: 'p3', nameAr: 'ريم القحطاني', avatar: '#ff00b7' },
+      { id: 'p2', nameAr: 'Khalid Al-Dosari', avatar: '#0072f9' },
+      { id: 'p3', nameAr: 'Reem Al-Qahtani', avatar: '#ff00b7' },
     ],
   },
   {
     level: 3,
-    titleAr: 'موظف أول',
+    titleAr: 'Senior Employee',
     people: [
-      { id: 'p4', nameAr: 'عبدالله الشمري', avatar: '#00c17a' },
-      { id: 'p5', nameAr: 'نورة الغامدي', avatar: '#ffbc0a' },
+      { id: 'p4', nameAr: 'Abdullah Al-Shammari', avatar: '#00c17a' },
+      { id: 'p5', nameAr: 'Noura Al-Ghamdi', avatar: '#ffbc0a' },
     ],
   },
   {
     level: 2,
-    titleAr: 'موظف',
+    titleAr: 'Employee',
     people: [
-      { id: 'p6', nameAr: 'فهد المطيري', avatar: '#ff9172' },
-      { id: 'p7', nameAr: 'مها السبيعي', avatar: '#84dbe5' },
+      { id: 'p6', nameAr: 'Fahad Al-Mutairi', avatar: '#ff9172' },
+      { id: 'p7', nameAr: 'Maha Al-Subaie', avatar: '#84dbe5' },
     ],
   },
   {
     level: 1,
-    titleAr: 'موظف مبتدئ',
-    people: [{ id: 'p8', nameAr: 'يوسف الحربي', avatar: '#494c6b' }],
+    titleAr: 'Junior Employee',
+    people: [{ id: 'p8', nameAr: 'Youssef Al-Harbi', avatar: '#494c6b' }],
   },
 ];

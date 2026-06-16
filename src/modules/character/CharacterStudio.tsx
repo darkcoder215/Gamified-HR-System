@@ -8,13 +8,13 @@ import Button from '@/ui/Button';
 type Tab = 'ai' | 'color';
 
 const TINTS: { label: string; hex: string | null }[] = [
-  { label: 'الأصلي', hex: null },
-  { label: 'أخضر', hex: '#00c17a' },
-  { label: 'أزرق', hex: '#0072f9' },
-  { label: 'كهرماني', hex: '#ffbc0a' },
-  { label: 'وردي', hex: '#ff00b7' },
-  { label: 'سماوي', hex: '#84dbe5' },
-  { label: 'عنّابي', hex: '#82003a' },
+  { label: 'Original', hex: null },
+  { label: 'Green', hex: '#00c17a' },
+  { label: 'Blue', hex: '#0072f9' },
+  { label: 'Amber', hex: '#ffbc0a' },
+  { label: 'Pink', hex: '#ff00b7' },
+  { label: 'Cyan', hex: '#84dbe5' },
+  { label: 'Burgundy', hex: '#82003a' },
 ];
 
 export default function CharacterStudio() {
@@ -41,7 +41,7 @@ export default function CharacterStudio() {
     const r = await generatePixelAvatar(photo);
     if (r.needsKey) {
       setError(
-        'ميزة التوليد بالذكاء الاصطناعي تُفعَّل في بيئة الإنتاج بعد إضافة مفتاح OPENAI_API_KEY. يمكنك الآن اختيار لون الشخصية من تبويب «الألوان».'
+        'AI generation is enabled in the production environment once the OPENAI_API_KEY is added. For now, you can pick your character color from the "Colors" tab.'
       );
     } else if (r.error) {
       setError(r.error);
@@ -60,9 +60,9 @@ export default function CharacterStudio() {
           style={{ background: player.avatar }}
         >
           {player.avatarImage ? (
-            <img src={player.avatarImage} alt="الشخصية" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
+            <img src={player.avatarImage} alt="Character" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
           ) : (
-            player.nameAr.trim().charAt(0) || '؟'
+            player.nameAr.trim().charAt(0) || '?'
           )}
         </div>
         <div className="flex-1">
@@ -74,14 +74,14 @@ export default function CharacterStudio() {
             onClick={() => setAvatarImage(null)}
             className="flex items-center gap-1 rounded-pill px-3 py-1.5 font-ui text-xs font-bold text-red transition hover:bg-warm-gray"
           >
-            <Trash2 size={14} /> إزالة
+            <Trash2 size={14} /> Remove
           </button>
         )}
       </div>
 
       {/* tabs */}
       <div className="mb-5 flex gap-2 rounded-pill bg-warm-gray p-1">
-        {([['ai', 'توليد بالذكاء الاصطناعي', Wand2], ['color', 'ألوان الشخصية', Palette]] as const).map(
+        {([['ai', 'AI Generation', Wand2], ['color', 'Character Colors', Palette]] as const).map(
           ([id, label, Icon]) => (
             <button
               key={id}
@@ -101,7 +101,7 @@ export default function CharacterStudio() {
       {tab === 'ai' && (
         <div>
           <p className="mb-4 font-body text-sm text-charcoal">
-            ارفع صورتك وسيحوّلها الذكاء الاصطناعي إلى شخصية بكسلية بأسلوب اللعبة — تمامًا كما في الدليل.
+            Upload your photo and AI will turn it into a pixel character in the game's style — just like in the guide.
           </p>
           <div className="grid grid-cols-2 gap-4">
             <button
@@ -109,11 +109,11 @@ export default function CharacterStudio() {
               className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-warm-gray bg-white text-muted transition hover:border-green"
             >
               {photo ? (
-                <img src={photo} alt="صورتك" className="h-full w-full rounded-lg object-cover" />
+                <img src={photo} alt="Your photo" className="h-full w-full rounded-lg object-cover" />
               ) : (
                 <>
                   <Upload size={28} />
-                  <span className="font-ui text-xs font-bold">اختر صورة</span>
+                  <span className="font-ui text-xs font-bold">Choose a photo</span>
                 </>
               )}
             </button>
@@ -121,17 +121,17 @@ export default function CharacterStudio() {
               <Button variant="accent" onClick={generate} disabled={!photo || loading}>
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin" /> جارٍ التوليد…
+                    <Loader2 size={16} className="animate-spin" /> Generating…
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <Sparkles size={16} /> ولّد الشخصية
+                    <Sparkles size={16} /> Generate Character
                   </span>
                 )}
               </Button>
               {photo && (
                 <button onClick={() => setPhoto(null)} className="font-ui text-xs text-muted hover:text-red">
-                  إزالة الصورة المختارة
+                  Remove selected photo
                 </button>
               )}
             </div>
@@ -153,7 +153,7 @@ export default function CharacterStudio() {
 
       {tab === 'color' && (
         <div>
-          <p className="mb-4 font-body text-sm text-charcoal">اختر لون شخصيتك داخل العالم:</p>
+          <p className="mb-4 font-body text-sm text-charcoal">Choose your character's color within the world:</p>
           <div className="flex flex-wrap gap-3">
             {TINTS.map((t) => {
               const active = player.characterTint === t.hex;

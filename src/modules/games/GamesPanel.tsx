@@ -50,11 +50,11 @@ export default function GamesPanel() {
     return (
       <div className="text-center">
         <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue text-white"><Gauge size={30} /></div>
-        <h3 className="font-display text-2xl font-black text-black">تحدّي القرار السريع</h3>
+        <h3 className="font-display text-2xl font-black text-black">Quick Decision Challenge</h3>
         <p className="mx-auto mt-2 max-w-sm font-body text-sm text-charcoal">
-          ٨ عبارات عن حلّ المشكلات واتخاذ القرار — حدّد بسرعة إن كانت <b>صحيحة</b> أم <b>خاطئة</b>. كل إجابة صحيحة تمنحك خبرة وعملات وترفع مهارة «حل المشكلات».
+          8 statements about problem-solving and decision-making — quickly decide whether each is <b>True</b> or <b>False</b>. Every correct answer earns you XP and coins and boosts your "Problem Solving" skill.
         </p>
-        <Button variant="accent" onClick={start} className="mt-5">ابدأ التحدّي</Button>
+        <Button variant="accent" onClick={start} className="mt-5">Start Challenge</Button>
       </div>
     );
 
@@ -62,19 +62,19 @@ export default function GamesPanel() {
     return (
       <div className="flex flex-col items-center text-center">
         <ScoreBadge score={scorePct} />
-        <h3 className="mt-4 font-display text-2xl font-black text-black">انتهى التحدّي!</h3>
+        <h3 className="mt-4 font-display text-2xl font-black text-black">Challenge Finished!</h3>
         <div className="mt-3 grid w-full max-w-sm grid-cols-2 gap-3">
-          <div className="rounded-lg bg-white p-3 shadow-soft"><p className="font-ui text-xs text-muted">إجابات صحيحة</p><p className="font-display text-2xl font-black text-green"><NumberText value={correct} /> / <NumberText value={items.length} /></p></div>
-          <div className="rounded-lg bg-white p-3 shadow-soft"><p className="font-ui text-xs text-muted">خبرة</p><p className="font-display text-2xl font-black text-blue">+<NumberText value={correct * 8} /></p></div>
+          <div className="rounded-lg bg-white p-3 shadow-soft"><p className="font-ui text-xs text-muted">Correct Answers</p><p className="font-display text-2xl font-black text-green"><NumberText value={correct} /> / <NumberText value={items.length} /></p></div>
+          <div className="rounded-lg bg-white p-3 shadow-soft"><p className="font-ui text-xs text-muted">XP</p><p className="font-display text-2xl font-black text-blue">+<NumberText value={correct * 8} /></p></div>
         </div>
-        <Button variant="accent" onClick={start} className="mt-5"><RotateCcw size={16} className="ms-1 inline" /> مرة أخرى</Button>
+        <Button variant="accent" onClick={start} className="mt-5"><RotateCcw size={16} className="ms-1 inline" /> Again</Button>
       </div>
     );
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <span className="rounded-pill bg-warm-gray px-3 py-1 font-ui text-xs font-bold text-charcoal">عبارة <NumberText value={i + 1} /> / <NumberText value={items.length} /></span>
+        <span className="rounded-pill bg-warm-gray px-3 py-1 font-ui text-xs font-bold text-charcoal">Statement <NumberText value={i + 1} /> / <NumberText value={items.length} /></span>
         <span className="flex items-center gap-1 font-ui text-xs font-bold text-green"><Zap size={14} /> <NumberText value={correct} /></span>
       </div>
       <AnimatePresence mode="wait">
@@ -99,7 +99,7 @@ export default function GamesPanel() {
                     color: 'var(--color-black)',
                   }}
                 >
-                  {val ? <Check size={20} style={{ color: 'var(--color-success)' }} /> : <X size={20} style={{ color: 'var(--color-error)' }} />} {val ? 'صحيح' : 'خطأ'}
+                  {val ? <Check size={20} style={{ color: 'var(--color-success)' }} /> : <X size={20} style={{ color: 'var(--color-error)' }} />} {val ? 'True' : 'False'}
                 </motion.button>
               );
             })}

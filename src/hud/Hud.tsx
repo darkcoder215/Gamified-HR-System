@@ -53,26 +53,26 @@ export default function Hud() {
   const showPrompt = !activeStation && !activeNpc && (stationFocus || npcFocus || activityFocus || exitFocus);
 
   const confirmReset = () => {
-    if (window.confirm('هل تريد إعادة ضبط كل تقدّمك والبدء من جديد؟')) resetSave();
+    if (window.confirm('Do you want to reset all your progress and start over?')) resetSave();
   };
   const controls: { id: string; icon: ReactNode; label: string; color: string; onClick: () => void }[] = [
-    { id: 'guide', icon: <BookOpen size={15} />, label: 'الدليل', color: 'var(--color-blue)', onClick: openGuide },
-    { id: 'zones', icon: <MapIcon size={15} />, label: 'المناطق', color: 'var(--color-green)', onClick: openZones },
-    { id: 'daily', icon: <Flame size={15} />, label: 'التحديات', color: 'var(--color-red)', onClick: openDaily },
-    { id: 'goals', icon: <Target size={15} />, label: 'أهدافي', color: 'var(--color-green)', onClick: openGoals },
-    { id: 'games', icon: <Gamepad2 size={15} />, label: 'الألعاب', color: 'var(--color-blue)', onClick: openGames },
-    { id: 'analytics', icon: <BarChart3 size={15} />, label: 'تحليلاتي', color: 'var(--color-green)', onClick: openAnalytics },
-    { id: 'shop', icon: <ShoppingBag size={15} />, label: 'المتجر', color: 'var(--color-amber)', onClick: openShop },
-    { id: 'pets', icon: <PawPrint size={15} />, label: 'الرفاق', color: 'var(--color-hot-pink)', onClick: openPets },
-    { id: 'character', icon: <Palette size={15} />, label: 'الشخصية', color: 'var(--color-charcoal)', onClick: openCharacter },
+    { id: 'guide', icon: <BookOpen size={15} />, label: 'Guide', color: 'var(--color-blue)', onClick: openGuide },
+    { id: 'zones', icon: <MapIcon size={15} />, label: 'Districts', color: 'var(--color-green)', onClick: openZones },
+    { id: 'daily', icon: <Flame size={15} />, label: 'Challenges', color: 'var(--color-red)', onClick: openDaily },
+    { id: 'goals', icon: <Target size={15} />, label: 'My Goals', color: 'var(--color-green)', onClick: openGoals },
+    { id: 'games', icon: <Gamepad2 size={15} />, label: 'Games', color: 'var(--color-blue)', onClick: openGames },
+    { id: 'analytics', icon: <BarChart3 size={15} />, label: 'My Analytics', color: 'var(--color-green)', onClick: openAnalytics },
+    { id: 'shop', icon: <ShoppingBag size={15} />, label: 'Shop', color: 'var(--color-amber)', onClick: openShop },
+    { id: 'pets', icon: <PawPrint size={15} />, label: 'Companions', color: 'var(--color-hot-pink)', onClick: openPets },
+    { id: 'character', icon: <Palette size={15} />, label: 'Character', color: 'var(--color-charcoal)', onClick: openCharacter },
     {
       id: 'mute',
       icon: muted ? <VolumeX size={15} /> : <Volume2 size={15} />,
-      label: muted ? 'تشغيل الصوت' : 'كتم الصوت',
+      label: muted ? 'Unmute' : 'Mute',
       color: 'var(--color-muted)',
       onClick: toggleMuted,
     },
-    { id: 'reset', icon: <RotateCcw size={14} />, label: 'إعادة ضبط', color: 'var(--color-muted)', onClick: confirmReset },
+    { id: 'reset', icon: <RotateCcw size={14} />, label: 'Reset', color: 'var(--color-muted)', onClick: confirmReset },
   ];
 
   return (
@@ -93,7 +93,7 @@ export default function Hud() {
               {player.avatarImage ? (
                 <img src={player.avatarImage} alt="" className="h-full w-full object-cover" style={{ imageRendering: 'pixelated' }} />
               ) : (
-                player.nameAr.trim().charAt(0) || '؟'
+                player.nameAr.trim().charAt(0) || '?'
               )}
             </div>
             {equippedPet && (
@@ -113,7 +113,7 @@ export default function Hud() {
                 className="shrink-0 rounded-pill px-2 py-0.5 font-ui text-[11px] font-bold text-white"
                 style={{ background: 'var(--color-black)' }}
               >
-                المستوى <NumberText value={prog.level} />
+                Level <NumberText value={prog.level} />
               </span>
             </div>
             <p className="hidden font-ui text-xs text-muted sm:block">{player.titleAr}</p>
@@ -121,9 +121,9 @@ export default function Hud() {
               <ProgressBar pct={prog.pct} glow height={7} />
               <div className="mt-0.5 hidden justify-between font-ui text-[10px] text-muted sm:flex">
                 <span>
-                  <NumberText value={prog.currentLevelXp} /> / <NumberText value={prog.neededForNext} /> خبرة
+                  <NumberText value={prog.currentLevelXp} /> / <NumberText value={prog.neededForNext} /> XP
                 </span>
-                <span>التالي: <NumberText value={prog.xpToNext} /></span>
+                <span>Next: <NumberText value={prog.xpToNext} /></span>
               </div>
             </div>
           </div>
@@ -148,8 +148,8 @@ export default function Hud() {
             </span>
             <span className="hidden h-8 w-px bg-white/15 sm:block" />
             <div className="hidden text-end leading-none sm:block">
-              <p className="font-display text-base font-bold text-white">باور</p>
-              <p className="mt-0.5 font-ui text-[10px] text-white/55">تطوير الموظفين</p>
+              <p className="font-display text-base font-bold text-white">POWR</p>
+              <p className="mt-0.5 font-ui text-[10px] text-white/55">Employee Development</p>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ export default function Hud() {
               <NumberText value={player.energy} />
             </span>
             <span className="mx-0.5 h-4 w-px bg-warm-gray" />
-            <button onClick={openShop} className="pointer-events-auto flex items-center gap-1 font-ui text-xs font-bold text-black" title="المتجر">
+            <button onClick={openShop} className="pointer-events-auto flex items-center gap-1 font-ui text-xs font-bold text-black" title="Shop">
               <Coins size={14} className="text-amber" /> <NumberText value={coins} group />
             </button>
           </div>
@@ -205,7 +205,7 @@ export default function Hud() {
         <button
           onClick={() => setMenuOpen((o) => !o)}
           className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-card"
-          aria-label="القائمة"
+          aria-label="Menu"
         >
           {menuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
@@ -256,11 +256,11 @@ export default function Hud() {
               </div>
               {stationLocked ? (
                 <span className="ms-2 flex items-center gap-1 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-muted)' }}>
-                  <Lock size={12} /> المستوى <span className="num">{stationUnlockLevel(stationFocus.id)}</span>
+                  <Lock size={12} /> Level <span className="num">{stationUnlockLevel(stationFocus.id)}</span>
                 </span>
               ) : (
                 <span className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-green)' }}>
-                  {isTouch ? 'زر التفاعل ←' : <>اضغط <span className="num">E</span> للدخول</>}
+                  {isTouch ? 'Interact button ←' : <>Press <span className="num">E</span> to enter</>}
                 </span>
               )}
             </div>
@@ -282,7 +282,7 @@ export default function Hud() {
                 <p className="font-ui text-xs text-muted">{activityFocus.hintAr}</p>
               </div>
               <span className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-green)' }}>
-                {isTouch ? 'ابدأ ←' : <>اضغط <span className="num">E</span> للبدء</>}
+                {isTouch ? 'Start ←' : <>Press <span className="num">E</span> to start</>}
               </span>
             </div>
           </motion.button>
@@ -299,11 +299,11 @@ export default function Hud() {
             <div className="flex items-center gap-3">
               <span className="text-2xl">🚪</span>
               <div className="text-start">
-                <p className="font-display text-lg font-black text-black">الخروج</p>
-                <p className="font-ui text-xs text-muted">العودة إلى المدينة</p>
+                <p className="font-display text-lg font-black text-black">Exit</p>
+                <p className="font-ui text-xs text-muted">Back to the city</p>
               </div>
               <span className="ms-2 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: 'var(--color-charcoal)' }}>
-                {isTouch ? 'اخرج ←' : <>اضغط <span className="num">E</span> للخروج</>}
+                {isTouch ? 'Exit ←' : <>Press <span className="num">E</span> to exit</>}
               </span>
             </div>
           </motion.button>
@@ -329,7 +329,7 @@ export default function Hud() {
                 <p className="font-ui text-xs text-muted">{npcFocus.titleAr}</p>
               </div>
               <span className="ms-2 flex items-center gap-1 rounded-pill px-3 py-1 font-ui text-xs font-bold text-white" style={{ background: npcFocus.tint }}>
-                <MessageSquare size={12} /> {isTouch ? 'تحدّث' : <>تحدّث · <span className="num">E</span></>}
+                <MessageSquare size={12} /> {isTouch ? 'Talk' : <>Talk · <span className="num">E</span></>}
               </span>
             </div>
           </motion.button>

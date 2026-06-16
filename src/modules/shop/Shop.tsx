@@ -21,27 +21,27 @@ export default function Shop() {
     <div>
       {/* balance */}
       <div className="mb-5 flex items-center justify-between rounded-lg p-4" style={{ background: 'var(--color-yellow-pale)' }}>
-        <span className="font-ui text-sm font-bold text-charcoal">رصيدك</span>
+        <span className="font-ui text-sm font-bold text-charcoal">Your Balance</span>
         <span className="flex items-center gap-1.5 font-display text-2xl font-black text-black">
-          <Coins size={22} className="text-amber" /> <NumberText value={coins} group /> عملة
+          <Coins size={22} className="text-amber" /> <NumberText value={coins} group /> coins
         </span>
       </div>
-      <p className="mb-4 font-ui text-xs text-muted">اكسب العملات من التقييمات والمهام والترقيات، وأنفقها على المظهر والمزايا.</p>
+      <p className="mb-4 font-ui text-xs text-muted">Earn coins from assessments, quests, and promotions, and spend them on looks and perks.</p>
 
       {/* Frames */}
       <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-black text-black">
-        <Sparkles size={18} className="text-green" /> إطارات الصورة
+        <Sparkles size={18} className="text-green" /> Avatar Frames
       </h3>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {/* none */}
         <div className="flex flex-col items-center gap-2 rounded-lg bg-white p-3 shadow-soft">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-warm-gray font-ui text-[10px] font-bold text-muted">بدون</span>
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-warm-gray font-ui text-[10px] font-bold text-muted">None</span>
           <button
             onClick={() => equipFrame(null)}
             className="w-full rounded-pill bg-black py-1.5 font-ui text-[11px] font-bold text-white disabled:opacity-40"
             disabled={!equippedFrame}
           >
-            {!equippedFrame ? 'مُجهّز' : 'إزالة الإطار'}
+            {!equippedFrame ? 'Equipped' : 'Remove Frame'}
           </button>
         </div>
         {frames.map((f) => {
@@ -54,7 +54,7 @@ export default function Shop() {
                 className="flex h-12 w-12 items-center justify-center rounded-full font-display text-base font-black text-white"
                 style={{ background: '#2b2d3f', boxShadow: `0 0 0 3px ${f.ring}${f.glow ? `, 0 0 10px ${f.ring}` : ''}` }}
               >
-                ٨
+                8
               </span>
               <span className="font-ui text-[11px] font-bold text-black">{f.nameAr}</span>
               {owned ? (
@@ -64,7 +64,7 @@ export default function Shop() {
                   className="w-full rounded-pill py-1.5 font-ui text-[11px] font-bold text-white disabled:opacity-50"
                   style={{ background: equipped ? 'var(--color-muted)' : 'var(--color-green)' }}
                 >
-                  {equipped ? '✓ مُجهّز' : 'تجهيز'}
+                  {equipped ? '✓ Equipped' : 'Equip'}
                 </button>
               ) : (
                 <button
@@ -83,7 +83,7 @@ export default function Shop() {
 
       {/* Perks */}
       <h3 className="mb-3 mt-6 flex items-center gap-2 font-display text-lg font-black text-black">
-        <Zap size={18} className="text-amber" /> مزايا
+        <Zap size={18} className="text-amber" /> Perks
       </h3>
       <div className="flex items-center justify-between rounded-lg bg-white p-4 shadow-soft">
         <div className="flex items-center gap-3">
@@ -91,8 +91,8 @@ export default function Shop() {
             <Zap size={20} />
           </span>
           <div>
-            <p className="font-ui text-sm font-bold text-black">شحن الطاقة كاملة</p>
-            <p className="font-ui text-xs text-muted">استعد طاقتك فورًا لمواصلة النزالات.</p>
+            <p className="font-ui text-sm font-bold text-black">Full Energy Refill</p>
+            <p className="font-ui text-xs text-muted">Instantly restore your energy to keep battling.</p>
           </div>
         </div>
         <Button
@@ -101,7 +101,7 @@ export default function Shop() {
           disabled={coins < REFILL_PRICE || energy >= MAX_ENERGY}
         >
           <span className="flex items-center gap-1">
-            {energy >= MAX_ENERGY ? 'ممتلئة' : <><Coins size={12} className="text-amber" /> <NumberText value={REFILL_PRICE} /></>}
+            {energy >= MAX_ENERGY ? 'Full' : <><Coins size={12} className="text-amber" /> <NumberText value={REFILL_PRICE} /></>}
             {energy >= MAX_ENERGY ? <Check size={14} /> : null}
           </span>
         </Button>

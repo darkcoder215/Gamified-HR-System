@@ -164,7 +164,7 @@ function rollDaily(s: { daily: DailyState; streak: number; lastActiveDay: string
 }
 
 const initialPlayer: PlayerState = {
-  nameAr: 'لاعب جديد',
+  nameAr: 'New Player',
   xp: 0,
   level: 1,
   energy: MAX_ENERGY,
@@ -397,10 +397,10 @@ export const useGameStore = create<GameState>()(
         closeAnalytics: () => set({ analyticsOpen: false }),
 
         startGame: (name) =>
-          commit({ started: true, player: { ...get().player, nameAr: name.trim() || 'لاعب جديد' } }),
+          commit({ started: true, player: { ...get().player, nameAr: name.trim() || 'New Player' } }),
 
         setName: (name) =>
-          commit({ player: { ...get().player, nameAr: name.trim() || 'لاعب جديد' } }),
+          commit({ player: { ...get().player, nameAr: name.trim() || 'New Player' } }),
 
         addXp: (amount) => commit({ player: { ...get().player, xp: get().player.xp + amount } }),
 

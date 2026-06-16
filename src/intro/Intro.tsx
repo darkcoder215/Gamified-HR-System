@@ -104,11 +104,11 @@ export default function Intro() {
         transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.1 }}
       />
       <motion.h1 variants={item} className="font-display text-5xl font-black text-black">
-        رحلة التطوّر
+        The Growth Journey
       </motion.h1>
       <motion.p variants={item} className="mt-2 font-body text-lg text-charcoal">
-        أهلًا <span className="highlight">{playerName}</span>! منصّة <b>باور</b> لتطوير الموظفين وتقييمهم وترقيتهم —
-        في عالم تفاعلي ممتع.
+        Welcome, <span className="highlight">{playerName}</span>! <b>POWR</b> is the platform for developing,
+        assessing, and promoting employees — in a fun, interactive world.
       </motion.p>
       <motion.img
         src="/game/tuxemon/char-front.png"
@@ -124,11 +124,11 @@ export default function Intro() {
     // 1 — Controls (adapts to touch vs keyboard)
     <Slide key="controls">
       <motion.span variants={item} className="mb-2 text-5xl">{isTouch ? '👆' : '🕹️'}</motion.span>
-      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">تنقّل في العالم</motion.h2>
+      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">Move around the world</motion.h2>
       {isTouch ? (
         <>
           <motion.p variants={item} className="mt-2 font-body text-base text-charcoal">
-            المس أي مكان في الشاشة <b>واسحب</b> لتحريك شخصيتك — تظهر عصا التحكّم تحت إصبعك.
+            Touch anywhere on the screen <b>and drag</b> to move your character — the joystick appears under your finger.
           </motion.p>
           <motion.div variants={item} className="mt-6 flex flex-col items-center gap-2">
             <motion.div
@@ -141,22 +141,22 @@ export default function Intro() {
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
             </motion.div>
-            <span className="font-ui text-xs text-muted">اسحب للتحرّك في كل الاتجاهات</span>
+            <span className="font-ui text-xs text-muted">Drag to move in any direction</span>
           </motion.div>
           <motion.div variants={item} className="mt-4 flex items-center gap-2 rounded-pill bg-green-light px-4 py-2 text-center font-ui text-sm font-bold text-black">
-            للدخول إلى مبنى أو التحدّث: اقترب ثم اضغط زر <span className="rounded-full bg-green px-2 py-0.5 text-white">تفاعل</span> الأخضر
+            To enter a building or talk: get close, then press the green <span className="rounded-full bg-green px-2 py-0.5 text-white">Interact</span> button
           </motion.div>
         </>
       ) : (
         <>
-          <motion.p variants={item} className="mt-2 font-body text-base text-charcoal">حرّك شخصيتك بين المباني واكتشف ما تقدّمه.</motion.p>
+          <motion.p variants={item} className="mt-2 font-body text-base text-charcoal">Move your character between the buildings and discover what each offers.</motion.p>
           <motion.div variants={item} className="mt-6 flex items-center justify-center gap-2">
             <Kbd>W</Kbd><Kbd>A</Kbd><Kbd>S</Kbd><Kbd>D</Kbd>
-            <span className="mx-2 font-ui text-sm text-muted">أو</span>
+            <span className="mx-2 font-ui text-sm text-muted">or</span>
             <Kbd>↑</Kbd><Kbd>↓</Kbd><Kbd>←</Kbd><Kbd>→</Kbd>
           </motion.div>
           <motion.div variants={item} className="mt-4 flex items-center gap-2 rounded-pill bg-green-light px-4 py-2 font-ui text-sm font-bold text-black">
-            اقترب من أي مبنى واضغط <Kbd>E</Kbd> للدخول
+            Get close to any building and press <Kbd>E</Kbd> to enter
           </motion.div>
         </>
       )}
@@ -164,8 +164,8 @@ export default function Intro() {
 
     // 2 — Buildings (pseudo-3D showcase of the real buildings)
     <Slide key="buildings">
-      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">المباني الخمسة</motion.h2>
-      <motion.p variants={item} className="mt-1 mb-6 font-body text-base text-charcoal">لكل مبنى دور يدفعك نحو الترقية.</motion.p>
+      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">The five buildings</motion.h2>
+      <motion.p variants={item} className="mt-1 mb-6 font-body text-base text-charcoal">Each building plays a role that drives you toward promotion.</motion.p>
       <div className="grid w-full grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
         {buildingGuides.map((b, k) => (
           <motion.div key={b.id} variants={item} className="flex flex-col items-center text-center">
@@ -182,13 +182,13 @@ export default function Intro() {
     // 3 — Progression
     <Slide key="progress">
       <motion.span variants={item} className="mb-2 text-5xl">📈</motion.span>
-      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">كيف تتقدّم</motion.h2>
+      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">How to progress</motion.h2>
       <motion.div variants={item} className="mt-5 w-full max-w-md space-y-3 text-start">
         {[
-          { c: '#00c17a', t: 'الخبرة (XP)', d: 'تكسبها من التقييمات والمهام، وترفع مستواك.' },
-          { c: '#ffbc0a', t: 'الطاقة', d: 'تنقص مع الإجابات الخاطئة وتتجدّد مع الوقت.' },
-          { c: '#0072f9', t: 'الأوسمة', d: 'مكافآت على إنجازاتك المميّزة.' },
-          { c: '#82003a', t: 'الترقية', d: 'استوفِ عتبة الخبرة ومتطلبات المهارات لتصعد البرج.' },
+          { c: '#00c17a', t: 'XP', d: 'Earn it from assessments and tasks to raise your level.' },
+          { c: '#ffbc0a', t: 'Energy', d: 'Drops with wrong answers and refills over time.' },
+          { c: '#0072f9', t: 'Badges', d: 'Rewards for your standout achievements.' },
+          { c: '#82003a', t: 'Promotion', d: 'Meet the XP threshold and skill requirements to climb the tower.' },
         ].map((r) => (
           <div key={r.t} className="flex items-center gap-3 rounded-lg bg-white p-3 shadow-soft">
             <span className="h-9 w-9 shrink-0 rounded-full" style={{ background: r.c }} />
@@ -203,17 +203,17 @@ export default function Intro() {
 
     // 4 — Tools
     <Slide key="tools">
-      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">أدواتك</motion.h2>
-      <motion.p variants={item} className="mt-1 mb-5 font-body text-base text-charcoal">كل ما تحتاجه على الشاشة دائمًا.</motion.p>
+      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">Your tools</motion.h2>
+      <motion.p variants={item} className="mt-1 mb-5 font-body text-base text-charcoal">Everything you need, always on screen.</motion.p>
       <div className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-3">
         {[
-          { icon: <MapIcon size={20} />, t: 'الخريطة', c: '#00c17a' },
-          { icon: <ListChecks size={20} />, t: 'دليل البداية', c: '#0072f9' },
-          { icon: <BarChart3 size={20} />, t: 'تحليلاتي', c: '#82003a' },
-          { icon: <BookOpen size={20} />, t: 'الدليل', c: '#ffbc0a' },
-          { icon: <Palette size={20} />, t: 'الشخصية (AI)', c: '#ff00b7' },
-          { icon: <ShoppingBag size={20} />, t: 'المتجر', c: '#ffbc0a' },
-          { icon: <TrendingUp size={20} />, t: 'برج الترقيات', c: '#2b2d3f' },
+          { icon: <MapIcon size={20} />, t: 'Map', c: '#00c17a' },
+          { icon: <ListChecks size={20} />, t: 'Getting Started', c: '#0072f9' },
+          { icon: <BarChart3 size={20} />, t: 'My Analytics', c: '#82003a' },
+          { icon: <BookOpen size={20} />, t: 'Guide', c: '#ffbc0a' },
+          { icon: <Palette size={20} />, t: 'Character (AI)', c: '#ff00b7' },
+          { icon: <ShoppingBag size={20} />, t: 'Shop', c: '#ffbc0a' },
+          { icon: <TrendingUp size={20} />, t: 'Promotion Tower', c: '#2b2d3f' },
         ].map((x) => (
           <motion.div key={x.t} variants={item} className="flex flex-col items-center gap-1.5 rounded-lg bg-white p-3 shadow-soft">
             <span className="flex h-11 w-11 items-center justify-center rounded-md text-white" style={{ background: x.c }}>{x.icon}</span>
@@ -225,20 +225,20 @@ export default function Intro() {
 
     // 5 — Do / Don't
     <Slide key="dos">
-      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">افعل · تجنّب</motion.h2>
+      <motion.h2 variants={item} className="font-display text-4xl font-black text-black">Do · Avoid</motion.h2>
       <div className="mt-5 grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
         <motion.div variants={item} className="rounded-lg p-4 text-start" style={{ background: 'var(--color-green-light)' }}>
-          <p className="mb-2 flex items-center gap-1.5 font-display text-lg font-black text-black"><Check size={18} className="text-green" /> افعل</p>
+          <p className="mb-2 flex items-center gap-1.5 font-display text-lg font-black text-black"><Check size={18} className="text-green" /> Do</p>
           <ul className="space-y-1.5 font-ui text-[13px] text-charcoal">
-            {['أكمل التقييمات بانتظام', 'نوّع بين المهارات', 'تابع «تحليلاتي» لخطوتك التالية', 'أكمل المهام لكسب الأوسمة'].map((t) => (
+            {['Complete assessments regularly', 'Mix up your skills', 'Check "My Analytics" for your next step', 'Complete tasks to earn badges'].map((t) => (
               <li key={t} className="flex items-start gap-1.5"><Check size={14} className="mt-0.5 shrink-0 text-green" />{t}</li>
             ))}
           </ul>
         </motion.div>
         <motion.div variants={item} className="rounded-lg p-4 text-start" style={{ background: 'var(--color-blush)' }}>
-          <p className="mb-2 flex items-center gap-1.5 font-display text-lg font-black text-black"><X size={18} className="text-red" /> تجنّب</p>
+          <p className="mb-2 flex items-center gap-1.5 font-display text-lg font-black text-black"><X size={18} className="text-red" /> Avoid</p>
           <ul className="space-y-1.5 font-ui text-[13px] text-charcoal">
-            {['إهمال طاقتك في النزالات', 'طلب الترقية قبل استيفاء المتطلبات', 'التركيز على مهارة واحدة', 'تجاهل المهارات الضعيفة'].map((t) => (
+            {['Neglecting your energy in battles', 'Requesting a promotion before meeting the requirements', 'Focusing on a single skill', 'Ignoring your weak skills'].map((t) => (
               <li key={t} className="flex items-start gap-1.5"><X size={14} className="mt-0.5 shrink-0 text-red" />{t}</li>
             ))}
           </ul>
@@ -257,8 +257,8 @@ export default function Intro() {
         animate={{ x: [0, 12, 0], opacity: 1 }}
         transition={{ x: { repeat: Infinity, duration: 1.2 }, opacity: { duration: 0.4 } }}
       />
-      <motion.h2 variants={item} className="font-display text-5xl font-black text-black">هيّا نبدأ!</motion.h2>
-      <motion.p variants={item} className="mt-2 font-body text-lg text-charcoal">عالم <b>باور</b> بانتظارك. تطوّر، تنافس، وارتقِ إلى القمّة.</motion.p>
+      <motion.h2 variants={item} className="font-display text-5xl font-black text-black">Let's go!</motion.h2>
+      <motion.p variants={item} className="mt-2 font-body text-lg text-charcoal">The world of <b>POWR</b> awaits you. Develop, compete, and rise to the top.</motion.p>
     </Slide>,
   ];
 
@@ -309,10 +309,10 @@ export default function Intro() {
       <div className="flex items-center justify-between p-5">
         <div className="flex items-center gap-2">
           <img src="/logo/powr-mark.svg" alt="POWR" className="h-8 w-8" />
-          <span className="font-display text-lg font-bold text-black">باور</span>
+          <span className="font-display text-lg font-bold text-black">POWR</span>
         </div>
         <button onClick={finishIntro} className="rounded-pill px-4 py-1.5 font-ui text-sm font-bold text-muted transition hover:text-black">
-          تخطّي
+          Skip
         </button>
       </div>
 
@@ -353,7 +353,7 @@ export default function Intro() {
           disabled={i === 0}
           className="flex items-center gap-1 rounded-pill bg-white px-4 py-2.5 font-ui text-sm font-bold text-charcoal shadow-soft transition disabled:opacity-0"
         >
-          <ArrowRight size={16} /> السابق
+          <ArrowRight size={16} /> Previous
         </button>
 
         <div className="flex items-center gap-2">
@@ -377,14 +377,14 @@ export default function Intro() {
             whileTap={{ scale: 0.97 }}
             className="rounded-pill bg-green px-7 py-3 font-ui text-base font-bold text-white shadow-card"
           >
-            ابدأ رحلتك
+            Start your journey
           </motion.button>
         ) : (
           <button
             onClick={() => setI((n) => Math.min(last, n + 1))}
             className="flex items-center gap-1 rounded-pill bg-black px-5 py-2.5 font-ui text-sm font-bold text-white shadow-card"
           >
-            التالي <ArrowLeft size={16} />
+            Next <ArrowLeft size={16} />
           </button>
         )}
       </div>

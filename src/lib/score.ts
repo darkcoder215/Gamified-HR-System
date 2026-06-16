@@ -8,9 +8,9 @@ export function scoreColor(pct: number): string {
 }
 
 export function scoreLabel(pct: number): string {
-  if (pct >= 85) return 'ممتاز';
-  if (pct >= 70) return 'جيد';
-  if (pct >= 50) return 'متوسط';
-  if (pct >= 30) return 'دون المتوسط';
-  return 'يحتاج تطويرًا';
+  if (pct >= 85) return 'Excellent';
+  if (pct >= 70) return 'Good';
+  if (pct >= 50) return 'Average';
+  if (pct >= 30) return 'Below Average';
+  return 'Needs Improvement';
 }

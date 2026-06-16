@@ -54,16 +54,16 @@ export default function AuthScreen() {
         className="relative z-10 w-full max-w-md rounded-xl bg-off-white p-8 text-center shadow-float"
       >
         <img src="/logo/made-in-powr.svg" alt="made in POWR" className="mx-auto mb-4 h-12 w-auto" />
-        <h1 className="font-display text-3xl font-black text-black">رحلة التطوّر</h1>
-        <p className="mt-1 font-body text-sm text-charcoal">منصّة <b>باور</b> لتطوير الموظفين وتقييمهم وترقيتهم</p>
+        <h1 className="font-display text-3xl font-black text-black">The Growth Journey</h1>
+        <p className="mt-1 font-body text-sm text-charcoal"><b>POWR</b> — the platform for developing, assessing, and promoting employees</p>
 
         {confirm ? (
           <div className="mt-6 rounded-lg bg-green-light p-5 text-center">
             <CheckCircle2 size={32} className="mx-auto mb-2 text-green" />
-            <p className="font-display text-lg font-black text-black">تحقّق من بريدك</p>
-            <p className="mt-1 font-ui text-sm text-charcoal">أرسلنا رابط تأكيد إلى <span className="num" dir="ltr">{email}</span>. فعّل حسابك ثم سجّل الدخول.</p>
+            <p className="font-display text-lg font-black text-black">Check your email</p>
+            <p className="mt-1 font-ui text-sm text-charcoal">We sent a confirmation link to <span className="num" dir="ltr">{email}</span>. Activate your account, then log in.</p>
             <button onClick={() => { setConfirm(false); setMode('login'); }} className="mt-4 rounded-pill bg-black px-5 py-2 font-ui text-sm font-bold text-white">
-              العودة لتسجيل الدخول
+              Back to log in
             </button>
           </div>
         ) : (
@@ -77,17 +77,17 @@ export default function AuthScreen() {
                   style={{ color: mode === m ? '#fff' : 'var(--color-muted)' }}
                 >
                   {mode === m && <motion.div layoutId="auth-tab" className="absolute inset-0 rounded-pill bg-black" />}
-                  <span className="relative z-10">{m === 'login' ? 'تسجيل الدخول' : 'حساب جديد'}</span>
+                  <span className="relative z-10">{m === 'login' ? 'Log in' : 'Sign up'}</span>
                 </button>
               ))}
             </div>
 
             <form onSubmit={submit} className="space-y-3 text-start">
               {mode === 'register' && (
-                <Field icon={<User size={16} />} placeholder="الاسم الكامل" value={name} onChange={setName} type="text" />
+                <Field icon={<User size={16} />} placeholder="Full name" value={name} onChange={setName} type="text" />
               )}
-              <Field icon={<Mail size={16} />} placeholder="البريد الإلكتروني" value={email} onChange={setEmail} type="email" dir="ltr" />
-              <Field icon={<Lock size={16} />} placeholder="كلمة المرور" value={password} onChange={setPassword} type="password" dir="ltr" />
+              <Field icon={<Mail size={16} />} placeholder="Email" value={email} onChange={setEmail} type="email" dir="ltr" />
+              <Field icon={<Lock size={16} />} placeholder="Password" value={password} onChange={setPassword} type="password" dir="ltr" />
 
               {error && <p className="rounded-lg bg-blush px-3 py-2 font-ui text-xs font-bold text-red" style={{ background: 'var(--color-blush)' }}>{error}</p>}
 
@@ -97,10 +97,10 @@ export default function AuthScreen() {
                 whileTap={{ scale: 0.97 }}
                 className="flex w-full items-center justify-center gap-2 rounded-pill bg-green py-3.5 font-ui text-base font-bold text-white shadow-card disabled:opacity-60"
               >
-                {loading ? <Loader2 size={18} className="animate-spin" /> : mode === 'login' ? 'دخول' : 'إنشاء الحساب'}
+                {loading ? <Loader2 size={18} className="animate-spin" /> : mode === 'login' ? 'Log in' : 'Create account'}
               </motion.button>
             </form>
-            <p className="mt-4 font-ui text-[11px] text-muted">التسجيل متاح ببريد الشركة المعتمد فقط.</p>
+            <p className="mt-4 font-ui text-[11px] text-muted">Registration is only available with an approved company email.</p>
           </>
         )}
       </motion.div>

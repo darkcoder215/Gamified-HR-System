@@ -77,7 +77,7 @@ export default function Celebrations() {
             >
               <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 1.2, repeat: Infinity }}><PetSprite id={pet.id} size={56} /></motion.div>
               <div className="text-start">
-                <p className="font-ui text-xs font-bold text-white/80">🎉 رفيق جديد انضمّ إليك!</p>
+                <p className="font-ui text-xs font-bold text-white/80">🎉 A new companion has joined you!</p>
                 <p className="font-display text-2xl font-black">{pet.nameAr}</p>
               </div>
             </motion.div>
@@ -103,7 +103,7 @@ export default function Celebrations() {
             >
               <span className="text-4xl">{zone.glyph}</span>
               <div className="text-start">
-                <p className="font-ui text-xs font-bold text-white/80">🎉 فُتح حيٌّ جديد!</p>
+                <p className="font-ui text-xs font-bold text-white/80">🎉 A new district has unlocked!</p>
                 <p className="font-display text-2xl font-black">{zone.nameAr}</p>
                 <p className="font-ui text-[11px] text-white/80">{zone.descAr}</p>
               </div>
@@ -134,9 +134,9 @@ export default function Celebrations() {
               animate={{ scale: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 220, damping: 14 }}
             >
-              <span className="font-ui text-lg font-bold text-green">أحسنت!</span>
+              <span className="font-ui text-lg font-bold text-green">Well done!</span>
               <h2 className="font-display text-5xl font-black text-black drop-shadow">
-                ترقّيت إلى المستوى <NumberText value={levelUp} />
+                You advanced to Level <NumberText value={levelUp} />
               </h2>
             </motion.div>
           </motion.div>
@@ -162,7 +162,7 @@ export default function Celebrations() {
                 {current.icon}
               </div>
               <div>
-                <p className="font-ui text-xs font-bold text-green">وسام جديد!</p>
+                <p className="font-ui text-xs font-bold text-green">New badge!</p>
                 <p className="font-display text-xl font-black text-black">{current.nameAr}</p>
                 <p className="font-ui text-xs text-muted">{current.descAr}</p>
               </div>

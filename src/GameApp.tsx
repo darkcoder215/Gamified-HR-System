@@ -113,7 +113,7 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
       <Suspense
         fallback={
           <div className="flex h-full w-full items-center justify-center bg-off-white">
-            <p className="animate-pulse font-display text-2xl font-black text-green">جارٍ تحميل العالم…</p>
+            <p className="animate-pulse font-display text-2xl font-black text-green">Loading the world…</p>
           </div>
         }
       >
@@ -133,7 +133,7 @@ export default function GameApp({ backend, onExit, signOut, userId }: Props) {
       {backend && (
         <div className="pointer-events-none fixed bottom-2 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5">
           <button onClick={openNotif} className="pointer-events-auto relative flex items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-charcoal shadow-card">
-            <Bell size={14} /> الإشعارات
+            <Bell size={14} /> Notifications
             {unread > 0 && <span className="num absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">{unread}</span>}
           </button>
           <button onClick={openInbox} className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white px-3 py-1.5 font-ui text-xs font-bold text-blue shadow-card"><Inbox size={14} /> مهامي</button>

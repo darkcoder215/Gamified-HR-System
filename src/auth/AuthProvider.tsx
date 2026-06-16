@@ -17,11 +17,11 @@ const Ctx = createContext<AuthCtx>(null as unknown as AuthCtx);
 export const useAuth = () => useContext(Ctx);
 
 function mapError(msg: string): string {
-  if (msg.includes('EMAIL_DOMAIN_NOT_ALLOWED')) return 'هذا البريد غير مسموح به. استخدم بريد الشركة المعتمد.';
-  if (msg.includes('Invalid login credentials')) return 'بريد إلكتروني أو كلمة مرور غير صحيحة.';
-  if (msg.includes('already registered') || msg.includes('already been registered')) return 'هذا البريد مسجّل بالفعل، سجّل الدخول.';
-  if (msg.toLowerCase().includes('password')) return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.';
-  return 'حدث خطأ، حاول مرة أخرى.';
+  if (msg.includes('EMAIL_DOMAIN_NOT_ALLOWED')) return 'This email is not allowed. Use your approved company email.';
+  if (msg.includes('Invalid login credentials')) return 'Incorrect email or password.';
+  if (msg.includes('already registered') || msg.includes('already been registered')) return 'This email is already registered, please log in.';
+  if (msg.toLowerCase().includes('password')) return 'Password must be at least 6 characters.';
+  return 'Something went wrong, please try again.';
 }
 
 export default function AuthProvider({ children }: { children: ReactNode }) {

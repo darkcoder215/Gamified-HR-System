@@ -17,7 +17,7 @@ export default function Toast() {
     const onLocked = (p: { stationId: string }) => {
       const z = zoneForStation(p.stationId as never);
       sfx('wrong');
-      setMsg({ kind: 'locked', text: z ? `«${z.nameAr}» مغلق — يفتح عند المستوى` : 'هذا المكان مغلق حاليًا', level: z?.unlockLevel });
+      setMsg({ kind: 'locked', text: z ? `"${z.nameAr}" is locked — unlocks at Level` : 'This place is currently locked', level: z?.unlockLevel });
       window.setTimeout(() => setMsg(null), 2600);
     };
     const onReward = (p: { text: string }) => {

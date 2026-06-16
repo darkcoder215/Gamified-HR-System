@@ -14,7 +14,7 @@ export default function GuideModal() {
   return (
     <div>
       <div className="mb-5 flex gap-2 rounded-pill bg-warm-gray p-1">
-        {([['buildings', 'المباني', Building2], ['howto', 'طريقة اللعب', Gamepad2]] as const).map(
+        {([['buildings', 'Buildings', Building2], ['howto', 'How to Play', Gamepad2]] as const).map(
           ([id, label, Icon]) => (
             <button
               key={id}
@@ -34,8 +34,8 @@ export default function GuideModal() {
       {tab === 'buildings' && (
         <div className="space-y-3">
           <p className="font-body text-sm text-charcoal">
-            تجوّل في عالم <span className="highlight">باور</span> وزُر المباني الخمسة — لكل مبنى دور يساعدك على
-            التطوّر والترقية:
+            Explore the <span className="highlight">POWR</span> world and visit the five buildings — each one plays a role that helps you
+            develop and get promoted:
           </p>
           {buildingGuides.map((b, i) => (
             <motion.div
@@ -67,32 +67,32 @@ export default function GuideModal() {
       {tab === 'howto' && (
         <div className="space-y-4">
           <div className="rounded-lg bg-white p-4 shadow-soft">
-            <h3 className="mb-2 font-display text-lg font-black text-black">الهدف</h3>
+            <h3 className="mb-2 font-display text-lg font-black text-black">The Goal</h3>
             <p className="font-body text-sm leading-relaxed text-charcoal">
-              طوّر مهاراتك عبر التقييمات والمهام، اجمع الخبرة لرفع مستواك، واستوفِ متطلبات كل رتبة لتتسلّق
-              <span className="highlight">سلّم الترقيات</span> حتى القيادة.
+              Develop your skills through assessments and quests, earn XP to raise your Level, and meet each rank's requirements to climb the
+              <span className="highlight">Promotion Track</span> all the way to leadership.
             </p>
           </div>
           <div className="rounded-lg bg-white p-4 shadow-soft">
-            <h3 className="mb-3 font-display text-lg font-black text-black">التحكّم</h3>
+            <h3 className="mb-3 font-display text-lg font-black text-black">Controls</h3>
             <ul className="space-y-2 font-ui text-sm text-charcoal">
               <li className="flex items-center gap-2">
                 <span className="rounded-md bg-warm-gray px-2 py-1 font-bold"><span className="num">WASD</span></span>
-                أو مفاتيح الأسهم للتحرّك في العالم
+                or the arrow keys to move around the world
               </li>
               <li className="flex items-center gap-2">
                 <span className="rounded-md bg-warm-gray px-2 py-1 font-bold"><span className="num">E</span></span>
-                للدخول إلى المبنى عند الاقتراب منه
+                to enter a building when you're close to it
               </li>
               <li className="flex items-center gap-2">
                 <span className="rounded-md bg-warm-gray px-2 py-1"><ArrowDownLeft size={15} /></span>
-                على الجوال: استخدم عصا التحكّم وزر التفاعل
+                On mobile: use the joystick and the interact button
               </li>
             </ul>
           </div>
           <div className="rounded-lg p-4" style={{ background: 'var(--color-green-light)' }}>
             <p className="font-ui text-sm font-bold text-black">
-              💡 تابع «دليل البداية» أسفل الشاشة لإكمال خطواتك الأولى، وافتح «تحليلاتي» لمعرفة أين تقف وما خطوتك التالية.
+              💡 Follow the "Getting Started Guide" at the bottom of the screen to complete your first steps, and open "My Analytics" to see where you stand and what your next step is.
             </p>
           </div>
           <button
@@ -102,7 +102,7 @@ export default function GuideModal() {
             }}
             className="flex w-full items-center justify-center gap-2 rounded-pill bg-black py-3 font-ui text-sm font-bold text-white transition hover:opacity-90"
           >
-            <PlayCircle size={16} /> شاهد المقدّمة من جديد
+            <PlayCircle size={16} /> Watch the intro again
           </button>
         </div>
       )}

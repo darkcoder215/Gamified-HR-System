@@ -24,8 +24,8 @@ export default function MiniMap() {
     <div className="pointer-events-none fixed bottom-4 left-4 z-20 sm:left-auto sm:right-4">
       <div className="rounded-xl bg-white p-1.5 shadow-card sm:p-2">
         <div className="mb-1 hidden items-center justify-between px-0.5 sm:flex">
-          <span className="font-ui text-[11px] font-bold text-charcoal">الخريطة</span>
-          <span className="num font-ui text-[10px] text-muted">باور</span>
+          <span className="font-ui text-[11px] font-bold text-charcoal">Map</span>
+          <span className="num font-ui text-[10px] text-muted">POWR</span>
         </div>
         <div className="relative overflow-hidden rounded-lg" style={{ width: SIZE, height: SIZE }} dir="ltr">
           <img

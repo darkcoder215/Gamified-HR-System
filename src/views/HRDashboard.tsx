@@ -6,11 +6,11 @@ import type { Profile, Role, RequestRow } from '@/lib/dbTypes';
 import DashShell from './DashShell';
 
 const ROLES: { id: Role; label: string }[] = [
-  { id: 'employee', label: 'موظف' },
-  { id: 'manager', label: 'مدير' },
-  { id: 'hr_admin', label: 'موارد بشرية' },
+  { id: 'employee', label: 'Employee' },
+  { id: 'manager', label: 'Manager' },
+  { id: 'hr_admin', label: 'HR' },
 ];
-const REQ_LABEL: Record<string, string> = { sick_leave: 'إجازة مرضية', holiday: 'إجازة', remote: 'عمل عن بُعد', question: 'سؤال', other: 'أخرى' };
+const REQ_LABEL: Record<string, string> = { sick_leave: 'Sick leave', holiday: 'Leave', remote: 'Remote work', question: 'Question', other: 'Other' };
 
 export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
   const { session, profile, signOut } = useAuth();
@@ -40,7 +40,7 @@ export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
   const broadcast = async () => {
     if (!annTitle.trim()) return;
     const { data } = await supabase.rpc('broadcast_announcement', { p_title: annTitle.trim(), p_body: annBody.trim() || null });
-    setAnnMsg(`أُرسل الإعلان إلى ${data ?? 0} موظفًا.`);
+    setAnnMsg(`Announcement sent to ${data ?? 0} employees.`);
     setAnnTitle(''); setAnnBody('');
     window.setTimeout(() => setAnnMsg(''), 4000);
   };
@@ -65,7 +65,7 @@ export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
   people.forEach((p) => { counts[p.role]++; });
 
   return (
-    <DashShell title="لوحة الموارد البشرية" role="hr_admin" name={profile?.full_name ?? ''} onPlay={onPlay} signOut={signOut}>
+    <DashShell title="HR Dashboard" role="hr_admin" name={profile?.full_name ?? ''} onPlay={onPlay} signOut={signOut}>
       <div className="mb-6 grid grid-cols-3 gap-3">
         {ROLES.map((r) => (
           <div key={r.id} className="rounded-lg bg-white p-3 text-center shadow-soft">
@@ -77,30 +77,30 @@ export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <section className="rounded-lg bg-white p-4 shadow-soft">
-          <h2 className="mb-2 flex items-center gap-2 font-display text-base font-black text-black"><Megaphone size={18} className="text-blue" /> إعلان عام</h2>
-          <input value={annTitle} onChange={(e) => setAnnTitle(e.target.value)} placeholder="عنوان الإعلان" className="mb-2 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
-          <textarea value={annBody} onChange={(e) => setAnnBody(e.target.value)} placeholder="نص الإعلان (اختياري)" rows={2} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
-          <button onClick={broadcast} className="mt-2 flex items-center gap-1.5 rounded-pill bg-blue px-4 py-2 font-ui text-sm font-bold text-white"><Send size={14} /> إرسال للجميع</button>
+          <h2 className="mb-2 flex items-center gap-2 font-display text-base font-black text-black"><Megaphone size={18} className="text-blue" /> Company Announcement</h2>
+          <input value={annTitle} onChange={(e) => setAnnTitle(e.target.value)} placeholder="Announcement title" className="mb-2 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+          <textarea value={annBody} onChange={(e) => setAnnBody(e.target.value)} placeholder="Announcement body (optional)" rows={2} className="w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
+          <button onClick={broadcast} className="mt-2 flex items-center gap-1.5 rounded-pill bg-blue px-4 py-2 font-ui text-sm font-bold text-white"><Send size={14} /> Send to everyone</button>
           {annMsg && <p className="mt-2 font-ui text-xs font-bold text-green">{annMsg}</p>}
         </section>
         <section className="rounded-lg bg-white p-4 shadow-soft">
-          <h2 className="mb-2 flex items-center gap-2 font-display text-base font-black text-black"><Settings2 size={18} className="text-amber" /> إعدادات التسجيل</h2>
-          <label className="font-ui text-xs text-muted">النطاقات المسموحة (مفصولة بفواصل)
+          <h2 className="mb-2 flex items-center gap-2 font-display text-base font-black text-black"><Settings2 size={18} className="text-amber" /> Sign-up Settings</h2>
+          <label className="font-ui text-xs text-muted">Allowed domains (comma-separated)
             <input value={domains} onChange={(e) => setDomains(e.target.value)} dir="ltr" className="num mt-1 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
           </label>
-          <label className="mt-2 block font-ui text-xs text-muted">بريد مسموح إضافي (مفصول بفواصل)
+          <label className="mt-2 block font-ui text-xs text-muted">Additional allowed emails (comma-separated)
             <input value={emails} onChange={(e) => setEmails(e.target.value)} dir="ltr" className="num mt-1 w-full rounded-lg border border-warm-gray px-3 py-2 font-ui text-sm" />
           </label>
-          <button onClick={saveSettings} className="mt-2 flex items-center gap-1.5 rounded-pill bg-black px-4 py-2 font-ui text-sm font-bold text-white"><Save size={14} /> حفظ</button>
+          <button onClick={saveSettings} className="mt-2 flex items-center gap-1.5 rounded-pill bg-black px-4 py-2 font-ui text-sm font-bold text-white"><Save size={14} /> Save</button>
         </section>
       </div>
 
       <section className="mb-8">
-        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><Users size={20} className="text-green" /> الموظفون</h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><Users size={20} className="text-green" /> Employees</h2>
         <div className="overflow-hidden rounded-lg bg-white shadow-soft">
           {people.map((p, i) => (
             <div key={p.id} className="flex flex-wrap items-center gap-3 p-3" style={{ background: i % 2 ? 'var(--color-off-white)' : '#fff' }}>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-black text-white" style={{ background: p.avatar_color ?? '#00c17a' }}>{(p.full_name ?? '؟').charAt(0)}</div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-black text-white" style={{ background: p.avatar_color ?? '#00c17a' }}>{(p.full_name ?? '?').charAt(0)}</div>
               <div className="min-w-[120px] flex-1">
                 <p className="font-ui text-sm font-bold text-black">{p.full_name}</p>
                 <p className="num font-ui text-[11px] text-muted" dir="ltr">{p.email}</p>
@@ -109,7 +109,7 @@ export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
                 {ROLES.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
               </select>
               <select value={p.manager_id ?? ''} onChange={(e) => setManager(p.id, e.target.value)} className="rounded-lg border border-warm-gray px-2 py-1.5 font-ui text-xs">
-                <option value="">— المدير —</option>
+                <option value="">— Manager —</option>
                 {managers.filter((m) => m.id !== p.id).map((m) => <option key={m.id} value={m.id}>{m.full_name}</option>)}
               </select>
             </div>
@@ -118,9 +118,9 @@ export default function HRDashboard({ onPlay }: { onPlay: () => void }) {
       </section>
 
       <section>
-        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><ShieldCheck size={20} className="text-amber" /> طلبات معلّقة <span className="num text-muted">({reqs.length})</span></h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-black text-black"><ShieldCheck size={20} className="text-amber" /> Pending requests <span className="num text-muted">({reqs.length})</span></h2>
         {reqs.length === 0 ? (
-          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">لا توجد طلبات معلّقة.</p>
+          <p className="rounded-lg bg-white p-4 font-ui text-sm text-muted shadow-soft">No pending requests.</p>
         ) : (
           <div className="space-y-2">
             {reqs.map((r) => (

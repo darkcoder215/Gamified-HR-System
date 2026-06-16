@@ -51,7 +51,7 @@ export default function LeaderboardHall() {
   return (
     <div>
       <div className="mb-5 flex gap-2 rounded-pill bg-warm-gray p-1">
-        {([['ranking', 'الترتيب', Trophy], ['badges', 'الأوسمة', Award]] as const).map(([id, label, Icon]) => (
+        {([['ranking', 'Ranking', Trophy], ['badges', 'Badges', Award]] as const).map(([id, label, Icon]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -95,13 +95,13 @@ export default function LeaderboardHall() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-ui text-sm font-bold text-black">
-                    {r.nameAr} {r.isPlayer && <span className="rounded-pill bg-green px-2 py-0.5 text-[10px] text-white">أنت</span>}
+                    {r.nameAr} {r.isPlayer && <span className="rounded-pill bg-green px-2 py-0.5 text-[10px] text-white">You</span>}
                   </p>
                   <p className="font-ui text-xs text-muted">{r.titleAr}</p>
                 </div>
                 <div className="text-end">
                   <p className="font-display text-base font-black text-black"><NumberText value={r.xp} group /></p>
-                  <p className="font-ui text-[10px] text-muted">المستوى <NumberText value={r.level} /></p>
+                  <p className="font-ui text-[10px] text-muted">Level <NumberText value={r.level} /></p>
                 </div>
               </motion.div>
             );
@@ -127,7 +127,7 @@ export default function LeaderboardHall() {
                 </div>
                 <p className="mt-2 font-ui text-sm font-bold text-black">{b.nameAr}</p>
                 <p className="font-ui text-[11px] text-muted">{b.descAr}</p>
-                {unlocked && <span className="mt-1 font-ui text-[10px] font-bold text-green">✓ مفتوح</span>}
+                {unlocked && <span className="mt-1 font-ui text-[10px] font-bold text-green">✓ Unlocked</span>}
               </motion.div>
             );
           })}
